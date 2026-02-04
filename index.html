@@ -3,35 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>청개구리 소음진단 AI (PRO)</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <title>청개구리 소음진단 AI (Expert Pro)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
     <style>
         :root {
-            /* [NEW] 산업용 정밀 진단 디자인 팔레트 */
-            --primary-dark: #263238;       /* 티타늄 다크 그레이 (헤더) */
-            --primary-main: #37474f;       /* 슬레이트 그레이 */
-            --accent-color: #ff6f00;       /* 세이프티 오렌지 (강조) */
-            --bg-color: #eceff1;           /* 차분한 쿨 그레이 배경 */
-            --card-bg: #ffffff;            
-            --text-primary: #212121;       
-            --text-secondary: #546e7a;     
-            --border-color: #cfd8dc;       
-            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.15); /* 조금 더 진한 그림자 */
+            /* [THEME] Professional Tech & Trust */
+            --bg-color: #eef2f6;              
+            --card-bg: #ffffff;
+            
+            --primary-dark: #1a233a;          
+            --primary-main: #2563eb;          
+            --primary-soft: #eff6ff;
+            
+            --accent-color: #00c853;          
+            --accent-gradient: linear-gradient(135deg, #00e676, #00c853);
+            
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            
+            --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+            --shadow-3d-btn: 0 4px 0 #1565c0;
         }
 
         body {
-            font-family: 'Noto Sans KR', sans-serif;
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-primary);
             margin: 0;
-            padding: 20px 0;
-            line-height: 1.6;
+            padding: 10px 0;
+            line-height: 1.4;
             display: flex;
             justify-content: center;
             align-items: flex-start;
@@ -40,259 +45,335 @@
 
         .mobile-container {
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
             background-color: var(--card-bg);
             box-shadow: var(--shadow-soft);
             overflow: hidden;
-            border-radius: 20px; /* 더 단단한 느낌의 곡률 */
-            margin: 0 10px;
+            border-radius: 20px;
+            margin: 0 5px;
             position: relative;
-            border-top: 5px solid var(--accent-color); /* 상단 오렌지 포인트 라인 */
+            border: 1px solid rgba(255,255,255,0.8);
         }
 
         .main-header {
-            background-color: var(--primary-dark);
+            background: linear-gradient(135deg, #1a233a 0%, #0d1b2a 100%);
             color: white;
-            padding: 1.5rem 1.2rem;
+            padding: 12px 15px;
             text-align: center;
             position: relative;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            box-shadow: 0 5px 15px rgba(26, 35, 58, 0.2);
+            z-index: 10;
         }
 
         .main-header h1 {
             margin: 0;
-            font-size: 1.25rem;
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            white-space: nowrap;
-        }
-
-        .main-header h1 i { margin-right: 8px; color: var(--accent-color); }
-
-        .version-wrapper {
-            display: flex;
-            justify-content: flex-end;
-            width: 100%;
-            margin-top: 8px;
-        }
-
-        .version-badge {
-            background-color: var(--accent-color);
-            color: #fff;
-            padding: 3px 12px;
-            border-radius: 4px; /* 사각 배지로 변경 (전문성 강조) */
-            font-size: 0.7rem;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-        }
-
-        .content { padding: 24px; background-color: #fff; }
-
-        .section {
-            background-color: #fff;
-            padding: 0;
-            margin-bottom: 35px;
-            border: none;
-        }
-
-        .section-title {
-            font-weight: 800;
-            color: var(--primary-dark);
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
             font-size: 1.1rem;
-            border-left: 5px solid var(--accent-color); /* 좌측 오렌지 바 */
-            padding-left: 12px;
-            background-color: #f5f5f5;
-            padding-top: 8px;
-            padding-bottom: 8px;
-            border-radius: 0 8px 8px 0;
+            font-weight: 800; 
+            letter-spacing: -0.5px;
+            display: flex; align-items: center; justify-content: center;
+            line-height: 1.2; white-space: nowrap;
         }
 
-        .section-title i { margin-right: 10px; color: var(--primary-main); }
-
-        .input-group { margin-bottom: 16px; }
+        .main-header h1 i.frog-icon { margin-right: 6px; color: #00e676; font-size: 1.2rem; filter: drop-shadow(0 0 5px rgba(0,230,118,0.4)); }
         
+        .version-badge {
+            background: rgba(255, 255, 255, 0.1);
+            color: #94a3b8;
+            padding: 2px 8px; border-radius: 20px;
+            font-size: 0.6rem; font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: inline-block; margin-top: 5px;
+            cursor: pointer;
+        }
+        .version-badge.dev-active {
+            background-color: #7c4dff !important; color: white !important;
+            box-shadow: 0 0 10px rgba(124, 77, 255, 0.6);
+            border: 1px solid #b388ff;
+        }
+
+        .content { 
+            padding: 15px 10px;
+            background-color: #fff; 
+        }
+        
+        .section { 
+            margin-bottom: 12px;
+            border-bottom: 1px dashed #e2e8f0; 
+            padding-bottom: 12px; 
+        }
+        .section:last-child { border-bottom: none; }
+        
+        .section-title {
+            font-weight: 800; color: var(--primary-dark); margin-bottom: 10px; 
+            display: flex; align-items: center; font-size: 0.95rem;
+            letter-spacing: -0.5px;
+        }
+        .section-title i { 
+            margin-right: 8px; 
+            color: white;
+            background: var(--primary-main);
+            width: 24px; height: 24px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+            box-shadow: 0 3px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        /* 기본정보 그리드 */
+        .info-grid-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.2fr 1.6fr; 
+            gap: 4px; 
+            align-items: end;
+            margin-bottom: 8px;
+        }
         .input-label { 
-            display: block; 
-            font-weight: 700; 
-            margin-bottom: 8px; 
-            color: var(--text-primary); 
-            font-size: 0.9rem;
-        }
-
-        input[type="text"], input[type="number"], textarea, input[type="file"] {
-            width: 100%;
-            padding: 14px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            background-color: #fafafa;
-            font-size: 1rem;
-            box-sizing: border-box; 
-            transition: all 0.3s ease;
-            color: var(--text-primary);
-            font-weight: 500;
-        }
-
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            background-color: #fff;
-        }
-
-        textarea { resize: none; height: 100px; }
-
-        .row-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            background-color: #fafafa;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #eee;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            transition: all 0.2s;
-        }
-
-        .checkbox-label:hover { border-color: var(--accent-color); background-color: #fff3e0; }
-        .checkbox-label input { margin-right: 10px; accent-color: var(--accent-color); transform: scale(1.1); }
-
-        .photo-stack { display: flex; flex-direction: column; gap: 16px; }
-
-        .upload-box {
-            border: 2px dashed #b0bec5;
-            background-color: #fafafa;
-            border-radius: 12px;
-            width: 100%;
-            aspect-ratio: 4 / 3; 
+            display: block; font-weight: 700; margin-bottom: 4px; 
+            color: var(--text-secondary); font-size: 0.75rem; 
             text-align: center;
-            color: #78909c;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease;
-            box-sizing: border-box;
-            position: relative;
-            overflow: hidden;
         }
 
-        .upload-box:hover { 
-            border-color: var(--accent-color); 
-            background-color: #fff3e0; 
-            color: var(--accent-color);
+        input[type="text"], textarea {
+            width: 100%; 
+            padding: 8px 4px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px; background-color: #f8fafc;
+            font-size: 0.85rem; box-sizing: border-box; 
+            color: var(--text-primary); font-weight: 600;
+            text-align: center; letter-spacing: -0.3px;
+            transition: all 0.3s;
         }
-
-        .upload-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.8; }
-        .upload-text-main { font-size: 1rem; font-weight: 700; }
-        .upload-text-sub { font-size: 0.8rem; font-weight: 400; opacity: 0.8; }
-        .file-input { display: none; }
         
-        .preview-img {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: none;
+        input::placeholder, textarea::placeholder { color: #b0bec5; font-weight: 400; }
+
+        input:focus, textarea:focus { 
+            border-color: var(--primary-main); background-color: #fff; 
+            outline: none; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); 
         }
+        #location, #defect-content { text-align: left; padding-left: 8px; }
+        textarea { resize: none; height: 60px; font-weight: normal; line-height: 1.4; padding: 8px; }
+
+        /* 소음 분류 체크박스 스타일 */
+        .noise-type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 5px;
+        }
+        .noise-checkbox-wrapper {
+            position: relative;
+            height: 100%;
+        }
+        .noise-checkbox-wrapper input[type="checkbox"] {
+            display: none;
+        }
+        .noise-checkbox-label {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 8px 2px;
+            height: 65px;
+            background: #fff; border: 1px solid #cbd5e1;
+            border-radius: 10px; cursor: pointer;
+            transition: all 0.15s; 
+            position: relative;
+        }
+        .noise-checkbox-label i.main-icon { 
+            font-size: 1.1rem;
+            margin-bottom: 4px; color: #94a3b8; 
+        }
+        .noise-checkbox-label span { 
+            font-size: 0.7rem;
+            font-weight: 700; color: #64748b; letter-spacing: -0.5px; line-height: 1.1;
+        }
+
+        .check-indicator {
+            position: absolute; top: 4px; right: 4px;
+            width: 14px; height: 14px; border-radius: 50%;
+            border: 1px solid #cbd5e1; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 8px; color: white;
+        }
+
+        .noise-checkbox-wrapper input:checked + .noise-checkbox-label {
+            background: #eff6ff; border-color: var(--primary-main);
+            box-shadow: 0 2px 5px rgba(37, 99, 235, 0.15);
+        }
+        .noise-checkbox-wrapper input:checked + .noise-checkbox-label i.main-icon { color: var(--primary-main); }
+        .noise-checkbox-wrapper input:checked + .noise-checkbox-label span { color: var(--primary-dark); }
+        
+        .noise-checkbox-wrapper input:checked + .noise-checkbox-label .check-indicator {
+            background: var(--primary-main); border-color: var(--primary-main);
+        }
+
+        /* 사진 업로드 박스 디자인 */
+        .photo-stack { display: flex; flex-direction: column; gap: 15px; } 
+        
+        .upload-group { background: #fff; }
+        .upload-group .input-label { text-align: left; color: var(--primary-dark); font-size: 0.85rem; margin-bottom: 6px; }
+        
+        .upload-box {
+            border: 2px dashed #cbd5e1; background-color: #f8fafc;
+            border-radius: 12px; width: 100%; 
+            aspect-ratio: 4 / 3; 
+            text-align: center; color: #94a3b8; cursor: pointer;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            position: relative; overflow: hidden; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .upload-box:hover { 
+            border-color: var(--primary-main); background-color: var(--primary-soft); 
+            transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
+        }
+        .upload-box.filled { border: 2px solid var(--primary-main); background: #fff; }
+        
+        .upload-icon { font-size: 1.8rem; margin-bottom: 8px; opacity: 0.8; color: var(--text-secondary); }
+        .upload-text-main { font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); }
+        .preview-img { width: 100%; height: 100%; object-fit: contain; display: none; background: #000; }
+        .file-input { display: none; }
+
+        .sub-photo-row { 
+            display: flex; align-items: center; justify-content: flex-end; 
+            gap: 8px; margin-top: 8px; 
+        }
+        
+        .sub-upload-btn-3d {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px 10px;
+            font-size: 0.7rem; 
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(145deg, #42a5f5, #1976d2);
+            border: none;
+            border-radius: 12px; 
+            box-shadow: 0 3px 0 #1565c0, 0 3px 6px rgba(0,0,0,0.15); 
+            cursor: pointer;
+            transition: all 0.1s;
+            text-shadow: 0 1px 1px rgba(0,0,0,0.2);
+        }
+
+        .sub-upload-btn-3d:active {
+            transform: translateY(3px); 
+            box-shadow: 0 0 0 #1565c0, inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .sub-upload-btn-3d.filled {
+            background: linear-gradient(145deg, #00e676, #00c853);
+            box-shadow: 0 3px 0 #009624, 0 4px 8px rgba(0,0,0,0.15);
+        }
+        .sub-upload-btn-3d.filled:active { box-shadow: 0 0 0 #009624; }
+
+        .media-box-style {
+            border-color: #90caf9 !important; background-color: #e3f2fd !important;
+            aspect-ratio: 6 / 2 !important;
+        }
+        .media-box-style:hover { background-color: #bbdefb !important; border-color: #1976d2 !important;}
+        .media-box-style.filled { border: 2px solid #1976d2 !important; background: #fff !important; }
+
+        .legal-disclaimer-box {
+            background-color: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+            padding: 12px; margin-top: 5px; margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .legal-title { color: #d32f2f; font-weight: 800; font-size: 0.8rem; display: flex; align-items: center; margin-bottom: 6px;}
+        .legal-text { font-size: 0.75rem; color: #64748b; line-height: 1.4; text-align: justify; margin-bottom: 8px; letter-spacing: -0.3px;}
+        .legal-check-wrapper { display: flex; align-items: center; cursor: pointer; padding-top: 8px; border-top: 1px dashed #e2e8f0; }
+        .legal-check-wrapper input { width: 18px; height: 18px; margin-right: 8px; cursor: pointer; accent-color: var(--primary-main); }
+        .legal-check-text { font-weight: 700; font-size: 0.8rem; color: var(--text-primary); }
 
         .analyze-btn {
-            width: 100%; 
-            padding: 18px;
-            background-color: var(--primary-dark);
-            color: var(--accent-color);
-            border: none; 
-            border-radius: 12px;
-            font-size: 1.2rem; 
-            font-weight: 800;
+            width: 100%; padding: 15px; 
+            background: #cbd5e1; color: #fff; border: none; border-radius: 14px;
+            font-size: 1.1rem; font-weight: 800; cursor: not-allowed; 
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: none; margin-top: 5px; transition: all 0.2s; position: relative; top: 0;
+        }
+        .analyze-btn.active {
+            background: linear-gradient(135deg, #1a233a, #0d1b2a); 
+            color: #00e676;
             cursor: pointer;
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            margin-top: 30px;
-            transition: transform 0.2s;
-            border: 2px solid var(--primary-dark);
+            box-shadow: 0 5px 0 #000, 0 10px 15px rgba(0,0,0,0.2);
         }
-        
-        .analyze-btn:hover {
-            background-color: #fff;
-            color: var(--primary-dark);
-            border-color: var(--primary-dark);
-        }
-
-        .analyze-btn:active { transform: scale(0.98); }
-        .analyze-btn i { margin-right: 10px; }
+        .analyze-btn.active:active { top: 5px; box-shadow: 0 0 0 #000, inset 0 3px 5px rgba(0,0,0,0.3); }
 
         #result-area {
-            margin-top: 24px; 
-            padding: 24px;
-            background-color: #fbe9e7; /* 아주 연한 오렌지 틴트 */
-            border-radius: 12px; 
-            border: 1px solid #ffccbc;
-            min-height: 120px;
-            display: none; 
-        }
-        
-        #result-area .section-title { 
-            color: #d84315; 
-            border-left-color: #d84315;
-            background-color: rgba(255, 255, 255, 0.5);
+            margin-top: 20px; padding: 20px; background-color: #fff; border-radius: 16px; 
+            border: 2px solid var(--primary-main); display: none; 
+            box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
         }
 
-        /* 차트 영역 */
-        .chart-container {
-            position: relative; 
-            height: 300px; 
-            width: 100%; 
-            margin-top: 20px;
-            display: flex;
-            justify-content: center;
+        .data-source-badge {
+            display: flex; align-items: center; gap: 8px;
+            background-color: #e8f5e9; border: 1px solid #a5d6a7;
+            color: #2e7d32; padding: 8px 12px; border-radius: 8px;
+            margin-bottom: 15px; font-size: 0.75rem; font-weight: 700;
+            line-height: 1.4;
         }
+        .data-source-badge i { font-size: 1.1rem; }
 
-        .footer-btns { display: flex; gap: 12px; margin-top: 30px; }
+        .report-photo-gallery {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            margin-bottom: 20px; border-bottom: 2px dashed #eee; padding-bottom: 20px;
+        }
+        .report-photo-item { display: flex; flex-direction: column; align-items: center; }
+        .report-photo-img {
+            width: 100%; aspect-ratio: 4/3; object-fit: contain;
+            border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;
+        }
+        .report-photo-label { font-size: 0.7rem; font-weight: 700; color: #64748b; margin-top: 4px; text-align: center; }
+
+        .report-summary-box {
+            background-color: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px;
+            padding: 12px; margin-bottom: 20px; font-size: 0.85rem;
+        }
+        .report-summary-item {
+            display: flex; justify-content: space-between;
+            border-bottom: 1px dashed #cbd5e1; padding: 6px 0; color: var(--text-primary);
+        }
+        .report-summary-item:last-child { border-bottom: none; }
+        .report-summary-label { font-weight: 600; color: var(--text-secondary); }
+        .report-summary-value { font-weight: 800; color: var(--primary-dark); }
+
+        .chart-container { position: relative; height: 300px; width: 100%; margin-top: 15px; }
+
+        .footer-btns { display: flex; gap: 10px; margin-top: 20px; } 
         .footer-btn {
-            flex: 1; padding: 14px; border: none; border-radius: 8px;
-            font-size: 1rem; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex: 1; padding: 12px; border: none; border-radius: 12px;
+            font-size: 0.9rem; font-weight: 700; cursor: pointer; color: white;
+            display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15); transition: transform 0.2s;
         }
-        .call-btn { background-color: var(--accent-color); color: white; }
-        .save-btn { background-color: var(--primary-main); }
+        .footer-btn:active { transform: scale(0.98); }
+        .call-btn { background: linear-gradient(135deg, #00c853, #009624); }
+        .save-btn { background: linear-gradient(135deg, #37474f, #263238); }
         
-        /* [수정] 푸터 디자인 개선 */
         .main-footer {
-            background-color: #263238; /* 다크 푸터 */
-            color: #b0bec5;
-            padding: 20px 15px; 
-            text-align: center;
-            font-size: 0.7rem; 
-            border-top: 4px solid var(--accent-color);
-            line-height: 1.8; 
-            font-weight: 400;
-            white-space: nowrap; 
+            background-color: #f8fafc; 
+            color: #94a3b8;
+            padding: 15px;
+            text-align: center; 
+            font-size: 0.65rem;
+            line-height: 1.4;
+            border-top: 1px solid #e2e8f0;
+            word-break: keep-all;
         }
         
-        @media (max-width: 360px) { .main-footer { white-space: normal; } }
-        
+        .print-legal-footer {
+            display: none; margin-top: 30px; border: 2px solid #000; padding: 15px; text-align: center;
+        }
+        .print-legal-content { font-size: 11px; text-align: justify; line-height: 1.6; color: #000; }
+
         @media print {
-            .mobile-container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
-            .analyze-btn, .footer-btns, .file-input, .upload-box { display: none !important; }
-            #result-area { display: block !important; border: 1px solid #000; }
+            body { background: white; padding: 0; display: block; }
+            .mobile-container { max-width: 100%; width: 100%; box-shadow: none; margin: 0; border: none; }
+            .analyze-btn, .footer-btns, .file-input, .legal-disclaimer-box, .noise-type-grid { display: none !important; }
+            .section:not(:has(#result-area)) { display: none; }
+            #result-area { display: block !important; border: 2px solid #000; margin-top: 0; padding: 10px; }
+            .report-summary-box { border: 1px solid #000; background: #fff; display: block !important;}
+            .report-summary-item { border-bottom: 1px solid #ccc; }
+            .report-photo-gallery { display: grid !important; page-break-inside: avoid; }
+            #chart_div { width: 100% !important; height: 350px !important; page-break-inside: avoid; }
+            .print-legal-footer { display: block !important; page-break-inside: avoid; }
         }
     </style>
 </head>
@@ -300,336 +381,737 @@
 
 <div class="mobile-container">
     <header class="main-header">
-        <h1><i class="fas fa-wave-square"></i> 청개구리 소음진단 AI (PRO)</h1>
-        <div class="version-wrapper">
-            <span class="version-badge">Ver 1.0 (BASIC)</span>
+        <h1>
+            <i class="fas fa-frog frog-icon"></i> 
+            청개구리 소음진단 AI (Expert)
+        </h1>
+        <div style="text-align: right;">
+            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 10.0 BigData Edition</span>
         </div>
     </header>
 
     <div class="content">
         <div class="section">
-            <div class="section-title"><i class="fas fa-clipboard-list"></i> 기본 진단 정보</div>
-            <div class="row-group">
+            <div class="section-title"><i class="fas fa-info"></i> 기본 정보 (Basic Info)</div>
+            <div class="info-grid-row">
                 <div class="input-group">
-                    <label class="input-label" for="location">진단 장소</label>
-                    <input type="text" id="location" placeholder="예: 공장 기계실, 배관실">
+                    <label class="input-label">동</label>
+                    <input type="text" id="dong" placeholder="101">
                 </div>
                 <div class="input-group">
-                    <label class="input-label" for="date">진단 일자</label>
-                    <input type="text" id="date" value="2026. 1. 2." style="text-align:center; font-weight:bold;">
+                    <label class="input-label">호</label>
+                    <input type="text" id="ho" placeholder="1204">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">진단 장소</label>
+                    <input type="text" id="location" placeholder="거실창">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">진단 일자</label>
+                    <input type="text" id="date" style="color:var(--primary-main); font-weight:800; letter-spacing:0;">
                 </div>
             </div>
-
-            <div class="input-group">
-                <label class="input-label" for="defect-content">소음 내용 상세</label>
-                <textarea id="defect-content" placeholder="발생 위치, 소리 유형(치익, 웅웅 등)을 상세히 입력해주세요."></textarea>
+            <div class="input-group" style="margin-top:8px;">
+                <textarea id="defect-content" placeholder="소음 발생 상황 및 상세 증상 (예: 바람 불 때 웅웅거림, 밤마다 쿵쿵 소리)"></textarea>
             </div>
         </div>
 
         <div class="section">
-            <div class="section-title"><i class="fas fa-volume-up"></i> 소음측정(MP4, MP3 입력)</div>
-            <div class="input-group">
-                <label class="input-label">현장 녹음/녹화 파일</label>
-                <div style="border: 2px solid #cfd8dc; padding: 15px; border-radius: 8px; background: #fff;">
-                    <input type="file" id="audio-file" accept="audio/*,video/*" style="width:100%; border:none; padding:0;">
+            <div class="section-title"><i class="fas fa-list-check"></i> 소음 발생 부위 선택 (다중 선택)</div>
+            <div style="font-size:0.75rem; color:#64748b; margin-bottom:5px; text-align:center;">
+                * 의심되는 부위를 모두 체크하세요. (체크된 항목 기반 정밀 분석)
+            </div>
+            <div class="noise-type-grid">
+                <div class="noise-checkbox-wrapper">
+                    <input type="checkbox" id="nt-window" class="noise-selector" value="창호(Window)">
+                    <label for="nt-window" class="noise-checkbox-label">
+                        <div class="check-indicator"><i class="fas fa-check"></i></div>
+                        <i class="fas fa-window-maximize main-icon"></i>
+                        <span>창호 소음</span>
+                    </label>
                 </div>
-                <p style="font-size:0.75rem; color:#d84315; margin-top:8px;">* 현장 소음이 담긴 녹음 파일 또는 동영상을 업로드하세요.</p>
+                <div class="noise-checkbox-wrapper">
+                    <input type="checkbox" id="nt-ceiling" class="noise-selector" value="천장(Ceiling)">
+                    <label for="nt-ceiling" class="noise-checkbox-label">
+                        <div class="check-indicator"><i class="fas fa-check"></i></div>
+                        <i class="fas fa-cloud main-icon"></i>
+                        <span>천장 소음</span>
+                    </label>
+                </div>
+                <div class="noise-checkbox-wrapper">
+                    <input type="checkbox" id="nt-floor" class="noise-selector" value="층간(Inter-floor)">
+                    <label for="nt-floor" class="noise-checkbox-label">
+                        <div class="check-indicator"><i class="fas fa-check"></i></div>
+                        <i class="fas fa-shoe-prints main-icon"></i>
+                        <span>층간 소음</span>
+                    </label>
+                </div>
+                <div class="noise-checkbox-wrapper">
+                    <input type="checkbox" id="nt-hvac" class="noise-selector" value="공조기/환기(HVAC)">
+                    <label for="nt-hvac" class="noise-checkbox-label">
+                        <div class="check-indicator"><i class="fas fa-check"></i></div>
+                        <i class="fas fa-fan main-icon"></i>
+                        <span>공조기 소음</span>
+                    </label>
+                </div>
+                <div class="noise-checkbox-wrapper">
+                    <input type="checkbox" id="nt-elevator" class="noise-selector" value="엘리베이터(Elevator)">
+                    <label for="nt-elevator" class="noise-checkbox-label">
+                        <div class="check-indicator"><i class="fas fa-check"></i></div>
+                        <i class="fas fa-elevator main-icon"></i>
+                        <span>엘리베이터</span>
+                    </label>
+                </div>
+                 <div class="noise-checkbox-wrapper">
+                    <input type="checkbox" id="nt-plumbing" class="noise-selector" value="배관(Plumbing)">
+                    <label for="nt-plumbing" class="noise-checkbox-label">
+                        <div class="check-indicator"><i class="fas fa-check"></i></div>
+                        <i class="fas fa-faucet main-icon"></i>
+                        <span>배관 소음</span>
+                    </label>
+                </div>
             </div>
         </div>
 
         <div class="section">
-            <div class="section-title"><i class="fas fa-crosshairs"></i> 발생 부위 체크</div>
-            <div class="checkbox-grid">
-                <label class="checkbox-label"><input type="checkbox"> 배관/밸브 (Gas)</label>
-                <label class="checkbox-label"><input type="checkbox"> 모터/펌프 (Mech)</label>
-                <label class="checkbox-label"><input type="checkbox"> 전기 패널 (Elec)</label>
-                <label class="checkbox-label"><input type="checkbox"> 창호/벽체 (Leak)</label>
-                <label class="checkbox-label"><input type="checkbox"> 천장/덕트</label>
-                <label class="checkbox-label"><input type="checkbox"> 기타 설비</label>
-            </div>
-        </div>
-
-        <div class="section">
-            <div class="section-title"><i class="fas fa-camera-retro"></i> 현장 사진 (Evidence)</div>
-            
+            <div class="section-title"><i class="fas fa-camera"></i> 현장 채증 (Evidence)</div>
             <div class="photo-stack">
-                <div>
-                    <label class="input-label" style="margin-bottom:8px;">1. 소음 부위 (필수)</label>
-                    <label for="img1-main" class="upload-box" id="preview-box-1">
+                <div class="upload-group">
+                    <label class="input-label">1. 현장 메인 사진 (필수)</label>
+                    <label for="img-main" class="upload-box" id="box-main">
                         <i class="fas fa-camera upload-icon"></i>
-                        <span class="upload-text-main">소음 발생 위치 촬영</span>
-                        <span class="upload-text-sub">전체적인 모습이 나오게 찍어주세요</span>
-                        <img id="preview-1" class="preview-img">
+                        <span class="upload-text-main">터치하여 메인 사진 촬영</span>
+                        <img id="view-main" class="preview-img">
                     </label>
-                    <input type="file" id="img1-main" class="file-input" accept="image/*" onchange="previewImage(this, 'preview-1', 'preview-box-1', 'main')">
+                    <input type="file" id="img-main" class="file-input" accept="image/*" onchange="handleImage(this, 'main', 'view-main', 'box-main')">
+                    
+                    <div class="sub-photo-row">
+                        <label for="img-main-add" class="sub-upload-btn-3d" id="btn-main-add">
+                            <i class="fas fa-plus"></i> 추가 사진
+                        </label>
+                        <input type="file" id="img-main-add" class="file-input" accept="image/*" onchange="handleSubImage(this, 'main_add', 'btn-main-add')">
+                    </div>
                 </div>
 
-                <div>
-                    <label class="input-label" style="margin-bottom:8px;">2. 근접 상세 사진 (필수)</label>
-                    <label for="img1-sub1" class="upload-box" id="preview-box-2">
+                <div class="upload-group">
+                    <label class="input-label">2. 문제 부위 상세 (근접)</label>
+                    <label for="img-sub" class="upload-box" id="box-sub">
                         <i class="fas fa-search-plus upload-icon"></i>
-                        <span class="upload-text-main">상세 부위 추가</span>
-                        <span class="upload-text-sub">문제 부위를 가까이서 찍어주세요</span>
-                        <img id="preview-2" class="preview-img">
+                        <span class="upload-text-main">터치하여 근접 촬영</span>
+                        <img id="view-sub" class="preview-img">
                     </label>
-                    <input type="file" id="img1-sub1" class="file-input" accept="image/*" onchange="previewImage(this, 'preview-2', 'preview-box-2', 'sub')">
+                    <input type="file" id="img-sub" class="file-input" accept="image/*" onchange="handleImage(this, 'sub', 'view-sub', 'box-sub')">
+                    
+                    <div class="sub-photo-row">
+                        <label for="img-sub-add" class="sub-upload-btn-3d" id="btn-sub-add">
+                            <i class="fas fa-plus"></i> 추가 사진
+                        </label>
+                        <input type="file" id="img-sub-add" class="file-input" accept="image/*" onchange="handleSubImage(this, 'sub_add', 'btn-sub-add')">
+                    </div>
                 </div>
+
+                <div class="upload-group" style="margin-top: 5px;">
+                    <label class="input-label" style="color: #1976d2;">
+                        <i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성)
+                    </label>
+                    <div style="font-size:0.7rem; color:#64748b; margin-bottom:5px;">
+                        * 10초 이내 짧은 파일 권장 (정확도 향상)
+                    </div>
+                    <label for="file-media" class="upload-box media-box-style" id="box-media">
+                        <i class="fas fa-video upload-icon" style="color: #1976d2;"></i>
+                        <span class="upload-text-main" style="color: #0d47a1;">동영상/음성 파일 선택</span>
+                        <div id="media-preview-text" style="display:none; font-size:0.8rem; font-weight:bold; color:#0d47a1; text-align:center; line-height:1.3;">
+                        </div>
+                    </label>
+                    <input type="file" id="file-media" class="file-input" accept="video/*, audio/*" onchange="handleMedia(this)">
+                </div>
+
             </div>
         </div>
 
         <div class="section">
-            <div class="section-title"><i class="fas fa-microscope"></i> 3. 전문 장비 데이터 (Optional)</div>
-            
+            <div class="section-title"><i class="fas fa-satellite-dish"></i> 정밀 진단 장비 데이터</div>
             <div class="photo-stack">
-                 <div>
-                    <label class="input-label">FLIR SI-2 (초음파 카메라)</label>
-                    <label for="img2" class="upload-box" id="preview-box-3" style="border-color: var(--accent-color);">
-                        <i class="fas fa-satellite-dish upload-icon" style="color:var(--accent-color);"></i> 
-                        <span class="upload-text-main">음향 시각화 이미지</span>
-                        <img id="preview-3" class="preview-img">
+                <div class="upload-group">
+                    <label class="input-label" style="color: var(--primary-main);">3. FLIR SI1 - LD (음향 카메라)</label>
+                    <div style="font-size:0.7rem; color:#64748b; margin-bottom:5px;">* 초음파 누설/소음원 시각화 데이터 (필수)</div>
+                    <label for="img-acoustic" class="upload-box" id="box-acoustic" style="border-color: #bbdefb; background-color: #f0f9ff;">
+                        <i class="fas fa-wave-square upload-icon" style="color: var(--primary-main);"></i>
+                        <span class="upload-text-main" style="color: var(--primary-main);">음향 진단 이미지 업로드</span>
+                        <img id="view-acoustic" class="preview-img">
                     </label>
-                    <input type="file" id="img2" class="file-input" accept="image/*" onchange="previewImage(this, 'preview-3', 'preview-box-3', 'equip')">
+                    <input type="file" id="img-acoustic" class="file-input" accept="image/*" onchange="handleImage(this, 'acoustic', 'view-acoustic', 'box-acoustic')">
+                    
+                    <div class="sub-photo-row">
+                        <label for="img-acoustic-add" class="sub-upload-btn-3d" id="btn-acoustic-add">
+                            <i class="fas fa-plus"></i> 추가 사진
+                        </label>
+                        <input type="file" id="img-acoustic-add" class="file-input" accept="image/*" onchange="handleSubImage(this, 'acoustic_add', 'btn-acoustic-add')">
+                    </div>
                 </div>
 
-                 <div>
-                    <label class="input-label">내부 사진 (선택)</label>
-                    <label for="img3" class="upload-box" id="preview-box-4">
-                        <i class="fas fa-cogs upload-icon"></i>
-                        <span class="upload-text-main">설비 내부/배관 사진</span>
-                        <img id="preview-4" class="preview-img">
+                <div class="upload-group">
+                    <label class="input-label">4. 열화상 카메라 (단열)</label>
+                    <label for="img-thermal" class="upload-box" id="box-thermal">
+                        <i class="fas fa-temperature-high upload-icon"></i>
+                        <span class="upload-text-main">열화상 이미지 업로드</span>
+                        <img id="view-thermal" class="preview-img">
                     </label>
-                    <input type="file" id="img3" class="file-input" accept="image/*" onchange="previewImage(this, 'preview-4', 'preview-box-4', 'thermal')">
+                    <input type="file" id="img-thermal" class="file-input" accept="image/*" onchange="handleImage(this, 'thermal', 'view-thermal', 'box-thermal')">
+                      <div class="sub-photo-row">
+                        <label for="img-thermal-add" class="sub-upload-btn-3d" id="btn-thermal-add">
+                            <i class="fas fa-plus"></i> 추가 사진
+                        </label>
+                        <input type="file" id="img-thermal-add" class="file-input" accept="image/*" onchange="handleSubImage(this, 'thermal_add', 'btn-thermal-add')">
+                    </div>
                 </div>
             </div>
         </div>
 
-        <button class="analyze-btn" onclick="startAnalysis()">
-            <i class="fas fa-bolt"></i> Premium AI 정밀 진단 시작
+        <div class="legal-disclaimer-box">
+            <div class="legal-title"><i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i> 분석 시작 전 필수 동의</div>
+            <div class="legal-text">
+                본 앱의 결과는 AI가 웹상의 공개된 기술 자료를 기반으로 분석한 <strong>참고용 소견</strong>입니다. 이는 '기술사법'에 의한 기술사의 공식 감정서가 아니며, <strong>법적 효력(소송 증거 등)이 없습니다.</strong> 정확한 진단은 관련 전문 자격 보유자의 현장 방문을 권장합니다.
+            </div>
+            <label class="legal-check-wrapper">
+                <input type="checkbox" id="legal-agree" onchange="toggleAnalyzeBtn()">
+                <span class="legal-check-text">위 면책 조항을 확인하였으며 동의합니다.</span>
+            </label>
+        </div>
+
+        <button class="analyze-btn" id="analyze-btn" onclick="startAnalysis()" disabled>
+            <i class="fas fa-microchip" style="margin-right:8px;"></i> AI 정밀 분석 리포트 생성
         </button>
 
         <div id="result-area">
-            <div class="section-title"><i class="fas fa-file-contract"></i> 진단 결과 리포트</div>
-            <div id="loading-spinner" style="text-align:center; padding:20px; display:none;">
-                <i class="fas fa-cog fa-spin" style="font-size:2.5rem; color:var(--accent-color);"></i>
-                <p id="loading-text" style="margin-top:10px; font-weight:bold;">음향 주파수 패턴 분석 중...</p>
+            <div class="section-title"><i class="fas fa-file-contract"></i> AI 분석 리포트</div>
+            
+            <div class="data-source-badge">
+                <i class="fas fa-globe"></i>
+                <span>본 진단 결과는 <strong>웹상에 공개된 방대한 건축 기술 자료 및 하자 사례 빅데이터</strong>를 기반으로 분석되었습니다.</span>
             </div>
-            <div id="analysis-content">
-                <p style="color: #78909c; font-weight:500; text-align:center;">
-                    데이터 입력 후 [진단 시작] 버튼을 눌러주세요.
+
+            <div id="report-summary-box" class="report-summary-box" style="display:none;"></div>
+
+            <div class="section-title" style="margin-top:15px; font-size:0.9rem; background:none; padding:0; color:var(--text-primary);">
+                <i class="fas fa-images" style="background:var(--text-secondary);"></i> 현장 채증 사진첩
+            </div>
+            <div id="report-photo-gallery" class="report-photo-gallery">
+                </div>
+
+            <div id="loading-spinner" style="text-align:center; padding:20px; display:none;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem; color:var(--primary-main);"></i>
+                <p id="loading-text" style="margin-top:10px; font-weight:bold; font-size:0.85rem; color:var(--text-secondary);">
+                    공개된 기술 빅데이터 대조 중...<br>
+                    (건축 물리/음향학 이론 적용)
                 </p>
             </div>
             
-            <div id="chart-section" style="display:none; margin-top:30px; padding-top:20px; border-top:1px dashed #cfd8dc;">
-                <div class="section-title" style="background:none; border:none; padding:0;"><i class="fas fa-chart-pie"></i> 소음 원인 분석 결과</div>
-                <div class="chart-container">
-                    <canvas id="causeChart"></canvas>
+            <div id="analysis-content"></div>
+            
+            <div id="chart-section" style="display:none; margin-top:20px; padding-top:15px; border-top:2px dashed #ccc;">
+                <div class="section-title"><i class="fas fa-chart-pie"></i> 원인 귀책 사유 분석 (3D)</div>
+                <div id="chart_div" class="chart-container"></div>
+                
+                <div class="print-legal-footer">
+                    <strong>※ 법적 면책 및 주의사항 ※</strong><br>
+                    <div class="print-legal-content">
+                        본 보고서는 사용자가 제공한 데이터(사진/음성)와 웹상의 공개 기술 자료를 바탕으로 AI가 생성한 '비공식 참고용 소견서'입니다. '기술사' 등 공인 전문가의 날인이 포함된 감정서가 아니며, 법적 분쟁의 증거 자료로 사용할 수 없습니다.
+                    </div>
                 </div>
-                <p style="text-align:center; font-size:0.75rem; color:#78909c; margin-top:10px;">
-                    * AI 알고리즘 기반 분석 결과 (신뢰도 98%)
-                </p>
             </div>
         </div>
 
         <div class="footer-btns">
-            <button class="footer-btn call-btn" onclick="window.location.href='tel:15997380'">
-                <i class="fas fa-headset"></i> 기술지원 문의
+            <button class="footer-btn call-btn" onclick="window.location.href='tel:01023220949'">
+                <i class="fas fa-headset" style="margin-right:5px;"></i> 기술지원
             </button>
-            <button class="footer-btn save-btn" onclick="window.print()">
-                <i class="fas fa-file-download"></i> 리포트 저장
+            <button class="footer-btn save-btn" onclick="savePdf()">
+                <i class="fas fa-file-pdf" style="margin-right:5px;"></i> PDF 저장
             </button>
         </div>
     </div> 
     
     <footer class="main-footer">
         청개구리샤시 | 사업자등록번호 : 123-36-31426 | 대표 : 전영웅<br>
-        전화 1599-7380 | COPYRIGHT ⓒ 2026 Cheong-gaeguri Corp. All Rights Reserved.
+        전화 1599-7380 | COPYRIGHT ⓒ 2026 Cheong-gaeguri Corp.
     </footer>
 
 </div>
 
 <script>
-    // 1. 보안키 설정 (기존과 동일)
-    const keyPart1 = "AIzaSyCGtANQJNBEGSh";
+    google.charts.load("current", {packages:["corechart"]});
+
+    // [API KEY 설정] 
+    const keyPart1 = "AIzaSyCGtANQJNBEGSh"; 
     const keyPart2 = "9zCrTXMEnR-";
     const keyPart3 = "PHxLlXtkw";
     const API_KEY = keyPart1 + keyPart2 + keyPart3;
 
-    // 2. 이미지 프리뷰
-    let images = { main: null, sub: null, equip: null, thermal: null };
+    // [Database] 공개된 기술 자료 기반 소음 진단 레퍼런스 (변수명 변경: PUBLIC_TECH_DB)
+    const PUBLIC_TECH_DB = [
+        {
+            types: ["배관(Plumbing)"],
+            symptom_keywords: ["쿵", "텅", "망치", "때리는"],
+            diagnosis: "수격 현상 (Water Hammering)",
+            mechanism: "유체의 운동에너지가 급격한 밸브 차단으로 인해 압력에너지로 변환, 배관 내벽을 타격하여 발생하는 충격파. 배관이 고정되지 않아 벽체를 치는 진동음 포함.",
+            solution: "1. 감압밸브(PRV) 압력 조절 (적정 수압 2.5~3.0kgf/cm²) 2. 수격방지기(Water Hammer Arrestor)를 소음원(수전 등) 최인접 설치 3. 배관 행거 고무 패드 보강"
+        },
+        {
+            types: ["배관(Plumbing)"],
+            symptom_keywords: ["졸졸", "물 흐르는", "똑똑", "쏴아"],
+            diagnosis: "배수 투과음 (Drainage Noise)",
+            mechanism: "PVC 배관의 얇은 관벽을 통해 유체 마찰음이 투과됨(Air-borne) 또는 배관이 슬라브 콘크리트와 직접 접촉하여 진동 전달(Structure-borne).",
+            solution: "1. 배관에 차음시트(고밀도) + 흡음재(발포고무) 이중 래핑 시공 2. 천장 내부 배관 관통부 틈새 폼/모르타르 밀실 충진"
+        },
+        {
+            types: ["창호(Window)"],
+            symptom_keywords: ["피리", "뱃고동", "우웅", "삐", "바람"],
+            diagnosis: "헬름홀츠 공명 (Helmholtz Resonance) 및 풍절음",
+            mechanism: "강풍이 특정 직경의 구멍(난간, 물구멍)이나 기둥을 지나갈 때 공기가 진동하며 특정 주파수 대역의 소음을 증폭시킴.",
+            solution: "1. 옥상 난간 핸드레일 하부 구멍 폼 충진 2. 창틀 물구멍(Weep hole) 전용 방풍캡 설치 3. 샤시 모헤어 마모 상태 점검 및 교체"
+        },
+        {
+            types: ["창호(Window)", "천장(Ceiling)"],
+            symptom_keywords: ["딱", "탁", "부러지는", "뚝"],
+            diagnosis: "열수축/팽창음 (Thermal Expansion)",
+            mechanism: "기온 변화나 난방 시 서로 다른 자재(PVC, 콘크리트, 금속)의 팽창 계수 차이로 마찰 발생 후 순간적으로 미끄러지며(Stick-Slip) 나는 소리.",
+            solution: "1. 창호 프레임과 구조체 사이 폼 충진 상태 점검 및 유격 확보 2. 천장 몰딩과 벽체 사이에 실리콘 윤활 스프레이 도포"
+        },
+        {
+            types: ["층간(Inter-floor)", "천장(Ceiling)", "엘리베이터(Elevator)", "기계/진동"],
+            symptom_keywords: ["웅웅", "진동", "모터", "기계"],
+            diagnosis: "고체 전달음 (Structure-borne Noise)",
+            mechanism: "펌프, 실외기, 엘리베이터 권상기 등의 진동이 방진 장치 미비로 인해 건물 뼈대(콘크리트)를 타고 전달됨. 저주파 특성.",
+            solution: "1. 발생원(펌프, 실외기) 하부 방진 고무/스프링 마운트 교체 2. 배관/기계가 벽체를 통과하는 부위의 절연(Insulation) 보강"
+        },
+        {
+            types: ["공조기/환기(HVAC)"],
+            symptom_keywords: ["파닥", "덜커덩", "탁탁"],
+            diagnosis: "댐퍼 기밀 불량 및 역풍 (Backdraft)",
+            mechanism: "외부 바람이 굴뚝효과(Stack Effect)나 강풍에 의해 공동배기구로 역류하여, 세대 내 댐퍼 날개를 때리는 소리.",
+            solution: "1. 고기밀 전동 댐퍼(Motorized Damper) 교체 설치 2. 후드 자바라와 배기구 연결 부위 기밀 테이핑 처리"
+        },
+        {
+            types: ["천장(Ceiling)", "배관(Plumbing)"], 
+            symptom_keywords: ["전기", "지잉"],
+            diagnosis: "전기 노이즈 (Coil Whine)",
+            mechanism: "조명 안정기(SMPS)나 차단기 코일의 떨림으로 인한 고주파 소음.",
+            solution: "1. 안정기(SMPS) 또는 등기구 교체 2. 디머 사용 시 호환성 확인"
+        }
+    ];
 
-    function previewImage(input, imgId, boxId, type) {
+    let images = { 
+        main: null, main_add: null,
+        sub: null, sub_add: null,
+        acoustic: null, acoustic_add: null,
+        thermal: null, thermal_add: null,
+        media: null, 
+        media_mime: null 
+    };
+
+    let imageUrls = {};
+    let clickCount = 0;
+    let clickTimer;
+    const DAILY_LIMIT = 100;
+
+    window.addEventListener('DOMContentLoaded', () => {
+        const isDev = localStorage.getItem('is_developer') === 'true';
+        if (isDev) {
+            document.getElementById('versionBadge').classList.add('dev-active');
+        }
+
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const formattedDate = `${year}.${month}.${day}`;
+        
+        const dateInput = document.getElementById('date');
+        if (dateInput) {
+            dateInput.value = formattedDate;
+            dateInput.setAttribute('placeholder', formattedDate);
+        }
+    });
+
+    window.checkDevMode = function() {
+        clearTimeout(clickTimer); 
+        clickCount++;
+
+        if (clickCount === 5) {
+            const isDev = localStorage.getItem('is_developer') === 'true';
+            localStorage.setItem('is_developer', !isDev);
+            const badge = document.getElementById('versionBadge');
+            
+            if (!isDev) {
+                alert("🐸 개발자 모드(무제한)가 활성화되었습니다!");
+                badge.classList.add('dev-active');
+            } else {
+                alert("개발자 모드가 해제되었습니다. (일일 100회 제한 적용)");
+                badge.classList.remove('dev-active');
+            }
+            clickCount = 0;
+        }
+
+        clickTimer = setTimeout(() => {
+            clickCount = 0;
+        }, 1000);
+    }
+
+    function checkDailyLimit() {
+        const isDev = localStorage.getItem('is_developer') === 'true';
+        if (isDev) return true; 
+
+        const todayStr = new Date().toDateString(); 
+        let usageData = JSON.parse(localStorage.getItem('noise_app_usage') || '{}');
+
+        if (usageData.date !== todayStr) {
+            usageData = { date: todayStr, count: 0 };
+        }
+
+        if (usageData.count >= DAILY_LIMIT) {
+            alert(`⚠️ 일일 무료 사용 한도(${DAILY_LIMIT}회)를 초과했습니다.\n내일 다시 이용해 주세요.`);
+            return false; 
+        }
+        
+        usageData.count++;
+        localStorage.setItem('noise_app_usage', JSON.stringify(usageData));
+        return true;
+    }
+
+    function handleImage(input, type, imgId, boxId) {
         if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = document.getElementById(imgId);
-                img.src = e.target.result;
-                img.style.display = 'block';
                 const box = document.getElementById(boxId);
+                img.src = e.target.result;
+                img.style.display = 'block'; 
                 box.querySelectorAll('i, span').forEach(el => el.style.display = 'none');
-                images[type] = e.target.result.split(',')[1];
+                box.classList.add('filled');
+                
+                images[type] = e.target.result.split(',')[1]; 
+                imageUrls[type] = e.target.result; 
             }
             reader.readAsDataURL(input.files[0]);
         }
     }
 
-    let myChart = null;
-    Chart.register(ChartDataLabels);
+    function handleSubImage(input, type, btnId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const btn = document.getElementById(btnId);
+                btn.innerHTML = `<i class="fas fa-check"></i> 추가됨`;
+                btn.classList.add('filled');
+                
+                images[type] = e.target.result.split(',')[1];
+                imageUrls[type] = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
 
-    // 3. AI 분석 시작 (소음 진단용)
+    function handleMedia(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            
+            if (file.size > 10 * 1024 * 1024) {
+                alert("파일 용량이 너무 큽니다. 10MB(약 10~15초) 이내의 파일만 가능합니다.");
+                input.value = ""; 
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const box = document.getElementById('box-media');
+                box.querySelector('.upload-icon').style.display = 'none';
+                box.querySelector('.upload-text-main').style.display = 'none';
+                
+                const previewText = document.getElementById('media-preview-text');
+                previewText.style.display = 'block';
+                previewText.innerHTML = `<i class="fas fa-file-audio"></i> ${file.name}<br><span style="font-size:0.7rem;">(분석 준비 완료)</span>`;
+                box.classList.add('filled');
+
+                images.media = e.target.result.split(',')[1]; 
+                images.media_mime = file.type; 
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function toggleAnalyzeBtn() {
+        const checkbox = document.getElementById('legal-agree');
+        const btn = document.getElementById('analyze-btn');
+        if (checkbox.checked) {
+            btn.classList.add('active');
+            btn.disabled = false;
+        } else {
+            btn.classList.remove('active');
+            btn.disabled = true;
+        }
+    }
+
+    function savePdf() {
+        const dong = document.getElementById('dong').value || "000";
+        const ho = document.getElementById('ho').value || "0000";
+        document.title = `소음진단AI앱(PRO)_${dong}동_${ho}호`;
+        window.print();
+    }
+
+    function renderReportPhotos() {
+        const gallery = document.getElementById('report-photo-gallery');
+        gallery.innerHTML = ''; 
+
+        const labels = {
+            main: '현장 메인', main_add: '현장 추가',
+            sub: '문제 부위', sub_add: '문제 부위 추가',
+            acoustic: '음향 카메라(필수)', acoustic_add: '음향 분석 추가',
+            thermal: '열화상', thermal_add: '열화상 추가'
+        };
+
+        let hasPhoto = false;
+        for (const [key, url] of Object.entries(imageUrls)) {
+            if (url) {
+                hasPhoto = true;
+                const div = document.createElement('div');
+                div.className = 'report-photo-item';
+                div.innerHTML = `
+                    <img src="${url}" class="report-photo-img">
+                    <div class="report-photo-label">${labels[key] || key}</div>
+                `;
+                gallery.appendChild(div);
+            }
+        }
+        
+        if (!hasPhoto) {
+            gallery.innerHTML = '<div style="grid-column:span 2; text-align:center; color:#999; font-size:0.8rem;">첨부된 사진이 없습니다.</div>';
+        }
+    }
+
+    function getSelectedNoiseTypes() {
+        const checkboxes = document.querySelectorAll('.noise-selector:checked');
+        let selected = [];
+        checkboxes.forEach((cb) => {
+            selected.push(cb.value);
+        });
+        return selected;
+    }
+
     async function startAnalysis() {
+        if (!checkDailyLimit()) {
+            return; 
+        }
+
         const resultArea = document.getElementById('result-area');
         const loading = document.getElementById('loading-spinner');
-        const loadingText = document.getElementById('loading-text');
         const content = document.getElementById('analysis-content');
         const chartSection = document.getElementById('chart-section');
-        const userDate = document.getElementById('date').value;
+        const summaryBox = document.getElementById('report-summary-box');
+        
+        const dong = document.getElementById('dong').value;
+        const ho = document.getElementById('ho').value;
+        const location = document.getElementById('location').value || "미지정";
+        
+        // 1. 사용자 선택 부위 가져오기
+        const selectedNoiseTypes = getSelectedNoiseTypes();
+        if (selectedNoiseTypes.length === 0) {
+            alert("정확한 분석을 위해 '소음 발생 부위'를 최소 하나 이상 선택해주세요.");
+            return;
+        }
+        
+        // 2. 선택된 부위와 매칭되는 레퍼런스 데이터만 추출 (RAG 핵심 로직)
+        let referenceData = [];
+        // DB의 types 배열 중 하나라도 사용자가 선택한 값에 포함되면 추출
+        referenceData = PUBLIC_TECH_DB.filter(item => 
+            item.types.some(t => selectedNoiseTypes.includes(t))
+        );
+
+        // 만약 매칭되는 게 없으면 전체 데이터 사용 (안전장치)
+        if (referenceData.length === 0) referenceData = PUBLIC_TECH_DB;
+        const referenceString = JSON.stringify(referenceData, null, 2);
+
+        let dateInput = document.getElementById('date').value;
+        if (!dateInput) {
+            const dateNow = new Date();
+            const year = dateNow.getFullYear();
+            const month = String(dateNow.getMonth() + 1).padStart(2, '0');
+            const day = String(dateNow.getDate()).padStart(2, '0');
+            dateInput = `${year}.${month}.${day}`;
+        }
+        
+        summaryBox.innerHTML = `
+            <div class="report-summary-item">
+                <span class="report-summary-label">진단 일자</span>
+                <span class="report-summary-value">${dateInput}</span>
+            </div>
+            <div class="report-summary-item">
+                <span class="report-summary-label">현장 위치</span>
+                <span class="report-summary-value">${dong}동 ${ho}호</span>
+            </div>
+            <div class="report-summary-item">
+                <span class="report-summary-label">중점 분석 대상</span>
+                <span class="report-summary-value" style="color:var(--primary-main);">${selectedNoiseTypes.join(', ')}</span>
+            </div>
+            <div class="report-summary-item" style="border-top:1px solid #cbd5e1; margin-top:5px; padding-top:5px;">
+                 <span class="report-summary-label">소음 파일 분석</span>
+                 <span class="report-summary-value" style="color:${images.media ? '#2563eb' : '#94a3b8'}">
+                    ${images.media ? '<i class="fas fa-check-circle"></i> 포함됨' : '없음'}
+                 </span>
+            </div>
+        `;
+        summaryBox.style.display = 'block';
 
         resultArea.style.display = 'block';
         loading.style.display = 'block';
         content.style.display = 'none';
         chartSection.style.display = 'none';
+        renderReportPhotos(); 
         resultArea.scrollIntoView({behavior: "smooth"});
 
         if(!images.main) {
-            alert("정밀 분석을 위해 '소음 부위(필수)' 사진은 꼭 등록해주세요.");
+            alert("정확한 진단을 위해 '현장 메인 사진'은 필수입니다.");
             loading.style.display = 'none';
             return;
         }
 
-        // [핵심] 소음 진단용 전문가 프롬프트
+        const currentMonth = new Date().getMonth() + 1; 
+        const isWinter = (currentMonth >= 11 || currentMonth <= 3); 
+        
+        let seasonPrompt = isWinter 
+            ? "[계절: 동절기] 열수축(창호,배관) 및 난방 배관 수격 현상, 결로 가능성 높음" 
+            : "[계절: 하절기] 에어컨/공조 기기 가동 소음 및 창문 개방으로 인한 외부 소음 유입";
+
+        // [변경] AI 페르소나 및 데이터 출처 관련 프롬프트 수정
         const prompt = `
-            당신은 20년 경력의 '산업 소음 및 설비 진단 전문가(청개구리 박사)'입니다.
-            
-            [진단 정보]
-            - 진단 일자: ${userDate} (이 날짜를 리포트 상단에 명시하세요)
+            당신은 웹상의 방대한 건축 기술 데이터와 소음 진동 이론을 학습한 **'AI 소음 진단 전문 어시스턴트'**입니다.
+            제출된 멀티모달 데이터(현장 사진, 소음 음원)와 아래 제공되는 **[공개 기술 레퍼런스 데이터]**를 정밀 대조하여 기술 소견서를 작성하십시오.
 
-            사용자는 소음 발생 현장의 사진과 FLIR SI-2(초음파 카메라) 이미지를 업로드했습니다.
-            이 데이터를 분석하여 소음의 원인을 진단해야 합니다.
+            [분석 기준 데이터 (Web Public Data)]
+            아래 JSON 데이터는 웹상의 건축/설비 기술 자료 중 사용자의 상황과 관련된 핵심 내용을 정리한 것입니다. 분석 시 이 내용을 인용하여 신뢰도를 높이십시오.
+            '''json
+            ${referenceString}
+            '''
 
-            [분석 지침]
-            1. **현장 사진 분석**: 소음이 발생하는 위치(배관, 모터, 창호 등)를 파악하세요.
-            2. **FLIR SI-2 이미지 분석**:
-               - 음향 이미지가 보여주는 소음원 위치를 특정하세요.
-               - 이것이 '기체 누설(Air Leak)', '전기 부분 방전(Partial Discharge)', '기계적 결함(베어링 마모 등)' 중 무엇인지 추정하세요.
-            3. **결과 판정**:
-               - 소음 원인을 **기체 누설 vs 전기 방전 vs 기계 결함 vs 기타(정상 포함)** 비중(%)으로 판단하세요.
+            [분석 범위 제한]
+            - **사용자가 선택한 중점 분석 부위:** ${selectedNoiseTypes.join(', ')}
+            - **지침:** 위 [분석 기준 데이터]에 있는 'diagnosis(진단명)', 'mechanism(발생원리)', 'solution(해결책)' 내용을 사용하여 전문적으로 작성하십시오.
+            - **주의:** 당신은 법적 자격이 있는 '기술사'가 아니므로, 단정적인 표현보다는 "분석됨", "추정됨", "사료됨" 등의 객관적 어미를 사용하십시오.
 
-            [출력 형식]
-            1. 전문적인 소음 진단 리포트를 작성하세요 (마크다운 형식).
-            2. 리포트 맨 마지막 줄에 반드시 아래 **JSON 형식**으로 비중을 출력하세요. (차트 그리기용)
-            
-            Example Output:
-            ... (리포트 내용) ...
-            
+            [진단 일자 및 환경]
+            - 진단 일자: **${dateInput}**
+            - 환경: ${seasonPrompt}
+            - 사용자 메모: ${document.getElementById('defect-content').value}
+
+            [보고서 출력 형식]
+            1. **[진단 개요]**: 일시 / 중점 분석 대상 명시
+            2. **[청음 및 영상 데이터 분석]**: 
+               - 오디오 파일이 있다면 주파수 특성(쿵 소리 vs 웅 소리 등) 분석
+               - 사진 상의 노후화, 틈새, 설치 상태 분석
+            3. **[종합 기술 소견 (Diagnosis)]**: 
+               - 추정 원인 (위 레퍼런스 데이터의 'diagnosis' 활용)
+               - 발생 메커니즘 (위 레퍼런스 데이터의 'mechanism' 활용)
+            4. **[전문가 권장 대책 (Solution)]**: 
+               - 단계별 조치 사항 (위 레퍼런스 데이터의 'solution' 활용)
+
+            [마지막 필수 JSON 데이터]
+            내용 끝에 다음 JSON을 반드시 포함하세요 (차트 생성용, 전체 합 100):
             ___JSON_START___
-            {"leak": 60, "discharge": 10, "mechanical": 30}
+            {"ventilation": 40, "insulation": 40, "normal": 20}
             ___JSON_END___
+            (ventilation: 환경/사용 요인, insulation: 구조/시공 요인, normal: 기타/단순 노후화)
         `;
 
         let parts = [{ text: prompt }];
-        if(images.main) parts.push({ inline_data: { mime_type: "image/jpeg", data: images.main } });
-        if(images.sub) parts.push({ inline_data: { mime_type: "image/jpeg", data: images.sub } });
-        if(images.equip) parts.push({ inline_data: { mime_type: "image/jpeg", data: images.equip } }); 
-        if(images.thermal) parts.push({ inline_data: { mime_type: "image/jpeg", data: images.thermal } });
-
-        const models = ["gemini-2.0-flash-exp", "gemini-1.5-pro", "gemini-1.5-flash"];
-        let success = false;
-        let finalJson = null;
-
-        for (let i = 0; i < models.length; i++) {
-            const modelName = models[i];
-            loadingText.innerText = `AI 모델(${modelName}) 소음 데이터 분석 중...`;
-
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: parts }] })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.candidates && data.candidates.length > 0) {
-                        let aiText = data.candidates[0].content.parts[0].text;
-                        
-                        const jsonMatch = aiText.match(/___JSON_START___([\s\S]*?)___JSON_END___/);
-                        if(jsonMatch) {
-                            try {
-                                finalJson = JSON.parse(jsonMatch[1]);
-                                aiText = aiText.replace(jsonMatch[0], ""); 
-                            } catch(e) { console.error("JSON 파싱 오류", e); }
-                        }
-
-                        const md = window.markdownit();
-                        content.innerHTML = md.render(aiText);
-                        success = true;
-                        break; 
-                    }
+        
+        for (const [key, value] of Object.entries(images)) {
+            if (value) {
+                if (key === 'media') {
+                    parts.push({ 
+                        inline_data: { 
+                            mime_type: images.media_mime, 
+                            data: value 
+                        } 
+                    });
+                    parts.push({ text: `[분석할 현장 소음 파일]` });
+                } 
+                else if (key === 'media_mime') { continue; }
+                else {
+                    parts.push({ inline_data: { mime_type: "image/jpeg", data: value } });
+                    parts.push({ text: `[증거 이미지: ${key}]` });
                 }
-            } catch (error) { console.error(error); }
+            }
         }
 
-        loading.style.display = 'none';
-        content.style.display = 'block';
+        const modelName = "gemini-2.0-flash-exp"; 
 
-        if (success && finalJson) {
-            chartSection.style.display = 'block';
-            drawChart(finalJson);
-        } else if (!success) {
-            content.innerHTML = `<p style="color:red; text-align:center;">⚠️ 분석 실패. 잠시 후 다시 시도해주세요.</p>`;
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    contents: [{ parts: parts }],
+                    generationConfig: {
+                        temperature: 0.2, 
+                        topK: 40,
+                        topP: 0.95,
+                        maxOutputTokens: 4096,
+                    }
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.candidates && data.candidates.length > 0) {
+                    let aiText = data.candidates[0].content.parts[0].text;
+                    let finalJson = null;
+
+                    const jsonMatch = aiText.match(/___JSON_START___([\s\S]*?)___JSON_END___/);
+                    if(jsonMatch) {
+                        try {
+                            finalJson = JSON.parse(jsonMatch[1]);
+                            aiText = aiText.replace(jsonMatch[0], ""); 
+                        } catch(e) { console.error(e); }
+                    }
+
+                    const md = window.markdownit();
+                    content.innerHTML = md.render(aiText);
+                    loading.style.display = 'none';
+                    content.style.display = 'block';
+
+                    if (finalJson) {
+                        chartSection.style.display = 'block';
+                        drawChart(finalJson);
+                    }
+                }
+            } else { throw new Error("API Error"); }
+        } catch (error) { 
+            console.error(error);
+            loading.style.display = 'none';
+            content.style.display = 'block';
+            content.innerHTML = "<p style='color:red;'>분석 중 오류가 발생했습니다. (파일 용량이 너무 크거나 네트워크 문제일 수 있습니다.)</p>";
         }
     }
 
-    // 4. 소음 원인 차트 그리기 (산업용 컬러 적용)
     function drawChart(data) {
-        const ctx = document.getElementById('causeChart').getContext('2d');
-        if(myChart) myChart.destroy();
+        var chartData = google.visualization.arrayToDataTable([
+            ['요인', '비율'],
+            ['환경/사용 요인', data.ventilation],
+            ['구조/시공 요인', data.insulation],
+            ['기타/노후화', data.normal]
+        ]);
 
-        // 데이터가 없는 항목은 0 처리
-        const valLeak = data.leak || 0;
-        const valDischarge = data.discharge || 0;
-        const valMech = data.mechanical || 0;
-        const valEtc = 100 - (valLeak + valDischarge + valMech);
+        var options = {
+            is3D: true, 
+            colors: ['#00e676', '#2563eb', '#64748b'], 
+            backgroundColor: 'transparent',
+            fontSize: 13,
+            chartArea: { width: '100%', height: '90%' },
+            legend: { position: 'bottom', textStyle: {fontSize: 11} }
+        };
 
-        myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ['기체 누설 (Leak)', '전기 방전 (Elec)', '기계 결함 (Mech)', '기타/정상'],
-                datasets: [{
-                    data: [valLeak, valDischarge, valMech, valEtc > 0 ? valEtc : 0],
-                    backgroundColor: [
-                        '#2962ff', // 누설 (Electric Blue)
-                        '#ffc107', // 방전 (Amber)
-                        '#d50000', // 기계 (Red)
-                        '#4caf50'  // 기타 (Green)
-                    ],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { 
-                        position: 'bottom',
-                        labels: {
-                            font: { family: "'Noto Sans KR', sans-serif" },
-                            boxWidth: 12
-                        }
-                    },
-                    datalabels: {
-                        color: '#fff',
-                        font: { weight: 'bold', size: 14 },
-                        formatter: (value) => {
-                            if(value > 0) return value + '%';
-                            else return '';
-                        },
-                        textShadowBlur: 4,
-                        textShadowColor: '#000'
-                    }
-                }
-            }
-        });
+        var chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+        chart.draw(chartData, options);
     }
 </script>
 
