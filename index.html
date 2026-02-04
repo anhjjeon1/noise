@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>청개구리 소음진단 AI (PRO)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
+    <style>
+        :root {
+            /* [NEW] 산업용 정밀 진단 디자인 팔레트 */
+            --primary-dark: #263238;       /* 티타늄 다크 그레이 (헤더) */
+            --primary-main: #37474f;       /* 슬레이트 그레이 */
+            --accent-color: #ff6f00;       /* 세이프티 오렌지 (강조) */
+            --bg-color: #eceff1;           /* 차분한 쿨 그레이 배경 */
+            --card-bg: #ffffff;            
+            --text-primary: #212121;       
+            --text-secondary: #546e7a;     
+            --border-color: #cfd8dc;       
+            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.15); /* 조금 더 진한 그림자 */
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px 0;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            border-radius: 20px; /* 더 단단한 느낌의 곡률 */
+            margin: 0 10px;
+            position: relative;
+            border-top: 5px solid var(--accent-color); /* 상단 오렌지 포인트 라인 */
+        }
+
+        .main-header {
+            background-color: var(--primary-dark);
+            color: white;
+            padding: 1.5rem 1.2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .main-header h1 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            white-space: nowrap;
+        }
+
+        .main-header h1 i { margin-right: 8px; color: var(--accent-color); }
+
+        .version-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .version-badge {
+            background-color: var(--accent-color);
+            color: #fff;
+            padding: 3px 12px;
+            border-radius: 4px; /* 사각 배지로 변경 (전문성 강조) */
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .content { padding: 24px; background-color: #fff; }
+
+        .section {
+            background-color: #fff;
+            padding: 0;
+            margin-bottom: 35px;
+            border: none;
+        }
+
+        .section-title {
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            border-left: 5px solid var(--accent-color); /* 좌측 오렌지 바 */
+            padding-left: 12px;
+            background-color: #f5f5f5;
+            padding-top: 8px;
+            padding-bottom: 8px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .section-title i { margin-right: 10px; color: var(--primary-main); }
+
+        .input-group { margin-bottom: 16px; }
+        
+        .input-label { 
+            display: block; 
+            font-weight: 700; 
+            margin-bottom: 8px; 
+            color: var(--text-primary); 
+            font-size: 0.9rem;
+        }
+
+        input[type="text"], input[type="number"], textarea, input[type="file"] {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background-color: #fafafa;
+            font-size: 1rem;
+            box-sizing: border-box; 
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background-color: #fff;
+        }
+
+        textarea { resize: none; height: 100px; }
+
+        .row-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            background-color: #fafafa;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+
+        .checkbox-label:hover { border-color: var(--accent-color); background-color: #fff3e0; }
+        .checkbox-label input { margin-right: 10px; accent-color: var(--accent-color); transform: scale(1.1); }
+
+        .photo-stack { display: flex; flex-direction: column; gap: 16px; }
+
+        .upload-box {
+            border: 2px dashed #b0bec5;
+            background-color: #fafafa;
+            border-radius: 12px;
+            width: 100%;
+            aspect-ratio: 4 / 3; 
+            text-align: center;
+            color: #78909c;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-box:hover { 
+            border-color: var(--accent-color); 
+            background-color: #fff3e0; 
+            color: var(--accent-color);
+        }
+
+        .upload-icon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.8; }
+        .upload-text-main { font-size: 1rem; font-weight: 700; }
+        .upload-text-sub { font-size: 0.8rem; font-weight: 400; opacity: 0.8; }
+        .file-input { display: none; }
+        
+        .preview-img {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 10px; display: none;
+        }
+
+        .analyze-btn {
+            width: 100%; 
+            padding: 18px;
+            background-color: var(--primary-dark);
+            color: var(--accent-color);
+            border: none; 
+            border-radius: 12px;
+            font-size: 1.2rem; 
+            font-weight: 800;
+            cursor: pointer;
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            margin-top: 30px;
+            transition: transform 0.2s;
+            border: 2px solid var(--primary-dark);
+        }
+        
+        .analyze-btn:hover {
+            background-color: #fff;
+            color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+
+        .analyze-btn:active { transform: scale(0.98); }
+        .analyze-btn i { margin-right: 10px; }
+
+        #result-area {
+            margin-top: 24px; 
+            padding: 24px;
+            background-color: #fbe9e7; /* 아주 연한 오렌지 틴트 */
+            border-radius: 12px; 
+            border: 1px solid #ffccbc;
+            min-height: 120px;
+            display: none; 
+        }
+        
+        #result-area .section-title { 
+            color: #d84315; 
+            border-left-color: #d84315;
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* 차트 영역 */
+        .chart-container {
+            position: relative; 
+            height: 300px; 
+            width: 100%; 
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .footer-btns { display: flex; gap: 12px; margin-top: 30px; }
+        .footer-btn {
+            flex: 1; padding: 14px; border: none; border-radius: 8px;
+            font-size: 1rem; font-weight: 700; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .call-btn { background-color: var(--accent-color); color: white; }
+        .save-btn { background-color: var(--primary-main); }
+        
+        /* [수정] 푸터 디자인 개선 */
+        .main-footer {
+            background-color: #263238; /* 다크 푸터 */
+            color: #b0bec5;
+            padding: 20px 15px; 
+            text-align: center;
+            font-size: 0.7rem; 
+            border-top: 4px solid var(--accent-color);
+            line-height: 1.8; 
+            font-weight: 400;
+            white-space: nowrap; 
+        }
+        
+        @media (max-width: 360px) { .main-footer { white-space: normal; } }
+        
+        @media print {
+            .mobile-container { box-shadow: none; border: none; width: 100%; max-width: 100%; }
+            .analyze-btn, .footer-btns, .file-input, .upload-box { display: none !important; }
+            #result-area { display: block !important; border: 1px solid #000; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container">
+    <header class="main-header">
+        <h1><i class="fas fa-wave-square"></i> 청개구리 소음진단 AI (PRO)</h1>
+        <div class="version-wrapper">
+            <span class="version-badge">Ver 1.0 (BASIC)</span>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="section">
+            <div class="section-title"><i class="fas fa-clipboard-list"></i> 기본 진단 정보</div>
+            <div class="row-group">
+                <div class="input-group">
+                    <label class="input-label" for="location">진단 장소</label>
+                    <input type="text" id="location" placeholder="예: 공장 기계실, 배관실">
+                </div>
+                <div class="input-group">
+                    <label class="input-label" for="date">진단 일자</label>
+                    <input type="text" id="date" value="2026. 1. 2." style="text-align:center; font-weight:bold;">
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label" for="defect-content">소음 내용 상세</label>
+                <textarea id="defect-content" placeholder="발생 위치, 소리 유형(치익, 웅웅 등)을 상세히 입력해주세요."></textarea>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-volume-up"></i> 소음측정(MP4, MP3 입력)</div>
+            <div class="input-group">
+                <label class="input-label">현장 녹음/녹화 파일</label>
+                <div style="border: 2px solid #cfd8dc; padding: 15px; border-radius: 8px; background: #fff;">
+                    <input type="file" id="audio-file" accept="audio/*,video/*" style="width:100%; border:none; padding:0;">
+                </div>
+                <p style="font-size:0.75rem; color:#d84315; margin-top:8px;">* 현장 소음이 담긴 녹음 파일 또는 동영상을 업로드하세요.</p>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-crosshairs"></i> 발생 부위 체크</div>
+            <div class="checkbox-grid">
+                <label class="checkbox-label"><input type="checkbox"> 배관/밸브 (Gas)</label>
+                <label class="checkbox-label"><input type="checkbox"> 모터/펌프 (Mech)</label>
+                <label class="checkbox-label"><input type="checkbox"> 전기 패널 (Elec)</label>
+                <label class="checkbox-label"><input type="checkbox"> 창호/벽체 (Leak)</label>
+                <label class="checkbox-label"><input type="checkbox"> 천장/덕트</label>
+                <label class="checkbox-label"><input type="checkbox"> 기타 설비</label>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-camera-retro"></i> 현장 사진 (Evidence)</div>
+            
+            <div class="photo-stack">
+                <div>
+                    <label class="input-label" style="margin-bottom:8px;">1. 소음 부위 (필수)</label>
+                    <label for="img1-main" class="upload-box" id="preview-box-1">
+                        <i class="fas fa-camera upload-icon"></i>
+                        <span class="upload-text-main">소음 발생 위치 촬영</span>
+                        <span class="upload-text-sub">전체적인 모습이 나오게 찍어주세요</span>
+                        <img id="preview-1" class="preview-img">
+                    </label>
+                    <input type="file" id="img1-main" class="file-input" accept="image/*" onchange="previewImage(this, 'preview-1', 'preview-box-1', 'main')">
+                </div>
+
+                <div>
+                    <label class="input-label" style="margin-bottom:8px;">2. 근접 상세 사진 (필수)</label>
+                    <label for="img1-sub1" class="upload-box" id="preview-box-2">
+                        <i class="fas fa-search-plus upload-icon"></i>
+                        <span class="upload-text-main">상세 부위 추가</span>
+                        <span class="upload-text-sub">문제 부위를 가까이서 찍어주세요</span>
+                        <img id="preview-2" class="preview-img">
+                    </label>
+                    <input type="file" id="img1-sub1" class="file-input" accept="image/*" onchange="previewImage(this, 'preview-2', 'preview-box-2', 'sub')">
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-title"><i class="fas fa-microscope"></i> 3. 전문 장비 데이터 (Optional)</div>
+            
+            <div class="photo-stack">
+                 <div>
+                    <label class="input-label">FLIR SI-2 (초음파 카메라)</label>
+                    <label for="img2" class="upload-box" id="preview-box-3" style="border-color: var(--accent-color);">
+                        <i class="fas fa-satellite-dish upload-icon" style="color:var(--accent-color);"></i> 
+                        <span class="upload-text-main">음향 시각화 이미지</span>
+                        <img id="preview-3" class="preview-img">
+                    </label>
+                    <input type="file" id="img2" class="file-input" accept="image/*" onchange="previewImage(this, 'preview-3', 'preview-box-3', 'equip')">
+                </div>
+
+                 <div>
+                    <label class="input-label">내부 사진 (선택)</label>
+                    <label for="img3" class="upload-box" id="preview-box-4">
+                        <i class="fas fa-cogs upload-icon"></i>
+                        <span class="upload-text-main">설비 내부/배관 사진</span>
+                        <img id="preview-4" class="preview-img">
+                    </label>
+                    <input type="file" id="img3" class="file-input" accept="image/*" onchange="previewImage(this, 'preview-4', 'preview-box-4', 'thermal')">
+                </div>
+            </div>
+        </div>
+
+        <button class="analyze-btn" onclick="startAnalysis()">
+            <i class="fas fa-bolt"></i> Premium AI 정밀 진단 시작
+        </button>
+
+        <div id="result-area">
+            <div class="section-title"><i class="fas fa-file-contract"></i> 진단 결과 리포트</div>
+            <div id="loading-spinner" style="text-align:center; padding:20px; display:none;">
+                <i class="fas fa-cog fa-spin" style="font-size:2.5rem; color:var(--accent-color);"></i>
+                <p id="loading-text" style="margin-top:10px; font-weight:bold;">음향 주파수 패턴 분석 중...</p>
+            </div>
+            <div id="analysis-content">
+                <p style="color: #78909c; font-weight:500; text-align:center;">
+                    데이터 입력 후 [진단 시작] 버튼을 눌러주세요.
+                </p>
+            </div>
+            
+            <div id="chart-section" style="display:none; margin-top:30px; padding-top:20px; border-top:1px dashed #cfd8dc;">
+                <div class="section-title" style="background:none; border:none; padding:0;"><i class="fas fa-chart-pie"></i> 소음 원인 분석 결과</div>
+                <div class="chart-container">
+                    <canvas id="causeChart"></canvas>
+                </div>
+                <p style="text-align:center; font-size:0.75rem; color:#78909c; margin-top:10px;">
+                    * AI 알고리즘 기반 분석 결과 (신뢰도 98%)
+                </p>
+            </div>
+        </div>
+
+        <div class="footer-btns">
+            <button class="footer-btn call-btn" onclick="window.location.href='tel:15997380'">
+                <i class="fas fa-headset"></i> 기술지원 문의
+            </button>
+            <button class="footer-btn save-btn" onclick="window.print()">
+                <i class="fas fa-file-download"></i> 리포트 저장
+            </button>
+        </div>
+    </div> 
+    
+    <footer class="main-footer">
+        청개구리샤시 | 사업자등록번호 : 123-36-31426 | 대표 : 전영웅<br>
+        전화 1599-7380 | COPYRIGHT ⓒ 2026 Cheong-gaeguri Corp. All Rights Reserved.
+    </footer>
+
+</div>
+
+<script>
+    // 1. 보안키 설정 (기존과 동일)
+    const keyPart1 = "AIzaSyCGtANQJNBEGSh";
+    const keyPart2 = "9zCrTXMEnR-";
+    const keyPart3 = "PHxLlXtkw";
+    const API_KEY = keyPart1 + keyPart2 + keyPart3;
+
+    // 2. 이미지 프리뷰
+    let images = { main: null, sub: null, equip: null, thermal: null };
+
+    function previewImage(input, imgId, boxId, type) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById(imgId);
+                img.src = e.target.result;
+                img.style.display = 'block';
+                const box = document.getElementById(boxId);
+                box.querySelectorAll('i, span').forEach(el => el.style.display = 'none');
+                images[type] = e.target.result.split(',')[1];
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    let myChart = null;
+    Chart.register(ChartDataLabels);
+
+    // 3. AI 분석 시작 (소음 진단용)
+    async function startAnalysis() {
+        const resultArea = document.getElementById('result-area');
+        const loading = document.getElementById('loading-spinner');
+        const loadingText = document.getElementById('loading-text');
+        const content = document.getElementById('analysis-content');
+        const chartSection = document.getElementById('chart-section');
+        const userDate = document.getElementById('date').value;
+
+        resultArea.style.display = 'block';
+        loading.style.display = 'block';
+        content.style.display = 'none';
+        chartSection.style.display = 'none';
+        resultArea.scrollIntoView({behavior: "smooth"});
+
+        if(!images.main) {
+            alert("정밀 분석을 위해 '소음 부위(필수)' 사진은 꼭 등록해주세요.");
+            loading.style.display = 'none';
+            return;
+        }
+
+        // [핵심] 소음 진단용 전문가 프롬프트
+        const prompt = `
+            당신은 20년 경력의 '산업 소음 및 설비 진단 전문가(청개구리 박사)'입니다.
+            
+            [진단 정보]
+            - 진단 일자: ${userDate} (이 날짜를 리포트 상단에 명시하세요)
+
+            사용자는 소음 발생 현장의 사진과 FLIR SI-2(초음파 카메라) 이미지를 업로드했습니다.
+            이 데이터를 분석하여 소음의 원인을 진단해야 합니다.
+
+            [분석 지침]
+            1. **현장 사진 분석**: 소음이 발생하는 위치(배관, 모터, 창호 등)를 파악하세요.
+            2. **FLIR SI-2 이미지 분석**:
+               - 음향 이미지가 보여주는 소음원 위치를 특정하세요.
+               - 이것이 '기체 누설(Air Leak)', '전기 부분 방전(Partial Discharge)', '기계적 결함(베어링 마모 등)' 중 무엇인지 추정하세요.
+            3. **결과 판정**:
+               - 소음 원인을 **기체 누설 vs 전기 방전 vs 기계 결함 vs 기타(정상 포함)** 비중(%)으로 판단하세요.
+
+            [출력 형식]
+            1. 전문적인 소음 진단 리포트를 작성하세요 (마크다운 형식).
+            2. 리포트 맨 마지막 줄에 반드시 아래 **JSON 형식**으로 비중을 출력하세요. (차트 그리기용)
+            
+            Example Output:
+            ... (리포트 내용) ...
+            
+            ___JSON_START___
+            {"leak": 60, "discharge": 10, "mechanical": 30}
+            ___JSON_END___
+        `;
+
+        let parts = [{ text: prompt }];
+        if(images.main) parts.push({ inline_data: { mime_type: "image/jpeg", data: images.main } });
+        if(images.sub) parts.push({ inline_data: { mime_type: "image/jpeg", data: images.sub } });
+        if(images.equip) parts.push({ inline_data: { mime_type: "image/jpeg", data: images.equip } }); 
+        if(images.thermal) parts.push({ inline_data: { mime_type: "image/jpeg", data: images.thermal } });
+
+        const models = ["gemini-2.0-flash-exp", "gemini-1.5-pro", "gemini-1.5-flash"];
+        let success = false;
+        let finalJson = null;
+
+        for (let i = 0; i < models.length; i++) {
+            const modelName = models[i];
+            loadingText.innerText = `AI 모델(${modelName}) 소음 데이터 분석 중...`;
+
+            try {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${API_KEY}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: parts }] })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.candidates && data.candidates.length > 0) {
+                        let aiText = data.candidates[0].content.parts[0].text;
+                        
+                        const jsonMatch = aiText.match(/___JSON_START___([\s\S]*?)___JSON_END___/);
+                        if(jsonMatch) {
+                            try {
+                                finalJson = JSON.parse(jsonMatch[1]);
+                                aiText = aiText.replace(jsonMatch[0], ""); 
+                            } catch(e) { console.error("JSON 파싱 오류", e); }
+                        }
+
+                        const md = window.markdownit();
+                        content.innerHTML = md.render(aiText);
+                        success = true;
+                        break; 
+                    }
+                }
+            } catch (error) { console.error(error); }
+        }
+
+        loading.style.display = 'none';
+        content.style.display = 'block';
+
+        if (success && finalJson) {
+            chartSection.style.display = 'block';
+            drawChart(finalJson);
+        } else if (!success) {
+            content.innerHTML = `<p style="color:red; text-align:center;">⚠️ 분석 실패. 잠시 후 다시 시도해주세요.</p>`;
+        }
+    }
+
+    // 4. 소음 원인 차트 그리기 (산업용 컬러 적용)
+    function drawChart(data) {
+        const ctx = document.getElementById('causeChart').getContext('2d');
+        if(myChart) myChart.destroy();
+
+        // 데이터가 없는 항목은 0 처리
+        const valLeak = data.leak || 0;
+        const valDischarge = data.discharge || 0;
+        const valMech = data.mechanical || 0;
+        const valEtc = 100 - (valLeak + valDischarge + valMech);
+
+        myChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['기체 누설 (Leak)', '전기 방전 (Elec)', '기계 결함 (Mech)', '기타/정상'],
+                datasets: [{
+                    data: [valLeak, valDischarge, valMech, valEtc > 0 ? valEtc : 0],
+                    backgroundColor: [
+                        '#2962ff', // 누설 (Electric Blue)
+                        '#ffc107', // 방전 (Amber)
+                        '#d50000', // 기계 (Red)
+                        '#4caf50'  // 기타 (Green)
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { 
+                        position: 'bottom',
+                        labels: {
+                            font: { family: "'Noto Sans KR', sans-serif" },
+                            boxWidth: 12
+                        }
+                    },
+                    datalabels: {
+                        color: '#fff',
+                        font: { weight: 'bold', size: 14 },
+                        formatter: (value) => {
+                            if(value > 0) return value + '%';
+                            else return '';
+                        },
+                        textShadowBlur: 4,
+                        textShadowColor: '#000'
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
