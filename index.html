@@ -147,7 +147,7 @@
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단 AI (Expert)</h1>
         <div style="text-align:right;">
-            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 11.1 Stable</span>
+            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 11.2 Stable</span>
         </div>
     </header>
     <div class="content">
@@ -536,6 +536,8 @@ ${envInfo}${dbInfo}${patternInfo}
 ${dbMax ? `5. **dB 측정값 정량분석**: 제출된 측정값(Lmax: ${dbMax}dB)을 법적 기준과 비교하여 초과/미달 판정` : ''}
 6. **복합원인 가능성** 분석 (단일원인 + 복합원인 시나리오 모두 제시)
 7. **시공하자 vs 환경요인** 귀책비율 구분
+8. **⚠️ 무관 부위 언급 절대 금지**: 사진에 창호가 보이지 않거나, 소음 발생 부위가 창호와 무관한 경우(예: 천장 소음, 배관 소음) 창호에 대한 분석이나 언급을 하지 마세요. 사용자가 선택한 '중점 분석 부위'와 직접적으로 관련된 항목만 분석하세요. 관련 없는 부위를 억지로 끌어다 언급하면 보고서 신뢰도가 크게 떨어집니다.
+9. **⚠️ 각 추정원인별 해결방법 필수**: 종합 소견에서 추정원인을 제시할 때, 반드시 각 원인에 대한 구체적 해결방법(레퍼런스DB의 solution 인용)을 함께 기재하세요. 원인만 나열하고 해결방법이 빠지면 안 됩니다. 특히 수격현상, 배수음 등 배관 관련 소음은 해결방법(감압밸브, 수격방지기, 배관래핑 등)을 반드시 상세히 포함하세요.
 
 ##[보고서 출력 형식 (8개 섹션)]
 
@@ -554,15 +556,20 @@ ${dbMax ? `- dB 측정값 기반 정량분석\n- 법적 기준 대비 판정 (�
 
 ### 4. 🎯 종합 기술 소견 (Diagnosis)
 - **1차 추정원인** (가장 유력한 단일 원인, 레퍼런스DB diagnosis 인용)
+  → 이 원인의 **구체적 해결방법** 필수 기재 (레퍼런스DB solution 인용)
 - **2차 추정원인** (복합/보조 원인 가능성)
+  → 이 원인의 **구체적 해결방법** 필수 기재 (레퍼런스DB solution 인용)
 - 발생 메커니즘 상세 설명 (레퍼런스DB mechanism 인용, 물리학 공식 포함)
 - 해당 KS/ISO 규격 번호 및 기준값 명시
+- **주의: 사용자가 선택하지 않은 부위나 사진에 보이지 않는 부위는 언급하지 말 것**
 
 ### 5. 🛠️ 단계별 전문가 권장 대책 (Solution Protocol)
-- **긴급 1단계** (즉시 시행 가능한 조치)
-- **본격 2단계** (전문업체 시공 필요)
-- **근본 3단계** (구조적/설비적 개선)
+- **긴급 1단계** (즉시 시행 가능한 조치) - 구체적 자재명/규격 포함
+- **본격 2단계** (전문업체 시공 필요) - 구체적 시공방법 포함
+- **근본 3단계** (구조적/설비적 개선) - 장기적 해결책
 - 각 단계별 예상 효과(dB 저감량 추정) 기재
+- **수격현상 포함 시**: 감압밸브(PRV) 조정, 수격방지기 설치, 배관 행거 보강 등 반드시 상세 기재
+- **배수음 포함 시**: 차음시트+흡음재 래핑, 관통부 충진, 방진행거 등 반드시 상세 기재
 
 ### 6. ⚖️ 귀책 사유 판정 (Liability Assessment)
 - 시공하자 요인 비율 (%) + 근거
@@ -578,19 +585,12 @@ ${dbMax ? `- dB 측정값 기반 정량분석\n- 법적 기준 대비 판정 (�
 - 본 AI 분석의 한계점 고지
 
 ##[마지막 필수 JSON 데이터]
-보고서 내용 끝에 반드시 아래 형식의 JSON을 포함하세요:
-___JSON_START___
-{
-  "ventilation": 40,
-  "insulation": 40,
-  "normal": 20,
-  "confidence": {
-    "photo": 75,
-    "acoustic": 60,
-    "overall": 68
-  }
-}
-___JSON_END___
+보고서 본문이 모두 끝난 후, 맨 마지막에 아래 형식의 JSON을 출력하세요.
+**중요: JSON 앞뒤의 구분자 CHART_DATA_START / CHART_DATA_END 를 정확히 그대로 출력하세요. 밑줄이나 별표 등 다른 문자를 추가하지 마세요.**
+
+CHART_DATA_START
+{"ventilation":40,"insulation":40,"normal":20,"confidence":{"photo":75,"acoustic":60,"overall":68}}
+CHART_DATA_END
 - ventilation: 환경/사용 요인(%), insulation: 구조/시공 요인(%), normal: 기타/노후화(%) → 합계 100
 - confidence.photo: 사진 기반 분석 신뢰도(0~100, 사진 명확도/근접촬영 여부에 따라)
 - confidence.acoustic: 음향데이터 신뢰도(0~100, 음향카메라/음성파일 유무에 따라, 없으면 30 이하)
@@ -643,8 +643,33 @@ ___JSON_END___
                 }
                 let aiText=data.candidates[0].content.parts[0].text;
                 let finalJson=null;
-                const jsonMatch=aiText.match(/___JSON_START___([\s\S]*?)___JSON_END___/);
-                if(jsonMatch){try{finalJson=JSON.parse(jsonMatch[1]);aiText=aiText.replace(jsonMatch[0],"");}catch(e){console.error("JSON파싱오류:",e);}}
+                // 다양한 JSON 구분자 패턴 시도 (AI가 변형할 수 있으므로 여러 패턴 매칭)
+                const jsonPatterns=[
+                    /CHART_DATA_START\s*([\s\S]*?)\s*CHART_DATA_END/,
+                    /___JSON_START___([\s\S]*?)___JSON_END___/,
+                    /JSON_START\s*([\s\S]*?)\s*JSON_END/,
+                    /\*\*JSON_START\*\*\s*([\s\S]*?)\s*\*\*JSON_END\*\*/,
+                    /```json\s*\n?\s*(\{[\s\S]*?"confidence"[\s\S]*?\})\s*\n?\s*```/
+                ];
+                for(const pat of jsonPatterns){
+                    const m=aiText.match(pat);
+                    if(m){
+                        try{
+                            const cleaned=m[1].replace(/```json|```/g,'').trim();
+                            finalJson=JSON.parse(cleaned);
+                            aiText=aiText.replace(m[0],"");
+                            console.log("[DEBUG] JSON 파싱 성공:", finalJson);
+                            break;
+                        }catch(e){console.error("JSON파싱시도:",e);}
+                    }
+                }
+                // 최후 폴백: JSON 객체 직접 탐색
+                if(!finalJson){
+                    const fallback=aiText.match(/\{\s*"ventilation"\s*:\s*\d+[\s\S]*?"confidence"[\s\S]*?\}\s*\}/);
+                    if(fallback){
+                        try{finalJson=JSON.parse(fallback[0]);aiText=aiText.replace(fallback[0],"");console.log("[DEBUG] 폴백 JSON 파싱 성공");}catch(e){}
+                    }
+                }
                 const md=window.markdownit();content.innerHTML=md.render(aiText);
                 loading.style.display='none';content.style.display='block';
                 if(finalJson){
