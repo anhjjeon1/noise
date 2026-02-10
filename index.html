@@ -147,7 +147,7 @@
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단 AI (Expert)</h1>
         <div style="text-align:right;">
-            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 11.2 Stable</span>
+            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 11.3 Stable</span>
         </div>
     </header>
     <div class="content">
@@ -612,7 +612,7 @@ CHART_DATA_END
     }
 
     try{
-        const apiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+        const apiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
         console.log("[DEBUG] API 호출 시작...");
         console.log("[DEBUG] API KEY 앞 10자:", API_KEY.substring(0,10)+"...");
 
