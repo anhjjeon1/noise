@@ -131,8 +131,9 @@
 
         @media print {
             body { background:white; padding:0; display:block; }
-            .mobile-container { max-width:100%; width:100%; box-shadow:none; margin:0; border:none; border-radius:0; }
+            .mobile-container { max-width:100%; width:100%; box-shadow:none; margin:0; border:none; border-radius:0; overflow:visible!important; }
             .main-header { border-radius:0; }
+            .content { overflow:visible!important; }
             .content > .section { display:none!important; }
             .analyze-btn,.footer-btns,.file-input,.legal-disclaimer-box,.noise-type-grid,.pattern-grid,.env-grid,.sub-photo-row,.main-footer { display:none!important; }
             #result-area { display:block!important; border:2px solid #000; margin-top:0; padding:10px; }
@@ -155,7 +156,7 @@
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단 AI (Expert)</h1>
         <div style="text-align:right;">
-            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 12.1 Stable</span>
+            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 12.2 Stable</span>
         </div>
     </header>
     <div class="content">
