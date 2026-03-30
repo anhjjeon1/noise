@@ -156,7 +156,7 @@
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단 AI (Expert)</h1>
         <div style="text-align:right;">
-            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 12.2 Stable</span>
+            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 12.3 Stable</span>
         </div>
     </header>
     <div class="content">
@@ -513,17 +513,62 @@ function savePdf(){
     const dong=document.getElementById('dong').value||'000';const ho=document.getElementById('ho').value||'0000';
     const d=new Date();const dateStr=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
     document.title=`${dong}동${ho}호소음검사_${dateStr}`;
-    // 인쇄 전 결과 영역 강제 표시
+
+    // 인쇄 전: 입력 폼 숨기고 결과만 표시
+    const mc=document.querySelector('.mobile-container');
+    const allSections=document.querySelectorAll('.content > .section');
+    const legalBox=document.querySelector('.legal-disclaimer-box');
+    const analyzeBtn=document.getElementById('analyze-btn');
+    const footerBtns=document.querySelector('.footer-btns');
+    const mainFooter=document.querySelector('.main-footer');
     const resultArea=document.getElementById('result-area');
     const content=document.getElementById('analysis-content');
     const chartSection=document.getElementById('chart-section');
     const confSection=document.getElementById('confidence-section');
+    const ocrStatus=document.getElementById('db-ocr-status');
+
+    // 원본 스타일 저장
+    const origMcOverflow=mc.style.overflow;
+    const origMcMaxWidth=mc.style.maxWidth;
+    const origMcBorder=mc.style.border;
+    const origMcBorderRadius=mc.style.borderRadius;
+    const origMcBoxShadow=mc.style.boxShadow;
+
+    // 컨테이너 overflow 해제 + 전폭
+    mc.style.overflow='visible';
+    mc.style.maxWidth='100%';
+    mc.style.border='none';
+    mc.style.borderRadius='0';
+    mc.style.boxShadow='none';
+
+    // 입력 폼 섹션 숨기기
+    allSections.forEach(s=>s.style.display='none');
+    if(legalBox)legalBox.style.display='none';
+    if(analyzeBtn)analyzeBtn.style.display='none';
+    if(footerBtns)footerBtns.style.display='none';
+    if(mainFooter)mainFooter.style.display='none';
+    if(ocrStatus)ocrStatus.style.display='none';
+
+    // 결과 영역 강제 표시
     if(resultArea)resultArea.style.display='block';
     if(content){content.style.display='block';content.style.overflow='visible';content.style.maxHeight='none';}
-    if(chartSection&&chartSection.querySelector('#chart_div canvas'))chartSection.style.display='block';
+    if(chartSection&&chartSection.querySelector('#chart_div'))chartSection.style.display='block';
     if(confSection&&confSection.querySelector('.confidence-bar-wrapper'))confSection.style.display='block';
     document.getElementById('loading-spinner').style.display='none';
+
     window.print();
+
+    // 인쇄 후: 원래 스타일 복원
+    mc.style.overflow=origMcOverflow;
+    mc.style.maxWidth=origMcMaxWidth;
+    mc.style.border=origMcBorder;
+    mc.style.borderRadius=origMcBorderRadius;
+    mc.style.boxShadow=origMcBoxShadow;
+    allSections.forEach(s=>s.style.display='');
+    if(legalBox)legalBox.style.display='';
+    if(analyzeBtn)analyzeBtn.style.display='';
+    if(footerBtns)footerBtns.style.display='';
+    if(mainFooter)mainFooter.style.display='';
 }
 function renderReportPhotos(){const g=document.getElementById('report-photo-gallery');g.innerHTML='';const labels={main:'현장메인',main_add:'현장추가',sub:'문제부위',sub_add:'문제부위추가',acoustic:'음향카메라',acoustic_add:'음향추가',thermal:'소음측정기',thermal_add:'소음측정기추가'};let has=false;for(const[k,u]of Object.entries(imageUrls)){if(u){has=true;const d=document.createElement('div');d.className='report-photo-item';d.innerHTML=`<img src="${u}" class="report-photo-img"><div class="report-photo-label">${labels[k]||k}</div>`;g.appendChild(d);}}if(!has)g.innerHTML='<div style="grid-column:span 2;text-align:center;color:#999;font-size:0.8rem;">첨부사진없음</div>';}
 
