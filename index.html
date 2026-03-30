@@ -182,7 +182,14 @@
                 </div>
             </div>
             <div style="margin-top:10px;padding-top:8px;border-top:1px dashed #e2e8f0;">
-                <div style="font-size:0.75rem;color:#64748b;margin-bottom:5px;text-align:center;"><i class="fas fa-volume-up" style="color:#f59e0b;"></i> 소음계 측정값 (선택 - 입력 시 정량분석)</div>
+                <div style="margin-bottom:10px;">
+                    <label class="input-label" style="text-align:left;font-size:0.8rem;color:var(--primary-dark);"><i class="fas fa-volume-up" style="color:#2563eb;margin-right:4px;"></i>소음측정기 앱 화면 <span style="font-size:0.65rem;color:#2563eb;">- 업로드 시 dB 자동 인식</span></label>
+                    <label for="img-thermal" class="upload-box media-box-style" id="box-thermal" style="aspect-ratio:5/2!important;"><i class="fas fa-volume-up upload-icon" style="font-size:1.3rem;"></i><span class="upload-text-main" style="font-size:0.75rem;">소음측정기 스크린샷 업로드</span><img id="view-thermal" class="preview-img"></label>
+                    <input type="file" id="img-thermal" class="file-input" accept="image/*" onchange="handleSoundMeterImage(this)">
+                    <div id="db-ocr-status" style="display:none;margin-top:6px;padding:8px 10px;border-radius:8px;font-size:0.75rem;font-weight:700;text-align:center;"></div>
+                    <div class="sub-photo-row"><label for="img-thermal-add" class="sub-upload-btn-3d" id="btn-thermal-add"><i class="fas fa-plus"></i> 추가</label><input type="file" id="img-thermal-add" class="file-input" accept="image/*" onchange="handleSubImage(this,'thermal_add','btn-thermal-add')"></div>
+                </div>
+                <div style="font-size:0.75rem;color:#64748b;margin-bottom:5px;text-align:center;"><i class="fas fa-keyboard" style="color:#f59e0b;"></i> 소음계 측정값 (자동 입력 또는 직접 입력)</div>
                 <div class="db-input-row">
                     <div><label class="input-label">최대값(dB)</label><input type="text" id="db-max" placeholder="예:52"></div>
                     <div><label class="input-label">평균값(dB)</label><input type="text" id="db-avg" placeholder="예:38"></div>
@@ -256,13 +263,6 @@
                     <label for="img-acoustic" class="upload-box" id="box-acoustic" style="border-color:#bbdefb;background-color:#f0f9ff;"><i class="fas fa-wave-square upload-icon" style="color:var(--primary-main);"></i><span class="upload-text-main" style="color:var(--primary-main);">음향 진단 이미지 업로드</span><img id="view-acoustic" class="preview-img"></label>
                     <input type="file" id="img-acoustic" class="file-input" accept="image/*" onchange="handleImage(this,'acoustic','view-acoustic','box-acoustic')">
                     <div class="sub-photo-row"><label for="img-acoustic-add" class="sub-upload-btn-3d" id="btn-acoustic-add"><i class="fas fa-plus"></i> 추가 사진</label><input type="file" id="img-acoustic-add" class="file-input" accept="image/*" onchange="handleSubImage(this,'acoustic_add','btn-acoustic-add')"></div>
-                </div>
-                <div class="upload-group">
-                    <label class="input-label">4. 소음측정기 앱 화면 (dB) <span style="font-size:0.65rem;color:#2563eb;">- 업로드 시 dB 자동 인식</span></label>
-                    <label for="img-thermal" class="upload-box" id="box-thermal"><i class="fas fa-volume-up upload-icon"></i><span class="upload-text-main">소음측정기 스크린샷 업로드</span><img id="view-thermal" class="preview-img"></label>
-                    <input type="file" id="img-thermal" class="file-input" accept="image/*" onchange="handleSoundMeterImage(this)">
-                    <div id="db-ocr-status" style="display:none;margin-top:6px;padding:8px 10px;border-radius:8px;font-size:0.75rem;font-weight:700;text-align:center;"></div>
-                    <div class="sub-photo-row"><label for="img-thermal-add" class="sub-upload-btn-3d" id="btn-thermal-add"><i class="fas fa-plus"></i> 추가 사진</label><input type="file" id="img-thermal-add" class="file-input" accept="image/*" onchange="handleSubImage(this,'thermal_add','btn-thermal-add')"></div>
                 </div>
             </div>
         </div>
