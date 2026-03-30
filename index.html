@@ -325,14 +325,14 @@ severity_weight:0.6,construction_defect_ratio:60,env_factor_ratio:40},
 diagnosis:"헬름홀츠 공명/카르만 와류 풍절음(Helmholtz Resonance/Kármán Vortex) - KS F 2235 참조",
 mechanism:"강풍(풍속10m/s이상)이 특정 구멍(옥상난간,물구멍Weep Hole)이나 돌출구조물을 지나갈때 공기진동으로 특정주파수 소음 증폭. 공명주파수 f=V/2π×√(A/VL). 고층일수록 풍속증가에 비례하여 심화.",
 legal_standard:"KS F 2235: 창호기밀성 1등급(1m³/h·m²이하) / ISO 10140 차음성능",
-solution:"1.옥상난간 핸드레일 하부 구멍 폼충진/메쉬스크린 설치 2.창틀 물구멍 방풍캡 설치 3.모헤어 마모점검 및 교체(정상5mm이상) 4.Blower Door Test로 기밀등급 재측정 5.카르만와류 저감 Spoiler 검토",
+solution:"1.FLIR Si1 초음파카메라(20~40kHz LD모드, 풍속3m/s이상 조건)로 소음원 위치 시각화 특정 2.옥상난간 핸드레일 하부 구멍 폼충진/메쉬스크린 설치 3.창틀 물구멍 방풍캡 설치 4.모헤어 마모점검 및 교체(정상5mm이상) 5.Blower Door Test로 기밀등급 재측정 6.카르만와류 저감 Spoiler 검토",
 severity_weight:0.7,construction_defect_ratio:50,env_factor_ratio:50},
 
 {types:["창호(Window)"],symptom_keywords:["바람소리","쉬이","새는","외풍","틈새","기밀"],frequency_range:"500~4000Hz(고주파누기음)",
 diagnosis:"창호 기밀불량/틈새 누기음(Air Leakage Noise) - KS F 2292 참조",
 mechanism:"프레임-유리간 또는 프레임-벽체간 실란트/가스켓 노후화로 기밀성능 저하. 외기가 틈새로 유입될때 고주파 마찰음 발생. 고층부 풍압차에 의해 증폭. 기밀 미충족시 에너지손실+결로 동반.",
 legal_standard:"KS F 2292: 창호 기밀성 시험 / 건축물 에너지절약 설계기준",
-solution:"1.가스켓/모헤어 전체교체(EPDM권장) 2.유리-프레임 실란트 재시공 3.프레임-구조체 우레탄폼+실리콘 2중밀봉 4.Blower Door 누기위치 특정후 집중보수",
+solution:"1.FLIR Si1 초음파카메라(20~40kHz LD모드)로 실란트 접합선·가스켓 전면 스캔하여 누기 지점 정밀 특정 2.가스켓/모헤어 전체교체(EPDM권장) 3.유리-프레임 실란트 재시공 4.프레임-구조체 우레탄폼+실리콘 2중밀봉 5.Blower Door 누기위치 특정후 집중보수",
 severity_weight:0.65,construction_defect_ratio:65,env_factor_ratio:35},
 
 {types:["창호(Window)","천장(Ceiling)"],symptom_keywords:["딱","탁","부러지는","뚝","틱","새벽","난방"],frequency_range:"1000~5000Hz(순간충격음)",
@@ -389,7 +389,28 @@ diagnosis:"우수충격음(Rain Impact Noise)",
 mechanism:"빗방울이 금속지붕(징크,칼라강판), 창호프레임상단, 실외기커버 등 경질표면에 충돌하여 발생. 최상층이나 지붕 아래층에서 심함.",
 legal_standard:"별도기준없으나 지속시 쾌적환경 침해판단가능",
 solution:"1.금속지붕/외장재 하면 제진시트(Damping Sheet) 부착 2.실외기커버 고무방진매트 설치 3.창호상부 물끊기몰딩(Drip Edge) 설치",
-severity_weight:0.35,construction_defect_ratio:25,env_factor_ratio:75}
+severity_weight:0.35,construction_defect_ratio:25,env_factor_ratio:75},
+
+{types:["창호(Window)"],symptom_keywords:["웅","웅웅","공명","울림","재시공","교체후","바람","저주파","지속"],frequency_range:"50~300Hz(저주파공명음)",
+diagnosis:"재시공 창호 공명챔버 현상(Post-Reinstallation Cavity Resonance) - KS F 2235 / 헬름홀츠 공진 참조",
+mechanism:"20년 이상 경과 아파트의 외벽 개구부에 장기 변형(처짐·뒤틀림)이 누적된 상태에서 창호 재시공 시, 창틀-벽체 사이에 불규칙한 공동(空洞)이 형성됨. 발포우레탄 과충진/미충진으로 공명챔버가 만들어지며, 특정 풍속(3m/s 이상)에서 헬름홀츠 공진주파수(f=V/2π×√(A/VL))가 형성되어 '웅~' 하는 지속적 저주파 소음 발생. 재시공 창호의 기밀성 향상으로 기존 기류 경로가 변경되면서 압력차 유발 기류음(휘파람음) 동반 가능.",
+legal_standard:"KS F 2235: 창호기밀성 1등급(1m³/h·m²이하) / 환경부 소음진동관리법: 야간 40dB(A)",
+solution:"1.FLIR Si1 초음파카메라(20~40kHz LD모드)로 소음 발생 지점 정밀 마킹(우선순위: ①창틀 상단 코너부 ②창틀-벽체 실란트 접합선 ③글레이징 비드 둘레 ④배수홀/환기구) 2.실란트 박리·균열 부위 제거 및 재시공(MS Polymer 탄성형 권장) 3.발포우레탄 충진 불량 부위 재충진+창틀 상단·측면 모르타르 공동 충전으로 공명챔버 제거 4.Blower Door Test로 기밀등급 재측정 5.필요시 창틀-개구부 수직·수평 편차 보정 후 재밀봉",
+severity_weight:0.85,construction_defect_ratio:80,env_factor_ratio:20},
+
+{types:["창호(Window)"],symptom_keywords:["윙","진동","유리","떨림","특정바람","공진","가스"],frequency_range:"100~500Hz(유리판공진음)",
+diagnosis:"복층유리 가스층 공진/판진동(IGU Gas Cavity Resonance) - KS L 2003 참조",
+mechanism:"복층유리(IGU)의 가스층(아르곤/공기)이 특정 풍향·풍속 조건에서 공진하여 유리 판진동 발생. 유리 두께-가스층 두께 조합에 따른 고유진동수와 외부 풍압 주파수가 일치(공진)할 때 증폭. 재시공 시 글레이징 비드 밀착 불량이 있으면 유리 고정력 저하로 진동 악화.",
+legal_standard:"KS L 2003: 복층유리 성능 / KS F 2235: 창호 차음성능",
+solution:"1.글레이징 비드 밀착상태 점검 및 재압착 또는 교체 2.유리-프레임 실란트 보강(구조용 실리콘) 3.유리 판 진동 확인 시 복층유리 교체 검토(두께 비대칭 조합: 5+12A+8mm 등) 4.FLIR Si1 고주파 영역(40kHz+)으로 비드 둘레 스캔하여 누설 지점 특정",
+severity_weight:0.6,construction_defect_ratio:55,env_factor_ratio:45},
+
+{types:["창호(Window)"],symptom_keywords:["쉬","새는소리","미세","틈","실리콘","시공후","경화","수축"],frequency_range:"1000~6000Hz(고주파미세기류음)",
+diagnosis:"재시공 실란트 경화수축 누기음(Sealant Curing Shrinkage Leakage)",
+mechanism:"창호 재시공 시 신규 도포한 실리콘 실란트의 경화 과정에서 수축(체적감소 5~15%)이 발생하여 미세 틈 형성. 이 틈으로 외기가 통과하면서 고주파 기류 통과음 발생. 특히 겨울철 저온 경화 시 수축률 증가. 크리센트(잠금장치) 압착력 부족 시 가스켓과 프레임 사이 기밀 저하로 복합 누기 발생.",
+legal_standard:"KS F 2292: 창호 기밀성 시험 / 건축물 에너지절약 설계기준",
+solution:"1.FLIR Si1 LD모드로 실란트 접합선 전면 스캔하여 누기 지점 특정 2.경화수축 발생 부위 실란트 제거 후 MS Polymer계 탄성실란트로 재시공(저온경화성 우수) 3.크리센트 압착력 조정 및 가스켓 교체(EPDM 권장) 4.배수홀 방향·이물질 점검, 방풍캡 설치 5.개폐 반복 시 잠금장치 주변 기밀 변화 비교 점검",
+severity_weight:0.5,construction_defect_ratio:70,env_factor_ratio:30}
 ];
 
 let images={main:null,main_add:null,sub:null,sub_add:null,acoustic:null,acoustic_add:null,thermal:null,thermal_add:null,media:null,media_mime:null};
