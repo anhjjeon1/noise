@@ -258,8 +258,8 @@
                     <div class="sub-photo-row"><label for="img-acoustic-add" class="sub-upload-btn-3d" id="btn-acoustic-add"><i class="fas fa-plus"></i> 추가 사진</label><input type="file" id="img-acoustic-add" class="file-input" accept="image/*" onchange="handleSubImage(this,'acoustic_add','btn-acoustic-add')"></div>
                 </div>
                 <div class="upload-group">
-                    <label class="input-label">4. 열화상 카메라 (단열)</label>
-                    <label for="img-thermal" class="upload-box" id="box-thermal"><i class="fas fa-temperature-high upload-icon"></i><span class="upload-text-main">열화상 이미지 업로드</span><img id="view-thermal" class="preview-img"></label>
+                    <label class="input-label">4. 소음측정기 앱 화면 (dB)</label>
+                    <label for="img-thermal" class="upload-box" id="box-thermal"><i class="fas fa-volume-up upload-icon"></i><span class="upload-text-main">소음측정기 스크린샷 업로드</span><img id="view-thermal" class="preview-img"></label>
                     <input type="file" id="img-thermal" class="file-input" accept="image/*" onchange="handleImage(this,'thermal','view-thermal','box-thermal')">
                     <div class="sub-photo-row"><label for="img-thermal-add" class="sub-upload-btn-3d" id="btn-thermal-add"><i class="fas fa-plus"></i> 추가 사진</label><input type="file" id="img-thermal-add" class="file-input" accept="image/*" onchange="handleSubImage(this,'thermal_add','btn-thermal-add')"></div>
                 </div>
@@ -437,7 +437,7 @@ function handleSubImage(input,type,btnId){if(input.files&&input.files[0]){const 
 function handleMedia(input){if(input.files&&input.files[0]){const f=input.files[0];if(f.size>10*1024*1024){alert("10MB이내 파일만 가능");input.value="";return;}const r=new FileReader();r.onload=function(e){const box=document.getElementById('box-media');box.querySelector('.upload-icon').style.display='none';box.querySelector('.upload-text-main').style.display='none';const p=document.getElementById('media-preview-text');p.style.display='block';p.innerHTML=`<i class="fas fa-file-audio"></i> ${f.name}<br><span style="font-size:0.7rem;">(준비완료)</span>`;box.classList.add('filled');images.media=e.target.result.split(',')[1];images.media_mime=f.type;};r.readAsDataURL(f);}}
 function toggleAnalyzeBtn(){const b=document.getElementById('analyze-btn');if(document.getElementById('legal-agree').checked){b.classList.add('active');b.disabled=false;}else{b.classList.remove('active');b.disabled=true;}}
 function savePdf(){const dong=document.getElementById('dong').value||'000';const ho=document.getElementById('ho').value||'0000';const d=new Date();const dateStr=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;document.title=`${dong}동${ho}호소음검사_${dateStr}`;window.print();}
-function renderReportPhotos(){const g=document.getElementById('report-photo-gallery');g.innerHTML='';const labels={main:'현장메인',main_add:'현장추가',sub:'문제부위',sub_add:'문제부위추가',acoustic:'음향카메라',acoustic_add:'음향추가',thermal:'열화상',thermal_add:'열화상추가'};let has=false;for(const[k,u]of Object.entries(imageUrls)){if(u){has=true;const d=document.createElement('div');d.className='report-photo-item';d.innerHTML=`<img src="${u}" class="report-photo-img"><div class="report-photo-label">${labels[k]||k}</div>`;g.appendChild(d);}}if(!has)g.innerHTML='<div style="grid-column:span 2;text-align:center;color:#999;font-size:0.8rem;">첨부사진없음</div>';}
+function renderReportPhotos(){const g=document.getElementById('report-photo-gallery');g.innerHTML='';const labels={main:'현장메인',main_add:'현장추가',sub:'문제부위',sub_add:'문제부위추가',acoustic:'음향카메라',acoustic_add:'음향추가',thermal:'소음측정기',thermal_add:'소음측정기추가'};let has=false;for(const[k,u]of Object.entries(imageUrls)){if(u){has=true;const d=document.createElement('div');d.className='report-photo-item';d.innerHTML=`<img src="${u}" class="report-photo-img"><div class="report-photo-label">${labels[k]||k}</div>`;g.appendChild(d);}}if(!has)g.innerHTML='<div style="grid-column:span 2;text-align:center;color:#999;font-size:0.8rem;">첨부사진없음</div>';}
 
 function getSelectedNoiseTypes(){return Array.from(document.querySelectorAll('.noise-selector:checked')).map(c=>c.value);}
 function getSelectedPatterns(){return Array.from(document.querySelectorAll('.pattern-selector:checked')).map(c=>c.value);}
@@ -572,7 +572,7 @@ ${dbMax ? `- dB 측정값 기반 정량분석\n- 법적 기준 대비 판정 (�
 ### 3. 🔬 멀티모달 증거 분석 (Evidence Analysis)
 - 사진 기반 분석: 자재상태, 틈새, 노후화, 설치불량 징후
 - 음향카메라(FLIR) 분석: 초음파 누설 지점, 소음원 시각화 해석
-- 열화상 분석: 단열취약부, 결로위험부, 열교(Thermal Bridge) 감지
+- 소음측정기 앱 스크린샷 분석: dB 수치(최소/평균/최대), 소음 파형 패턴, 측정 시간대, 소음 변동 추이 해석
 - 음성/영상 분석: 소음 특성(충격음/연속음), 추정 주파수대역
 
 ### 4. 🎯 종합 기술 소견 (Diagnosis)
@@ -627,7 +627,7 @@ CHART_DATA_END
             if(key==='media'){parts.push({inline_data:{mime_type:images.media_mime,data:value}});parts.push({text:'[현장 소음 파일 - 주파수 특성, 충격음/연속음 여부, 패턴 분석 필요]'});}
             else if(key==='media_mime')continue;
             else{parts.push({inline_data:{mime_type:"image/jpeg",data:value}});
-                const imgLabels={main:'현장전경(공간구조,자재상태 분석)',sub:'문제부위근접(틈새,노후화,설치불량 분석)',acoustic:'음향카메라FLIR(초음파누설지점,소음원시각화 분석)',thermal:'열화상카메라(단열취약부,결로위험,열교 분석)',main_add:'현장추가사진',sub_add:'문제부위추가',acoustic_add:'음향추가',thermal_add:'열화상추가'};
+                const imgLabels={main:'현장전경(공간구조,자재상태 분석)',sub:'문제부위근접(틈새,노후화,설치불량 분석)',acoustic:'음향카메라FLIR(초음파누설지점,소음원시각화 분석)',thermal:'소음측정기앱스크린샷(dB수치,최소/평균/최대값,소음파형패턴,측정시간대,소음변동추이 정량분석)',main_add:'현장추가사진',sub_add:'문제부위추가',acoustic_add:'음향추가',thermal_add:'소음측정기추가'};
                 parts.push({text:`[증거이미지: ${imgLabels[key]||key}]`});}
         }
     }
