@@ -20,7 +20,7 @@
         .main-header { background:linear-gradient(135deg,#1a233a 0%,#0d1b2a 100%); color:white; padding:12px 15px; text-align:center; position:relative; border-bottom-left-radius:20px; border-bottom-right-radius:20px; box-shadow:0 5px 15px rgba(26,35,58,0.2); z-index:10; }
         .main-header h1 { margin:0; font-size:1.1rem; font-weight:800; letter-spacing:-0.5px; display:flex; align-items:center; justify-content:center; line-height:1.2; white-space:nowrap; }
         .main-header h1 i.frog-icon { margin-right:6px; color:#00e676; font-size:1.2rem; filter:drop-shadow(0 0 5px rgba(0,230,118,0.4)); }
-        .version-badge { background:rgba(255,255,255,0.1); color:#94a3b8; padding:2px 8px; border-radius:20px; font-size:0.6rem; font-weight:500; border:1px solid rgba(255,255,255,0.1); display:inline-block; margin-top:5px; cursor:pointer; }
+        .version-badge { background:rgba(255,255,255,0.1); color:#94a3b8; padding:2px 8px; border-radius:20px; font-size:0.6rem; font-weight:500; border:1px solid rgba(255,255,255,0.1); cursor:pointer; position:absolute; right:15px; top:50%; transform:translateY(-50%); }
         .version-badge.dev-active { background-color:#7c4dff!important; color:white!important; box-shadow:0 0 10px rgba(124,77,255,0.6); border:1px solid #b388ff; }
         .content { padding:15px 10px; background-color:#fff; }
         .section { margin-bottom:12px; border-bottom:1px dashed #e2e8f0; padding-bottom:12px; }
@@ -169,10 +169,8 @@
 <body>
 <div class="mobile-container">
     <header class="main-header">
-        <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단 AI (Expert)</h1>
-        <div style="text-align:right;">
-            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.4 Stable</span>
-        </div>
+        <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단앱</h1>
+        <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.5</span>
     </header>
     <div class="content">
         <!-- 기본 정보 -->
