@@ -27,13 +27,28 @@
         .section:last-child { border-bottom:none; }
         .section-title { font-weight:800; color:var(--primary-dark); margin-bottom:10px; display:flex; align-items:center; font-size:0.95rem; letter-spacing:-0.5px; }
         .section-title i { margin-right:8px; color:white; background:var(--primary-main); width:24px; height:24px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:0.8rem; box-shadow:0 3px 8px rgba(37,99,235,0.3); }
-        .info-grid-row { display:grid; grid-template-columns:1fr 1fr 1.2fr 1.6fr; gap:4px; align-items:end; margin-bottom:8px; }
+        .info-grid-row { display:grid; grid-template-columns:1fr 1fr 1.4fr; gap:6px; align-items:end; margin-bottom:8px; }
         .input-label { display:block; font-weight:700; margin-bottom:4px; color:var(--text-secondary); font-size:0.75rem; text-align:center; }
         input[type="text"],textarea { width:100%; padding:8px 4px; border:1px solid #e2e8f0; border-radius:10px; background-color:#f8fafc; font-size:0.85rem; box-sizing:border-box; color:var(--text-primary); font-weight:600; text-align:center; letter-spacing:-0.3px; transition:all 0.3s; }
         input::placeholder,textarea::placeholder { color:#b0bec5; font-weight:400; }
         input:focus,textarea:focus { border-color:var(--primary-main); background-color:#fff; outline:none; box-shadow:0 0 0 3px rgba(37,99,235,0.1); }
         #location,#defect-content { text-align:left; padding-left:8px; }
         textarea { resize:none; height:60px; font-weight:normal; line-height:1.4; padding:8px; }
+
+        /* v13.2: 음성입력 마이크 버튼 (결로진단앱 패턴 포팅) */
+        .mic-input-wrap { position:relative; }
+        .mic-input-wrap > input, .mic-input-wrap > textarea { padding-right:34px !important; }
+        .mic-btn { position:absolute; right:4px; top:50%; transform:translateY(-50%); width:26px; height:26px; border-radius:50%; border:1.5px solid #cbd5e1; background:#fff; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:0.72rem; padding:0; transition:all 0.15s; z-index:2; }
+        .mic-btn:hover { border-color:var(--primary-main); color:var(--primary-main); background:var(--primary-soft); }
+        .mic-btn:active { transform:translateY(-50%) scale(0.92); }
+        .mic-btn.listening { background:linear-gradient(135deg,#DC2626,#FF6B6B); border-color:#DC2626; color:#fff; animation:micPulse 1.2s ease-in-out infinite; }
+        .mic-input-wrap.textarea-wrap .mic-btn { top:8px; transform:none; }
+        .mic-input-wrap.textarea-wrap .mic-btn:active { transform:scale(0.92); }
+        .mic-input-wrap.textarea-wrap .mic-btn.listening { transform:none; }
+        .mic-input-wrap .input-suffix { position:absolute; right:36px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:0.7rem; font-weight:600; pointer-events:none; z-index:1; white-space:nowrap; letter-spacing:0.2px; }
+        .mic-input-wrap.with-suffix > input { padding-right:60px !important; }
+        @keyframes micPulse { 0%,100% { box-shadow:0 0 0 0 rgba(220,38,38,0.55); } 50% { box-shadow:0 0 0 7px rgba(220,38,38,0); } }
+        .mic-status { font-size:0.7rem; color:var(--primary-main); margin-top:2px; min-height:12px; text-align:center; font-weight:600; }
 
         /* 환경 조건 */
         .env-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px; }
@@ -156,7 +171,7 @@
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단 AI (Expert)</h1>
         <div style="text-align:right;">
-            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.1 Stable</span>
+            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.2 Stable</span>
         </div>
     </header>
     <div class="content">
@@ -164,11 +179,30 @@
         <div class="section">
             <div class="section-title"><i class="fas fa-info"></i> 기본 정보 (Basic Info)</div>
             <div class="info-grid-row">
-                <div><label class="input-label">동</label><input type="text" id="dong" placeholder="101"></div>
-                <div><label class="input-label">호</label><input type="text" id="ho" placeholder="1204"></div>
-                <div><label class="input-label">진단 장소</label><input type="text" id="location" placeholder="거실창"></div>
-                <div><label class="input-label">진단 일자</label><input type="text" id="date" style="color:var(--primary-main);font-weight:800;"></div>
+                <div>
+                    <div class="mic-input-wrap with-suffix">
+                        <input type="text" id="dong" placeholder="101">
+                        <span class="input-suffix">동</span>
+                        <button type="button" class="mic-btn" id="mic-dong" onclick="voiceInput('dong')" aria-label="동 음성입력"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+                <div>
+                    <div class="mic-input-wrap with-suffix">
+                        <input type="text" id="ho" placeholder="1204">
+                        <span class="input-suffix">호</span>
+                        <button type="button" class="mic-btn" id="mic-ho" onclick="voiceInput('ho')" aria-label="호 음성입력"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+                <div>
+                    <div class="mic-input-wrap with-suffix">
+                        <input type="text" id="location" placeholder="거실창">
+                        <span class="input-suffix">장소</span>
+                        <button type="button" class="mic-btn" id="mic-location" onclick="voiceInput('location')" aria-label="장소 음성입력"><i class="fas fa-microphone"></i></button>
+                    </div>
+                </div>
+                <input type="hidden" id="date">
             </div>
+            <div class="mic-status" id="mic-status"></div>
             <div style="margin-top:8px;"><textarea id="defect-content" placeholder="소음 발생 상황 및 상세 증상 (예: 바람 불 때 웅웅거림, 밤마다 쿵쿵 소리)"></textarea></div>
         </div>
 
@@ -874,6 +908,119 @@ function drawChart(data){
     var chartData=google.visualization.arrayToDataTable([['요인','비율'],['환경/사용요인',data.ventilation],['구조/시공요인',data.insulation],['기타/노후화',data.normal]]);
     var options={is3D:true,colors:['#00e676','#2563eb','#64748b'],backgroundColor:'transparent',fontSize:13,chartArea:{width:'100%',height:'90%'},legend:{position:'bottom',textStyle:{fontSize:11}}};
     var chart=new google.visualization.PieChart(document.getElementById('chart_div'));chart.draw(chartData,options);
+}
+
+// v13.2: 음성입력 (STT - Web Speech API, 결로진단앱 패턴 포팅)
+const _SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let _recActive = null;
+let _currentRec = null;
+let _micPrimed = false;
+
+function _setMicStatus(msg){
+    const el = document.getElementById('mic-status');
+    if(el) el.textContent = msg || '';
+}
+
+async function _primeMic(){
+    if(_micPrimed) return true;
+    try{
+        if(!localStorage.getItem('_micGuideShown')){
+            alert('🎤 마이크 권한 안내\n\n곧 브라우저에서 마이크 권한 팝업이 뜹니다.\n"항상 허용"(또는 "사이트 접속 시 허용")을 선택해 주세요.\n\n⚠️ "이번만 허용"을 고르면 음성 버튼을 누를 때마다 팝업이 다시 나타납니다.');
+            localStorage.setItem('_micGuideShown','1');
+        }
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+            const s = await navigator.mediaDevices.getUserMedia({audio:true});
+            s.getTracks().forEach(t => { try{ t.stop(); }catch(e){} });
+        }
+        _micPrimed = true;
+        return true;
+    }catch(e){
+        const err = (e && (e.name||e.message))||'';
+        if(err.indexOf('NotAllowed')>=0 || err.indexOf('Permission')>=0){
+            alert('🎤 마이크가 차단되었습니다.\n브라우저 주소창 좌측 자물쇠 아이콘 ▸ 사이트 설정 ▸ 마이크 ▸ 허용으로 변경해 주세요.');
+        }
+        return false;
+    }
+}
+
+function _mkRec(onResult, onEnd){
+    const rec = new _SR();
+    rec.lang = 'ko-KR';
+    rec.interimResults = false;
+    rec.continuous = false;
+    rec.maxAlternatives = 1;
+    rec.onresult = (e) => {
+        try{
+            const transcript = (e.results[0][0].transcript||'').trim();
+            if(transcript) onResult(transcript);
+        }catch(err){}
+    };
+    rec.onend = () => { if(onEnd) onEnd(); };
+    rec.onerror = (e) => {
+        const err = e.error||'';
+        if(err === 'not-allowed' || err === 'permission-denied' || err === 'service-not-allowed'){
+            alert('🎤 마이크 권한이 필요합니다.\n브라우저 설정에서 마이크를 허용해주세요.');
+        } else if(err === 'no-speech'){
+            _setMicStatus('🎤 음성이 감지되지 않았습니다');
+        } else if(err && err !== 'aborted'){
+            _setMicStatus('🎤 오류: '+err);
+        }
+    };
+    return rec;
+}
+
+function _stopRec(){
+    if(_currentRec){
+        try{ _currentRec.abort(); }catch(e){}
+        _currentRec = null;
+    }
+    _recActive = null;
+    document.querySelectorAll('.mic-btn.listening').forEach(b => b.classList.remove('listening'));
+}
+
+window.voiceInput = async function(targetId){
+    if(!_SR){ alert('이 브라우저는 음성입력을 지원하지 않습니다.\nChrome, Edge, Safari(iOS 14.5+)를 사용해주세요.'); return; }
+    const btn = document.getElementById('mic-' + targetId);
+    if(_recActive === targetId){ _stopRec(); _setMicStatus('🎤 음성입력 종료'); return; }
+    const ok = await _primeMic();
+    if(!ok) return;
+    _stopRec();
+    _recActive = targetId;
+    if(btn) btn.classList.add('listening');
+
+    const cfg = ({
+        'dong':     {msg:'🎤 동을 말씀해 주세요... (예: "101")'},
+        'ho':       {msg:'🎤 호수를 말씀해 주세요... (예: "1204")'},
+        'location': {msg:'🎤 장소를 말씀해 주세요... (예: "거실창")'}
+    })[targetId] || {msg:'🎤 말씀해 주세요...'};
+
+    _setMicStatus(cfg.msg);
+    const rec = _mkRec(
+        (text) => {
+            const f = document.getElementById(targetId);
+            if(f){
+                f.value = text;
+                f.dispatchEvent(new Event('input', {bubbles:true}));
+                f.dispatchEvent(new Event('change', {bubbles:true}));
+            }
+            _setMicStatus('🎤 입력 완료: ' + text.slice(0, 60) + (text.length>60?'...':''));
+            setTimeout(() => _setMicStatus(''), 3000);
+        },
+        () => { if(btn) btn.classList.remove('listening'); _recActive = null; _currentRec = null; }
+    );
+    _currentRec = rec;
+    try{ rec.start(); }catch(e){
+        if(btn) btn.classList.remove('listening');
+        _recActive = null; _currentRec = null;
+        _setMicStatus('🎤 시작 실패: ' + (e.message||''));
+    }
+};
+
+// 브라우저가 STT 미지원이면 마이크 버튼 자동 숨김
+if(!_SR){
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.mic-btn').forEach(b => b.style.display = 'none');
+    });
 }
 </script>
 </body>
