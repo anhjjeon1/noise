@@ -171,7 +171,7 @@
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단 AI (Expert)</h1>
         <div style="text-align:right;">
-            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.2 Stable</span>
+            <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.3 Stable</span>
         </div>
     </header>
     <div class="content">
@@ -203,7 +203,13 @@
                 <input type="hidden" id="date">
             </div>
             <div class="mic-status" id="mic-status"></div>
-            <div style="margin-top:8px;"><textarea id="defect-content" placeholder="소음 발생 상황 및 상세 증상 (예: 바람 불 때 웅웅거림, 밤마다 쿵쿵 소리)"></textarea></div>
+            <div style="margin-top:8px;">
+                <label class="input-label" style="text-align:left;">소음 내용 <span style="font-size:0.7rem;color:#94a3b8;font-weight:500;">(음성 최대 20초 자동 종료)</span></label>
+                <div class="mic-input-wrap textarea-wrap">
+                    <textarea id="defect-content" placeholder="소음 발생 상황 및 상세 증상 (예: 바람 불 때 웅웅거림, 밤마다 쿵쿵 소리)"></textarea>
+                    <button type="button" class="mic-btn" id="mic-defect-content" onclick="voiceInput('defect-content')" aria-label="소음내용 음성입력"><i class="fas fa-microphone"></i></button>
+                </div>
+            </div>
         </div>
 
         <!-- ★ NEW: 소음 환경 조건 -->
@@ -943,19 +949,89 @@ async function _primeMic(){
     }
 }
 
-function _mkRec(onResult, onEnd){
+function _mkRec(onResult, onEnd, opts){
+    opts = opts || {};
+    const longForm = !!opts.longForm;
+    const silenceMs = opts.silenceMs || 8000;
+    const maxDurationMs = opts.maxDurationMs || 20000;
+    const onInterim = opts.onInterim;
     const rec = new _SR();
     rec.lang = 'ko-KR';
-    rec.interimResults = false;
-    rec.continuous = false;
+    rec.interimResults = longForm;
+    rec.continuous = longForm;
     rec.maxAlternatives = 1;
-    rec.onresult = (e) => {
-        try{
-            const transcript = (e.results[0][0].transcript||'').trim();
-            if(transcript) onResult(transcript);
-        }catch(err){}
-    };
-    rec.onend = () => { if(onEnd) onEnd(); };
+
+    if(longForm){
+        let savedAccumulated = '';
+        let accumulated = '';
+        let silenceTimer = null;
+        let maxDurationTimer = null;
+        let hasStartedSpeaking = false;
+        let isIntendedStop = false;
+        const resetSilence = () => {
+            if(!hasStartedSpeaking) return;
+            clearTimeout(silenceTimer);
+            silenceTimer = setTimeout(() => {
+                isIntendedStop = true;
+                try{ rec.stop(); }catch(e){}
+            }, silenceMs);
+        };
+        rec.onresult = (e) => {
+            const finalParts = [];
+            let interim = '';
+            for(let i = 0; i < e.results.length; i++){
+                const t = (e.results[i][0].transcript || '').trim();
+                if(!t) continue;
+                if(e.results[i].isFinal){
+                    const last = finalParts[finalParts.length-1];
+                    if(!last) finalParts.push(t);
+                    else if(t === last) {}
+                    else if(t.startsWith(last)) finalParts[finalParts.length-1] = t;
+                    else if(last.startsWith(t)) {}
+                    else finalParts.push(t);
+                } else {
+                    interim += t;
+                }
+            }
+            const currentSession = finalParts.join(' ');
+            accumulated = (savedAccumulated + (currentSession ? (savedAccumulated ? ' ' : '') + currentSession : '')).trim();
+            const display = (accumulated + (interim ? ' ' + interim : '')).trim();
+            if(display && !hasStartedSpeaking){
+                hasStartedSpeaking = true;
+                if(!maxDurationTimer){
+                    maxDurationTimer = setTimeout(() => {
+                        isIntendedStop = true;
+                        try{ rec.stop(); }catch(e){}
+                    }, maxDurationMs);
+                }
+            }
+            if(display && onInterim) onInterim(display);
+            resetSilence();
+        };
+        rec.onend = () => {
+            clearTimeout(silenceTimer);
+            if(!isIntendedStop){
+                savedAccumulated = accumulated;
+                hasStartedSpeaking = false;
+                try{ rec.start(); return; }catch(e){}
+            }
+            clearTimeout(maxDurationTimer);
+            const text = accumulated.trim();
+            if(text) onResult(text);
+            if(onEnd) onEnd();
+        };
+        rec._lfMarkIntended = () => { isIntendedStop = true; };
+        rec._lfStart = () => {};
+    } else {
+        rec.onresult = (e) => {
+            try{
+                const transcript = (e.results[0][0].transcript||'').trim();
+                if(transcript) onResult(transcript);
+            }catch(err){}
+        };
+        rec.onend = () => { if(onEnd) onEnd(); };
+    }
+
     rec.onerror = (e) => {
         const err = e.error||'';
         if(err === 'not-allowed' || err === 'permission-denied' || err === 'service-not-allowed'){
@@ -971,7 +1047,9 @@ function _mkRec(onResult, onEnd){
 
 function _stopRec(){
     if(_currentRec){
-        try{ _currentRec.abort(); }catch(e){}
+        const isLongForm = !!_currentRec._lfStart;
+        if(isLongForm && _currentRec._lfMarkIntended) _currentRec._lfMarkIntended();
+        try{ isLongForm ? _currentRec.stop() : _currentRec.abort(); }catch(e){}
         _currentRec = null;
     }
     _recActive = null;
@@ -989,10 +1067,12 @@ window.voiceInput = async function(targetId){
     if(btn) btn.classList.add('listening');
 
     const cfg = ({
-        'dong':     {msg:'🎤 동을 말씀해 주세요... (예: "101")'},
-        'ho':       {msg:'🎤 호수를 말씀해 주세요... (예: "1204")'},
-        'location': {msg:'🎤 장소를 말씀해 주세요... (예: "거실창")'}
-    })[targetId] || {msg:'🎤 말씀해 주세요...'};
+        'dong':           {longForm:false, msg:'🎤 동을 말씀해 주세요... (예: "101")'},
+        'ho':             {longForm:false, msg:'🎤 호수를 말씀해 주세요... (예: "1204")'},
+        'location':       {longForm:false, msg:'🎤 장소를 말씀해 주세요... (예: "거실창")'},
+        'defect-content': {longForm:true,  silenceMs:8000, maxDurationMs:20000,
+                           msg:'🎤 소음 내용을 말씀해 주세요... (20초 후 자동 종료)'}
+    })[targetId] || {longForm:false, msg:'🎤 말씀해 주세요...'};
 
     _setMicStatus(cfg.msg);
     const rec = _mkRec(
@@ -1006,10 +1086,16 @@ window.voiceInput = async function(targetId){
             _setMicStatus('🎤 입력 완료: ' + text.slice(0, 60) + (text.length>60?'...':''));
             setTimeout(() => _setMicStatus(''), 3000);
         },
-        () => { if(btn) btn.classList.remove('listening'); _recActive = null; _currentRec = null; }
+        () => { if(btn) btn.classList.remove('listening'); _recActive = null; _currentRec = null; },
+        cfg.longForm ? {
+            longForm: true,
+            silenceMs: cfg.silenceMs,
+            maxDurationMs: cfg.maxDurationMs,
+            onInterim: (txt) => { const f = document.getElementById(targetId); if(f) f.value = txt; }
+        } : undefined
     );
     _currentRec = rec;
-    try{ rec.start(); }catch(e){
+    try{ rec.start(); if(cfg.longForm && rec._lfStart) rec._lfStart(); }catch(e){
         if(btn) btn.classList.remove('listening');
         _recActive = null; _currentRec = null;
         _setMicStatus('🎤 시작 실패: ' + (e.message||''));
