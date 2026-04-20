@@ -12,16 +12,16 @@
         :root {
             --bg-color: #eef2f6; --card-bg: #ffffff;
             --primary-dark: #1a233a; --primary-main: #2563eb; --primary-soft: #eff6ff;
-            --accent-color: #00c853; --text-primary: #1e293b; --text-secondary: #64748b;
+            --accent-color: #2563eb; --text-primary: #1e293b; --text-secondary: #64748b;
             --shadow-soft: 0 10px 30px rgba(0,0,0,0.05);
         }
         body { font-family:'Pretendard',-apple-system,BlinkMacSystemFont,system-ui,Roboto,sans-serif; background-color:var(--bg-color); color:var(--text-primary); margin:0; padding:10px 0; line-height:1.4; display:flex; justify-content:center; align-items:flex-start; min-height:100vh; }
         .mobile-container { width:100%; max-width:500px; background-color:var(--card-bg); box-shadow:var(--shadow-soft); overflow:hidden; border-radius:20px; margin:0 5px; position:relative; border:1px solid rgba(255,255,255,0.8); }
         .main-header { background:linear-gradient(135deg,#1a233a 0%,#0d1b2a 100%); color:white; padding:12px 15px; text-align:center; position:relative; border-bottom-left-radius:20px; border-bottom-right-radius:20px; box-shadow:0 5px 15px rgba(26,35,58,0.2); z-index:10; }
         .main-header h1 { margin:0; font-size:1.1rem; font-weight:800; letter-spacing:-0.5px; display:flex; align-items:center; justify-content:center; line-height:1.2; white-space:nowrap; }
-        .main-header h1 i.frog-icon { margin-right:6px; color:#00e676; font-size:1.2rem; filter:drop-shadow(0 0 5px rgba(0,230,118,0.4)); }
+        .main-header h1 i.frog-icon { margin-right:6px; color:#2563eb; font-size:1.2rem; filter:drop-shadow(0 0 5px rgba(37,99,235,0.4)); }
         .version-badge { background:rgba(255,255,255,0.1); color:#94a3b8; padding:2px 8px; border-radius:20px; font-size:0.6rem; font-weight:500; border:1px solid rgba(255,255,255,0.1); cursor:pointer; position:absolute; right:15px; top:50%; transform:translateY(-50%); }
-        .version-badge.dev-active { background-color:#7c4dff!important; color:white!important; box-shadow:0 0 10px rgba(124,77,255,0.6); border:1px solid #b388ff; }
+        .version-badge.dev-active { background-color:#1a233a!important; color:white!important; box-shadow:0 0 10px rgba(26,35,58,0.6); border:1px solid #64748b; }
         .content { padding:15px 10px; background-color:#fff; }
         .section { margin-bottom:12px; border-bottom:1px dashed #e2e8f0; padding-bottom:12px; }
         .section:last-child { border-bottom:none; }
@@ -41,7 +41,7 @@
         .mic-btn { position:absolute; right:4px; top:50%; transform:translateY(-50%); width:26px; height:26px; border-radius:50%; border:1.5px solid #cbd5e1; background:#fff; color:var(--text-secondary); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; font-size:0.72rem; padding:0; transition:all 0.15s; z-index:2; }
         .mic-btn:hover { border-color:var(--primary-main); color:var(--primary-main); background:var(--primary-soft); }
         .mic-btn:active { transform:translateY(-50%) scale(0.92); }
-        .mic-btn.listening { background:linear-gradient(135deg,#DC2626,#FF6B6B); border-color:#DC2626; color:#fff; animation:micPulse 1.2s ease-in-out infinite; }
+        .mic-btn.listening { background:linear-gradient(135deg,#dc2626,#FF6B6B); border-color:#dc2626; color:#fff; animation:micPulse 1.2s ease-in-out infinite; }
         .mic-input-wrap.textarea-wrap .mic-btn { top:8px; transform:none; }
         .mic-input-wrap.textarea-wrap .mic-btn:active { transform:scale(0.92); }
         .mic-input-wrap.textarea-wrap .mic-btn.listening { transform:none; }
@@ -77,9 +77,9 @@
         .pattern-label { display:flex; align-items:center; gap:6px; padding:8px 10px; background:#fff; border:1px solid #cbd5e1; border-radius:8px; cursor:pointer; transition:all 0.15s; }
         .pattern-label i { font-size:0.9rem; color:#94a3b8; }
         .pattern-label span { font-size:0.72rem; font-weight:600; color:#64748b; }
-        .pattern-checkbox-wrapper input:checked+.pattern-label { background:#fef3c7; border-color:#f59e0b; }
-        .pattern-checkbox-wrapper input:checked+.pattern-label i { color:#f59e0b; }
-        .pattern-checkbox-wrapper input:checked+.pattern-label span { color:#92400e; font-weight:700; }
+        .pattern-checkbox-wrapper input:checked+.pattern-label { background:#eff6ff; border-color:#2563eb; }
+        .pattern-checkbox-wrapper input:checked+.pattern-label i { color:#2563eb; }
+        .pattern-checkbox-wrapper input:checked+.pattern-label span { color:#1a233a; font-weight:700; }
 
         /* 사진 업로드 */
         .photo-stack { display:flex; flex-direction:column; gap:15px; }
@@ -93,26 +93,26 @@
         .preview-img { width:100%; height:100%; object-fit:contain; display:none; background:#000; }
         .file-input { display:none; }
         .sub-photo-row { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:8px; }
-        .sub-upload-btn-3d { display:inline-flex; align-items:center; justify-content:center; padding:5px 10px; font-size:0.7rem; font-weight:700; color:#fff; background:linear-gradient(145deg,#42a5f5,#1976d2); border:none; border-radius:12px; box-shadow:0 3px 0 #1565c0,0 3px 6px rgba(0,0,0,0.15); cursor:pointer; transition:all 0.1s; text-shadow:0 1px 1px rgba(0,0,0,0.2); }
-        .sub-upload-btn-3d:active { transform:translateY(3px); box-shadow:0 0 0 #1565c0,inset 0 2px 4px rgba(0,0,0,0.2); }
-        .sub-upload-btn-3d.filled { background:linear-gradient(145deg,#00e676,#00c853); box-shadow:0 3px 0 #009624,0 4px 8px rgba(0,0,0,0.15); }
-        .media-box-style { border-color:#90caf9!important; background-color:#e3f2fd!important; aspect-ratio:6/2!important; }
-        .media-box-style:hover { background-color:#bbdefb!important; border-color:#1976d2!important; }
-        .media-box-style.filled { border:2px solid #1976d2!important; background:#fff!important; }
+        .sub-upload-btn-3d { display:inline-flex; align-items:center; justify-content:center; padding:5px 10px; font-size:0.7rem; font-weight:700; color:#fff; background:linear-gradient(145deg,#2563eb,#2563eb); border:none; border-radius:12px; box-shadow:0 3px 0 #1a233a,0 3px 6px rgba(0,0,0,0.15); cursor:pointer; transition:all 0.1s; text-shadow:0 1px 1px rgba(0,0,0,0.2); }
+        .sub-upload-btn-3d:active { transform:translateY(3px); box-shadow:0 0 0 #1a233a,inset 0 2px 4px rgba(0,0,0,0.2); }
+        .sub-upload-btn-3d.filled { background:linear-gradient(145deg,#2563eb,#2563eb); box-shadow:0 3px 0 #1a233a,0 4px 8px rgba(0,0,0,0.15); }
+        .media-box-style { border-color:#cbd5e1!important; background-color:#eff6ff!important; aspect-ratio:6/2!important; }
+        .media-box-style:hover { background-color:#cbd5e1!important; border-color:#2563eb!important; }
+        .media-box-style.filled { border:2px solid #2563eb!important; background:#fff!important; }
 
         .legal-disclaimer-box { background-color:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:12px; margin-top:5px; margin-bottom:15px; box-shadow:0 2px 5px rgba(0,0,0,0.03); }
-        .legal-title { color:#d32f2f; font-weight:800; font-size:0.8rem; display:flex; align-items:center; margin-bottom:6px; }
+        .legal-title { color:#dc2626; font-weight:800; font-size:0.8rem; display:flex; align-items:center; margin-bottom:6px; }
         .legal-text { font-size:0.75rem; color:#64748b; line-height:1.4; text-align:justify; margin-bottom:8px; letter-spacing:-0.3px; }
         .legal-check-wrapper { display:flex; align-items:center; cursor:pointer; padding-top:8px; border-top:1px dashed #e2e8f0; }
         .legal-check-wrapper input { width:18px; height:18px; margin-right:8px; cursor:pointer; accent-color:var(--primary-main); }
         .legal-check-text { font-weight:700; font-size:0.8rem; color:var(--text-primary); }
 
         .analyze-btn { width:100%; padding:15px; background:#cbd5e1; color:#fff; border:none; border-radius:14px; font-size:1.1rem; font-weight:800; cursor:not-allowed; display:flex; align-items:center; justify-content:center; box-shadow:none; margin-top:5px; transition:all 0.2s; position:relative; top:0; }
-        .analyze-btn.active { background:linear-gradient(135deg,#1a233a,#0d1b2a); color:#00e676; cursor:pointer; box-shadow:0 5px 0 #000,0 10px 15px rgba(0,0,0,0.2); }
+        .analyze-btn.active { background:linear-gradient(135deg,#1a233a,#0d1b2a); color:#2563eb; cursor:pointer; box-shadow:0 5px 0 #000,0 10px 15px rgba(0,0,0,0.2); }
         .analyze-btn.active:active { top:5px; box-shadow:0 0 0 #000,inset 0 3px 5px rgba(0,0,0,0.3); }
 
         #result-area { margin-top:20px; padding:20px; background-color:#fff; border-radius:16px; border:2px solid var(--primary-main); display:none; box-shadow:0 10px 30px rgba(37,99,235,0.1); }
-        .data-source-badge { display:flex; align-items:center; gap:8px; background-color:#e8f5e9; border:1px solid #a5d6a7; color:#2e7d32; padding:8px 12px; border-radius:8px; margin-bottom:15px; font-size:0.75rem; font-weight:700; line-height:1.4; }
+        .data-source-badge { display:flex; align-items:center; gap:8px; background-color:#eff6ff; border:1px solid #cbd5e1; color:#1a233a; padding:8px 12px; border-radius:8px; margin-bottom:15px; font-size:0.75rem; font-weight:700; line-height:1.4; }
         .data-source-badge i { font-size:1.1rem; }
         .report-photo-gallery { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:20px; border-bottom:2px dashed #eee; padding-bottom:20px; }
         .report-photo-item { display:flex; flex-direction:column; align-items:center; }
@@ -131,14 +131,14 @@
         .confidence-bar-label { display:flex; justify-content:space-between; font-size:0.75rem; font-weight:700; margin-bottom:4px; }
         .confidence-bar-bg { height:10px; background:#e2e8f0; border-radius:5px; overflow:hidden; }
         .confidence-bar-fill { height:100%; border-radius:5px; transition:width 1s ease-out; }
-        .conf-high { background:linear-gradient(90deg,#00c853,#00e676); }
-        .conf-mid { background:linear-gradient(90deg,#f59e0b,#fbbf24); }
-        .conf-low { background:linear-gradient(90deg,#ef4444,#f87171); }
+        .conf-high { background:linear-gradient(90deg,#2563eb,#2563eb); }
+        .conf-mid { background:linear-gradient(90deg,#2563eb,#2563eb); }
+        .conf-low { background:linear-gradient(90deg,#dc2626,#f87171); }
 
         .footer-btns { display:flex; gap:10px; margin-top:20px; }
         .footer-btn { flex:1; padding:12px; border:none; border-radius:12px; font-size:0.9rem; font-weight:700; cursor:pointer; color:white; display:flex; justify-content:center; align-items:center; box-shadow:0 3px 8px rgba(0,0,0,0.15); transition:transform 0.2s; }
         .footer-btn:active { transform:scale(0.98); }
-        .call-btn { background:linear-gradient(135deg,#00c853,#009624); }
+        .call-btn { background:linear-gradient(135deg,#2563eb,#1a233a); }
         .save-btn { background:linear-gradient(135deg,#37474f,#263238); }
         .main-footer { background-color:#f8fafc; color:#94a3b8; padding:15px; text-align:center; font-size:0.65rem; line-height:1.4; border-top:1px solid #e2e8f0; word-break:keep-all; }
         .print-legal-footer { display:none; margin-top:30px; border:2px solid #000; padding:15px; text-align:center; }
@@ -170,7 +170,7 @@
 <div class="mobile-container">
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단앱</h1>
-        <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.6</span>
+        <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.7</span>
     </header>
     <div class="content">
         <!-- 기본 정보 -->
@@ -213,7 +213,7 @@
         <!-- ★ NEW: 소음 환경 조건 -->
         <div class="section">
             <div class="section-title"><i class="fas fa-sliders-h"></i> 소음 환경 조건 (Precision)</div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:5px;text-align:center;">* 환경 조건 입력 시 정밀도가 <strong style="color:#d32f2f;">30% 이상</strong> 향상됩니다.</div>
+            <div style="font-size:0.7rem;color:#64748b;margin-bottom:5px;text-align:center;">* 환경 조건 입력 시 정밀도가 <strong style="color:#dc2626;">30% 이상</strong> 향상됩니다.</div>
             <div class="env-grid">
                 <div><label class="input-label">소음 발생 시간대</label>
                     <select class="env-select" id="noise-time"><option value="">선택</option><option value="새벽(00~06시)">새벽 (00~06시)</option><option value="아침(06~09시)">아침 (06~09시)</option><option value="낮(09~18시)">낮 (09~18시)</option><option value="저녁(18~22시)">저녁 (18~22시)</option><option value="야간(22~00시)">야간 (22~00시)</option><option value="24시간 상시">24시간 상시</option></select>
@@ -235,7 +235,7 @@
                     <input type="file" id="img-thermal" class="file-input" accept="image/*" onchange="handleSoundMeterImage(this)">
                     <div id="db-ocr-status" style="display:none;margin-top:6px;padding:8px 10px;border-radius:8px;font-size:0.75rem;font-weight:700;text-align:center;"></div>
                 </div>
-                <div style="font-size:0.75rem;color:#64748b;margin-bottom:5px;text-align:center;"><i class="fas fa-keyboard" style="color:#f59e0b;"></i> 소음계 측정값 (자동 입력 또는 직접 입력)</div>
+                <div style="font-size:0.75rem;color:#64748b;margin-bottom:5px;text-align:center;"><i class="fas fa-keyboard" style="color:#2563eb;"></i> 소음계 측정값 (자동 입력 또는 직접 입력)</div>
                 <div class="db-input-row">
                     <div><label class="input-label">최대값(dB)</label><input type="text" id="db-max" placeholder="예:52"></div>
                     <div><label class="input-label">평균값(dB)</label><input type="text" id="db-avg" placeholder="예:38"></div>
@@ -291,8 +291,8 @@
                     </div>
                 </div>
                 <div class="upload-group" style="margin-top:5px;">
-                    <label class="input-label" style="color:#1976d2;text-align:left;"><i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성) <span style="font-size:0.65rem;color:#64748b;font-weight:500;">* 10초 이내 짧은 파일 권장</span></label>
-                    <label for="file-media" class="upload-box media-box-style" id="box-media" style="aspect-ratio:unset!important;height:50px;flex-direction:row!important;gap:8px;padding:4px 10px;"><i class="fas fa-video upload-icon" style="color:#1976d2;font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="color:#0d47a1;font-size:0.8rem;">동영상/음성 파일 선택</span><div id="media-preview-text" style="display:none;font-size:0.8rem;font-weight:bold;color:#0d47a1;text-align:center;line-height:1.3;"></div></label>
+                    <label class="input-label" style="color:#2563eb;text-align:left;"><i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성) <span style="font-size:0.65rem;color:#64748b;font-weight:500;">* 10초 이내 짧은 파일 권장</span></label>
+                    <label for="file-media" class="upload-box media-box-style" id="box-media" style="aspect-ratio:unset!important;height:50px;flex-direction:row!important;gap:8px;padding:4px 10px;"><i class="fas fa-video upload-icon" style="color:#2563eb;font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="color:#1a233a;font-size:0.8rem;">동영상/음성 파일 선택</span><div id="media-preview-text" style="display:none;font-size:0.8rem;font-weight:bold;color:#1a233a;text-align:center;line-height:1.3;"></div></label>
                     <input type="file" id="file-media" class="file-input" accept="video/*,audio/*" onchange="handleMedia(this)">
                 </div>
             </div>
@@ -307,11 +307,11 @@
                     <div style="font-size:0.7rem;color:#64748b;margin-bottom:5px;">* 초음파 누설/소음원 시각화 데이터 (필수)</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                         <div>
-                            <label for="img-acoustic" class="upload-box" id="box-acoustic" style="border-color:#bbdefb;background-color:#f0f9ff;"><i class="fas fa-wave-square upload-icon" style="color:var(--primary-main);"></i><span class="upload-text-main" style="color:var(--primary-main);">음향 진단 1</span><img id="view-acoustic" class="preview-img"></label>
+                            <label for="img-acoustic" class="upload-box" id="box-acoustic" style="border-color:#cbd5e1;background-color:#f8fafc;"><i class="fas fa-wave-square upload-icon" style="color:var(--primary-main);"></i><span class="upload-text-main" style="color:var(--primary-main);">음향 진단 1</span><img id="view-acoustic" class="preview-img"></label>
                             <input type="file" id="img-acoustic" class="file-input" accept="image/*" onchange="handleImage(this,'acoustic','view-acoustic','box-acoustic')">
                         </div>
                         <div>
-                            <label for="img-acoustic-2" class="upload-box" id="box-acoustic-2" style="border-color:#bbdefb;background-color:#f0f9ff;"><i class="fas fa-wave-square upload-icon" style="color:var(--primary-main);"></i><span class="upload-text-main" style="color:var(--primary-main);">음향 진단 2</span><img id="view-acoustic-2" class="preview-img"></label>
+                            <label for="img-acoustic-2" class="upload-box" id="box-acoustic-2" style="border-color:#cbd5e1;background-color:#f8fafc;"><i class="fas fa-wave-square upload-icon" style="color:var(--primary-main);"></i><span class="upload-text-main" style="color:var(--primary-main);">음향 진단 2</span><img id="view-acoustic-2" class="preview-img"></label>
                             <input type="file" id="img-acoustic-2" class="file-input" accept="image/*" onchange="handleImage(this,'acoustic_add','view-acoustic-2','box-acoustic-2')">
                         </div>
                     </div>
@@ -536,15 +536,15 @@ async function extractDbFromImage(base64Data){
         if(bgVal!=null){document.getElementById('db-bg').value=bgVal;filled.push(`배경 ${bgVal}`);}
 
         if(filled.length>0){
-            status.style.background='#f0fdf4';status.style.color='#16a34a';status.style.border='1px solid #86efac';
+            status.style.background='#f8fafc';status.style.color='#16a34a';status.style.border='1px solid #86efac';
             status.innerHTML=`<i class="fas fa-check-circle"></i> dB 자동 입력 완료: ${filled.join(' / ')} dB(A)`;
         }else{
-            status.style.background='#fef3c7';status.style.color='#d97706';status.style.border='1px solid #fcd34d';
+            status.style.background='#eff6ff';status.style.color='#2563eb';status.style.border='1px solid #eff6ff';
             status.innerHTML='<i class="fas fa-exclamation-triangle"></i> dB 값을 인식하지 못했습니다. 직접 입력해주세요.';
         }
     }catch(err){
         console.error('[dB OCR]',err);
-        status.style.background='#fef3c7';status.style.color='#d97706';status.style.border='1px solid #fcd34d';
+        status.style.background='#eff6ff';status.style.color='#2563eb';status.style.border='1px solid #eff6ff';
         status.innerHTML='<i class="fas fa-exclamation-triangle"></i> 자동 인식 실패. dB 값을 직접 입력해주세요.';
     }
 }
@@ -690,10 +690,10 @@ async function startAnalysis(){
         <div class="report-summary-item"><span class="report-summary-label">진단 일자</span><span class="report-summary-value">${dateInput}</span></div>
         <div class="report-summary-item"><span class="report-summary-label">현장 위치</span><span class="report-summary-value">${dong}동 ${ho}호</span></div>
         <div class="report-summary-item"><span class="report-summary-label">중점 분석 대상</span><span class="report-summary-value" style="color:var(--primary-main);">${selectedNoiseTypes.join(', ')}</span></div>
-        ${selectedPatterns.length>0?`<div class="report-summary-item"><span class="report-summary-label">소음 패턴</span><span class="report-summary-value" style="color:#f59e0b;">${selectedPatterns.map(p=>p.split('(')[0]).join(', ')}</span></div>`:''}
+        ${selectedPatterns.length>0?`<div class="report-summary-item"><span class="report-summary-label">소음 패턴</span><span class="report-summary-value" style="color:#2563eb;">${selectedPatterns.map(p=>p.split('(')[0]).join(', ')}</span></div>`:''}
         ${noiseTime?`<div class="report-summary-item"><span class="report-summary-label">발생 시간대</span><span class="report-summary-value">${noiseTime}</span></div>`:''}
         ${floorInfo?`<div class="report-summary-item"><span class="report-summary-label">건물 위치</span><span class="report-summary-value">${floorInfo}</span></div>`:''}
-        ${dbMax?`<div class="report-summary-item"><span class="report-summary-label">측정 Lmax</span><span class="report-summary-value" style="color:#d32f2f;">${dbMax} dB(A)</span></div>`:''}
+        ${dbMax?`<div class="report-summary-item"><span class="report-summary-label">측정 Lmax</span><span class="report-summary-value" style="color:#dc2626;">${dbMax} dB(A)</span></div>`:''}
         <div class="report-summary-item"><span class="report-summary-label">소음 파일</span><span class="report-summary-value" style="color:${images.media?'#2563eb':'#94a3b8'}">${images.media?'<i class="fas fa-check-circle"></i> 포함':'없음'}</span></div>`;
     summaryBox.style.display='block';
 
@@ -835,7 +835,7 @@ CHART_DATA_END
                 // 안전 필터 체크
                 if(data.candidates[0].finishReason==='SAFETY'){
                     loading.style.display='none';content.style.display='block';
-                    content.innerHTML="<p style='color:#f59e0b;font-weight:bold;'>⚠️ 안전 필터에 의해 응답이 차단되었습니다. 다른 사진으로 다시 시도해주세요.</p>";
+                    content.innerHTML="<p style='color:#2563eb;font-weight:bold;'>⚠️ 안전 필터에 의해 응답이 차단되었습니다. 다른 사진으로 다시 시도해주세요.</p>";
                     return;
                 }
                 let aiText=data.candidates[0].content.parts.filter(p=>!p.thought).map(p=>p.text).join('') || data.candidates[0].content.parts[0].text;
@@ -915,7 +915,7 @@ CHART_DATA_END
 
 function drawChart(data){
     var chartData=google.visualization.arrayToDataTable([['요인','비율'],['환경/사용요인',data.ventilation],['구조/시공요인',data.insulation],['기타/노후화',data.normal]]);
-    var options={is3D:true,colors:['#00e676','#2563eb','#64748b'],backgroundColor:'transparent',fontSize:13,chartArea:{width:'100%',height:'90%'},legend:{position:'bottom',textStyle:{fontSize:11}}};
+    var options={is3D:true,colors:['#2563eb','#2563eb','#64748b'],backgroundColor:'transparent',fontSize:13,chartArea:{width:'100%',height:'90%'},legend:{position:'bottom',textStyle:{fontSize:11}}};
     var chart=new google.visualization.PieChart(document.getElementById('chart_div'));chart.draw(chartData,options);
 }
 
