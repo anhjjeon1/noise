@@ -61,9 +61,9 @@
         .noise-type-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-top:5px; }
         .noise-checkbox-wrapper { position:relative; height:100%; }
         .noise-checkbox-wrapper input[type="checkbox"] { display:none; }
-        .noise-checkbox-label { display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px 2px; height:65px; background:#fff; border:1px solid #cbd5e1; border-radius:10px; cursor:pointer; transition:all 0.15s; position:relative; }
-        .noise-checkbox-label i.main-icon { font-size:1.1rem; margin-bottom:4px; color:#94a3b8; }
-        .noise-checkbox-label span { font-size:0.7rem; font-weight:700; color:#64748b; letter-spacing:-0.5px; line-height:1.1; }
+        .noise-checkbox-label { display:flex; flex-direction:row; align-items:center; justify-content:center; gap:6px; padding:6px 8px; height:42px; background:#fff; border:1px solid #cbd5e1; border-radius:10px; cursor:pointer; transition:all 0.15s; position:relative; }
+        .noise-checkbox-label i.main-icon { font-size:1rem; margin-bottom:0; color:#94a3b8; }
+        .noise-checkbox-label span { font-size:0.72rem; font-weight:700; color:#64748b; letter-spacing:-0.3px; line-height:1.1; }
         .check-indicator { position:absolute; top:4px; right:4px; width:14px; height:14px; border-radius:50%; border:1px solid #cbd5e1; background:#fff; display:flex; align-items:center; justify-content:center; font-size:8px; color:white; }
         .noise-checkbox-wrapper input:checked+.noise-checkbox-label { background:#eff6ff; border-color:var(--primary-main); box-shadow:0 2px 5px rgba(37,99,235,0.15); }
         .noise-checkbox-wrapper input:checked+.noise-checkbox-label i.main-icon { color:var(--primary-main); }
@@ -170,7 +170,7 @@
 <div class="mobile-container">
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단앱</h1>
-        <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.5</span>
+        <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.6</span>
     </header>
     <div class="content">
         <!-- 기본 정보 -->
@@ -278,22 +278,21 @@
         <div class="section">
             <div class="section-title"><i class="fas fa-camera"></i> 현장 채증 (Evidence)</div>
             <div class="photo-stack">
-                <div class="upload-group">
-                    <label class="input-label">1. 현장 메인 사진 (필수)</label>
-                    <label for="img-main" class="upload-box" id="box-main"><i class="fas fa-camera upload-icon"></i><span class="upload-text-main">터치하여 메인 사진 촬영</span><img id="view-main" class="preview-img"></label>
-                    <input type="file" id="img-main" class="file-input" accept="image/*" onchange="handleImage(this,'main','view-main','box-main')">
-                    <div class="sub-photo-row"><label for="img-main-add" class="sub-upload-btn-3d" id="btn-main-add"><i class="fas fa-plus"></i> 추가 사진</label><input type="file" id="img-main-add" class="file-input" accept="image/*" onchange="handleSubImage(this,'main_add','btn-main-add')"></div>
-                </div>
-                <div class="upload-group">
-                    <label class="input-label">2. 문제 부위 상세 (근접)</label>
-                    <label for="img-sub" class="upload-box" id="box-sub"><i class="fas fa-search-plus upload-icon"></i><span class="upload-text-main">터치하여 근접 촬영</span><img id="view-sub" class="preview-img"></label>
-                    <input type="file" id="img-sub" class="file-input" accept="image/*" onchange="handleImage(this,'sub','view-sub','box-sub')">
-                    <div class="sub-photo-row"><label for="img-sub-add" class="sub-upload-btn-3d" id="btn-sub-add"><i class="fas fa-plus"></i> 추가 사진</label><input type="file" id="img-sub-add" class="file-input" accept="image/*" onchange="handleSubImage(this,'sub_add','btn-sub-add')"></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                    <div class="upload-group">
+                        <label class="input-label">1. 현장 메인 사진 (필수)</label>
+                        <label for="img-main" class="upload-box" id="box-main"><i class="fas fa-camera upload-icon"></i><span class="upload-text-main">터치하여 메인 사진 촬영</span><img id="view-main" class="preview-img"></label>
+                        <input type="file" id="img-main" class="file-input" accept="image/*" onchange="handleImage(this,'main','view-main','box-main')">
+                    </div>
+                    <div class="upload-group">
+                        <label class="input-label">2. 문제 부위 상세 (근접)</label>
+                        <label for="img-sub" class="upload-box" id="box-sub"><i class="fas fa-search-plus upload-icon"></i><span class="upload-text-main">터치하여 근접 촬영</span><img id="view-sub" class="preview-img"></label>
+                        <input type="file" id="img-sub" class="file-input" accept="image/*" onchange="handleImage(this,'sub','view-sub','box-sub')">
+                    </div>
                 </div>
                 <div class="upload-group" style="margin-top:5px;">
-                    <label class="input-label" style="color:#1976d2;"><i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성)</label>
-                    <div style="font-size:0.7rem;color:#64748b;margin-bottom:5px;">* 10초 이내 짧은 파일 권장</div>
-                    <label for="file-media" class="upload-box media-box-style" id="box-media"><i class="fas fa-video upload-icon" style="color:#1976d2;"></i><span class="upload-text-main" style="color:#0d47a1;">동영상/음성 파일 선택</span><div id="media-preview-text" style="display:none;font-size:0.8rem;font-weight:bold;color:#0d47a1;text-align:center;line-height:1.3;"></div></label>
+                    <label class="input-label" style="color:#1976d2;text-align:left;"><i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성) <span style="font-size:0.65rem;color:#64748b;font-weight:500;">* 10초 이내 짧은 파일 권장</span></label>
+                    <label for="file-media" class="upload-box media-box-style" id="box-media" style="aspect-ratio:unset!important;height:50px;flex-direction:row!important;gap:8px;padding:4px 10px;"><i class="fas fa-video upload-icon" style="color:#1976d2;font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="color:#0d47a1;font-size:0.8rem;">동영상/음성 파일 선택</span><div id="media-preview-text" style="display:none;font-size:0.8rem;font-weight:bold;color:#0d47a1;text-align:center;line-height:1.3;"></div></label>
                     <input type="file" id="file-media" class="file-input" accept="video/*,audio/*" onchange="handleMedia(this)">
                 </div>
             </div>
@@ -306,9 +305,16 @@
                 <div class="upload-group">
                     <label class="input-label" style="color:var(--primary-main);">3. FLIR SI1-LD (음향 카메라)</label>
                     <div style="font-size:0.7rem;color:#64748b;margin-bottom:5px;">* 초음파 누설/소음원 시각화 데이터 (필수)</div>
-                    <label for="img-acoustic" class="upload-box" id="box-acoustic" style="border-color:#bbdefb;background-color:#f0f9ff;"><i class="fas fa-wave-square upload-icon" style="color:var(--primary-main);"></i><span class="upload-text-main" style="color:var(--primary-main);">음향 진단 이미지 업로드</span><img id="view-acoustic" class="preview-img"></label>
-                    <input type="file" id="img-acoustic" class="file-input" accept="image/*" onchange="handleImage(this,'acoustic','view-acoustic','box-acoustic')">
-                    <div class="sub-photo-row"><label for="img-acoustic-add" class="sub-upload-btn-3d" id="btn-acoustic-add"><i class="fas fa-plus"></i> 추가 사진</label><input type="file" id="img-acoustic-add" class="file-input" accept="image/*" onchange="handleSubImage(this,'acoustic_add','btn-acoustic-add')"></div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                        <div>
+                            <label for="img-acoustic" class="upload-box" id="box-acoustic" style="border-color:#bbdefb;background-color:#f0f9ff;"><i class="fas fa-wave-square upload-icon" style="color:var(--primary-main);"></i><span class="upload-text-main" style="color:var(--primary-main);">음향 진단 1</span><img id="view-acoustic" class="preview-img"></label>
+                            <input type="file" id="img-acoustic" class="file-input" accept="image/*" onchange="handleImage(this,'acoustic','view-acoustic','box-acoustic')">
+                        </div>
+                        <div>
+                            <label for="img-acoustic-2" class="upload-box" id="box-acoustic-2" style="border-color:#bbdefb;background-color:#f0f9ff;"><i class="fas fa-wave-square upload-icon" style="color:var(--primary-main);"></i><span class="upload-text-main" style="color:var(--primary-main);">음향 진단 2</span><img id="view-acoustic-2" class="preview-img"></label>
+                            <input type="file" id="img-acoustic-2" class="file-input" accept="image/*" onchange="handleImage(this,'acoustic_add','view-acoustic-2','box-acoustic-2')">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
