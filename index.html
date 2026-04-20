@@ -170,7 +170,7 @@
 <div class="mobile-container">
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단앱</h1>
-        <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.7</span>
+        <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.8</span>
     </header>
     <div class="content">
         <!-- 기본 정보 -->
@@ -517,7 +517,7 @@ async function extractDbFromImage(base64Data){
 - 값을 찾을 수 없으면 null로 설정
 - 소수점 포함 가능 (예: 41.4)`;
 
-        const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${API_KEY}`,{
+        const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`,{
             method:'POST',headers:{'Content-Type':'application/json'},
             body:JSON.stringify({contents:[{parts:[{text:ocrPrompt},{inline_data:{mime_type:"image/jpeg",data:base64Data}}]}],generationConfig:{temperature:0.1,maxOutputTokens:256}})
         });
@@ -809,7 +809,7 @@ CHART_DATA_END
     }
 
     try{
-        const apiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite-preview:generateContent?key=${API_KEY}`;
+        const apiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`;
         console.log("[DEBUG] API 호출 시작...");
         console.log("[DEBUG] API KEY 앞 10자:", API_KEY.substring(0,10)+"...");
 
