@@ -170,7 +170,7 @@
 <div class="mobile-container">
     <header class="main-header">
         <h1><i class="fas fa-frog frog-icon"></i> 청개구리 소음진단앱</h1>
-        <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 13.8</span>
+        <span class="version-badge" id="versionBadge" onclick="window.checkDevMode()">Ver 14.0</span>
     </header>
     <div class="content">
         <!-- 기본 정보 -->
@@ -355,8 +355,84 @@
 
 <script>
 google.charts.load("current",{packages:["corechart"]});
-const keyPart1="AIzaSyA7qKIvvR";const keyPart2="fYA2I0XGUZbddm";const keyPart3="cfdKDwA8p_c";
-const API_KEY=keyPart1+keyPart2+keyPart3;
+
+// ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
+// GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
+const APP_VERSION = 'v14.0';
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
+let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
+let _fp = localStorage.getItem('noise_fp') || '';
+if (!_fp) {
+    _fp = Date.now() + '_' + Math.random().toString(36).substring(2, 12);
+    localStorage.setItem('noise_fp', _fp);
+}
+
+async function ensureAdminAuth(forceReauth) {
+    if (ADMIN_TOKEN && !forceReauth) return ADMIN_TOKEN;
+    const pwd = window.prompt('🔐 관리자 비밀번호를 입력하세요\n(24시간 후 자동 만료)');
+    if (!pwd) throw new Error('인증 취소');
+    const res = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'admin_auth', pwd: pwd, fp: _fp })
+    });
+    const data = await res.json();
+    if (!data.success) {
+        alert('비밀번호가 틀렸습니다');
+        throw new Error('인증 실패');
+    }
+    ADMIN_TOKEN = data.token;
+    localStorage.setItem('noise_admin_token', ADMIN_TOKEN);
+    return ADMIN_TOKEN;
+}
+
+// parts 배열을 GAS로 보내고 Gemini 결과 텍스트 반환 (실제 모델: gemini-3.1-flash-lite, 서버 측 상수)
+async function callGeminiViaGAS(parts, config) {
+    const prompt = parts.filter(p => p.text).map(p => p.text).join('\n');
+    const images = parts.filter(p => p.inline_data).map(p => ({
+        mimeType: p.inline_data.mime_type,
+        data: p.inline_data.data
+    }));
+    let token;
+    try { token = await ensureAdminAuth(); }
+    catch (e) { throw e; }
+    const res = await fetch(GAS_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({
+            action: 'ai',
+            adminToken: token,
+            prompts: [{ prompt, images, config: config || {} }]
+        })
+    });
+    const data = await res.json();
+    if (data.error === 'unauthorized') {
+        localStorage.removeItem('noise_admin_token');
+        ADMIN_TOKEN = '';
+        // 한 번 재시도
+        token = await ensureAdminAuth(true);
+        const res2 = await fetch(GAS_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({
+                action: 'ai',
+                adminToken: token,
+                prompts: [{ prompt, images, config: config || {} }]
+            })
+        });
+        const data2 = await res2.json();
+        if (!data2.results || !data2.results.length) throw new Error('AI 응답 없음');
+        const r2 = data2.results[0];
+        if (r2.error === 'safety') throw new Error('safety filter blocked');
+        if (r2.error) throw new Error(r2.error);
+        return r2.text;
+    }
+    if (!data.results || !data.results.length) throw new Error(data.message || 'AI 응답 없음');
+    const result = data.results[0];
+    if (result.error === 'safety') throw new Error('safety filter blocked');
+    if (result.error) throw new Error(result.error);
+    return result.text;
+}
 
 // ★★★ v11.0 확장 전문 기술 DB (KS/ISO 규격 + 주파수 + 판정기준 + 복합원인)
 const PUBLIC_TECH_DB=[
@@ -471,7 +547,10 @@ let imageUrls={};
 let clickCount=0;let clickTimer;const DAILY_LIMIT=100;
 
 window.addEventListener('DOMContentLoaded',()=>{
-    if(localStorage.getItem('is_developer')==='true') document.getElementById('versionBadge').classList.add('dev-active');
+    // v14.0: 헤더 버전 배지 동적 바인딩 (APP_VERSION만 올리면 자동 갱신)
+    const vb=document.getElementById('versionBadge');
+    if(vb) vb.textContent='Ver '+APP_VERSION.replace(/^v/,'');
+    if(localStorage.getItem('is_developer')==='true') vb.classList.add('dev-active');
     const t=new Date();
     const d=document.getElementById('date');
     if(d){d.value=`${t.getFullYear()}.${String(t.getMonth()+1).padStart(2,'0')}.${String(t.getDate()).padStart(2,'0')}`;d.setAttribute('placeholder',d.value);}
@@ -517,13 +596,10 @@ async function extractDbFromImage(base64Data){
 - 값을 찾을 수 없으면 null로 설정
 - 소수점 포함 가능 (예: 41.4)`;
 
-        const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`,{
-            method:'POST',headers:{'Content-Type':'application/json'},
-            body:JSON.stringify({contents:[{parts:[{text:ocrPrompt},{inline_data:{mime_type:"image/jpeg",data:base64Data}}]}],generationConfig:{temperature:0.1,maxOutputTokens:256}})
-        });
-        if(!res.ok)throw new Error('API 오류');
-        const data=await res.json();
-        const txt=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
+        const txt=await callGeminiViaGAS(
+            [{text:ocrPrompt},{inline_data:{mime_type:"image/jpeg",data:base64Data}}],
+            {temperature:0.1,maxOutputTokens:256}
+        );
         // JSON 추출
         const jsonMatch=txt.match(/\{[\s\S]*?\}/);
         if(!jsonMatch)throw new Error('JSON 없음');
@@ -808,101 +884,62 @@ CHART_DATA_END
         }
     }
 
+    // 요청 바디 크기 체크 (로그용)
+    const bodySizeMB=(new Blob([JSON.stringify(parts)]).size/(1024*1024)).toFixed(2);
+    console.log("[DEBUG] 요청 크기:", bodySizeMB, "MB");
+
     try{
-        const apiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${API_KEY}`;
-        console.log("[DEBUG] API 호출 시작...");
-        console.log("[DEBUG] API KEY 앞 10자:", API_KEY.substring(0,10)+"...");
-
-        const requestBody={contents:[{parts:parts}],generationConfig:{temperature:0.15,topK:40,topP:0.95,maxOutputTokens:8192}};
-        
-        // 요청 바디 크기 체크
-        const bodyStr=JSON.stringify(requestBody);
-        const bodySizeMB=(new Blob([bodyStr]).size/(1024*1024)).toFixed(2);
-        console.log("[DEBUG] 요청 크기:", bodySizeMB, "MB");
-
-        const response=await fetch(apiUrl,{
-            method:'POST',headers:{'Content-Type':'application/json'},
-            body:bodyStr
-        });
-
-        console.log("[DEBUG] HTTP 상태코드:", response.status);
-
-        if(response.ok){
-            const data=await response.json();
-            console.log("[DEBUG] 응답 수신 성공");
-            
-            if(data.candidates&&data.candidates.length>0){
-                // 안전 필터 체크
-                if(data.candidates[0].finishReason==='SAFETY'){
-                    loading.style.display='none';content.style.display='block';
-                    content.innerHTML="<p style='color:#2563eb;font-weight:bold;'>⚠️ 안전 필터에 의해 응답이 차단되었습니다. 다른 사진으로 다시 시도해주세요.</p>";
-                    return;
-                }
-                let aiText=data.candidates[0].content.parts.filter(p=>!p.thought).map(p=>p.text).join('') || data.candidates[0].content.parts[0].text;
-                console.log("[DEBUG] finishReason:", data.candidates[0].finishReason, "partsCount:", data.candidates[0].content.parts.length, "textLen:", aiText.length, "thinkingTokens:", data.usageMetadata?.thoughtsTokenCount, "candidateTokens:", data.usageMetadata?.candidatesTokenCount);
-                let finalJson=null;
-                // 다양한 JSON 구분자 패턴 시도 (AI가 변형할 수 있으므로 여러 패턴 매칭)
-                const jsonPatterns=[
-                    /CHART_DATA_START\s*([\s\S]*?)\s*CHART_DATA_END/,
-                    /___JSON_START___([\s\S]*?)___JSON_END___/,
-                    /JSON_START\s*([\s\S]*?)\s*JSON_END/,
-                    /\*\*JSON_START\*\*\s*([\s\S]*?)\s*\*\*JSON_END\*\*/,
-                    /```json\s*\n?\s*(\{[\s\S]*?"confidence"[\s\S]*?\})\s*\n?\s*```/
-                ];
-                for(const pat of jsonPatterns){
-                    const m=aiText.match(pat);
-                    if(m){
-                        try{
-                            const cleaned=m[1].replace(/```json|```/g,'').trim();
-                            finalJson=JSON.parse(cleaned);
-                            aiText=aiText.replace(m[0],"");
-                            console.log("[DEBUG] JSON 파싱 성공:", finalJson);
-                            break;
-                        }catch(e){console.error("JSON파싱시도:",e);}
-                    }
-                }
-                // 최후 폴백: JSON 객체 직접 탐색
-                if(!finalJson){
-                    const fallback=aiText.match(/\{\s*"ventilation"\s*:\s*\d+[\s\S]*?"confidence"[\s\S]*?\}\s*\}/);
-                    if(fallback){
-                        try{finalJson=JSON.parse(fallback[0]);aiText=aiText.replace(fallback[0],"");console.log("[DEBUG] 폴백 JSON 파싱 성공");}catch(e){}
-                    }
-                }
-                const md=window.markdownit();content.innerHTML=md.render(aiText);
-                loading.style.display='none';content.style.display='block';
-                if(finalJson){
-                    chartSection.style.display='block';drawChart(finalJson);
-                    renderConfidenceBars(finalJson);
-                }
-            } else {
-                // 후보 없음
-                loading.style.display='none';content.style.display='block';
-                const blockReason=data.promptFeedback?.blockReason||'알 수 없음';
-                content.innerHTML=`<p style='color:red;font-weight:bold;'>⚠️ AI 응답을 생성하지 못했습니다.<br><span style='font-size:0.8rem;'>차단 사유: ${blockReason}</span></p>`;
-            }
-        } else {
-            // HTTP 오류 상세 처리
-            const errData=await response.json().catch(()=>null);
-            const errMsg=errData?.error?.message||'알 수 없는 오류';
-            const errCode=errData?.error?.code||response.status;
-            const errStatus=errData?.error?.status||'';
-            console.error("[ERROR] API 응답:", JSON.stringify(errData,null,2));
-            
+        let aiText;
+        try {
+            aiText = await callGeminiViaGAS(parts, {temperature:0.15, topK:40, topP:0.95, maxOutputTokens:8192});
+        } catch (gasErr) {
+            const msg = String(gasErr.message || '').toLowerCase();
             loading.style.display='none';content.style.display='block';
-            let userMsg='';
-            if(errCode===400) userMsg='요청 데이터가 너무 크거나 형식 오류입니다. 사진/동영상 용량을 줄여보세요.';
-            else if(errCode===401||errCode===403) userMsg='API KEY가 유효하지 않거나 권한이 없습니다. KEY를 확인해주세요.';
-            else if(errCode===404) userMsg='AI 모델을 찾을 수 없습니다. 모델명을 확인해주세요.';
-            else if(errCode===429) userMsg='API 호출 한도를 초과했습니다. 잠시 후 다시 시도해주세요.';
-            else if(errCode===500||errCode===503) userMsg='Google AI 서버 오류입니다. 잠시 후 다시 시도해주세요.';
-            else userMsg=errMsg;
-            
-            content.innerHTML=`<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px;">
-                <p style="color:#dc2626;font-weight:800;margin:0 0 8px 0;"><i class="fas fa-exclamation-circle"></i> 분석 오류 (Code: ${errCode})</p>
-                <p style="color:#7f1d1d;font-size:0.85rem;margin:0 0 6px 0;">${userMsg}</p>
-                <p style="color:#94a3b8;font-size:0.7rem;margin:0;">상세: ${errMsg} ${errStatus?'('+errStatus+')':''}</p>
-                <p style="color:#94a3b8;font-size:0.7rem;margin:4px 0 0 0;">요청크기: ${bodySizeMB}MB</p>
-            </div>`;
+            if (msg.includes('safety')) {
+                content.innerHTML="<p style='color:#2563eb;font-weight:bold;'>⚠️ 안전 필터에 의해 응답이 차단되었습니다. 다른 사진으로 다시 시도해주세요.</p>";
+                return;
+            }
+            if (msg.includes('인증 취소') || msg.includes('인증 실패') || msg.includes('unauthorized')) {
+                content.innerHTML="<div style='background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px;'><p style='color:#dc2626;font-weight:800;margin:0 0 8px 0;'><i class='fas fa-exclamation-circle'></i> 관리자 인증 필요</p><p style='color:#7f1d1d;font-size:0.85rem;margin:0;'>비밀번호 입력이 취소되었거나 인증이 실패했습니다. 페이지 새로고침 후 다시 시도해주세요.</p></div>";
+                return;
+            }
+            content.innerHTML=`<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px;"><p style="color:#dc2626;font-weight:800;margin:0 0 8px 0;"><i class="fas fa-exclamation-circle"></i> 분석 오류</p><p style="color:#7f1d1d;font-size:0.85rem;margin:0;">${gasErr.message||'AI 호출 실패'}</p><p style="color:#94a3b8;font-size:0.7rem;margin:4px 0 0 0;">요청크기: ${bodySizeMB}MB</p></div>`;
+            return;
+        }
+        console.log("[DEBUG] 응답 수신, textLen:", aiText.length);
+        let finalJson=null;
+        // 다양한 JSON 구분자 패턴 시도 (AI가 변형할 수 있으므로 여러 패턴 매칭)
+        const jsonPatterns=[
+            /CHART_DATA_START\s*([\s\S]*?)\s*CHART_DATA_END/,
+            /___JSON_START___([\s\S]*?)___JSON_END___/,
+            /JSON_START\s*([\s\S]*?)\s*JSON_END/,
+            /\*\*JSON_START\*\*\s*([\s\S]*?)\s*\*\*JSON_END\*\*/,
+            /```json\s*\n?\s*(\{[\s\S]*?"confidence"[\s\S]*?\})\s*\n?\s*```/
+        ];
+        for(const pat of jsonPatterns){
+            const m=aiText.match(pat);
+            if(m){
+                try{
+                    const cleaned=m[1].replace(/```json|```/g,'').trim();
+                    finalJson=JSON.parse(cleaned);
+                    aiText=aiText.replace(m[0],"");
+                    console.log("[DEBUG] JSON 파싱 성공:", finalJson);
+                    break;
+                }catch(e){console.error("JSON파싱시도:",e);}
+            }
+        }
+        // 최후 폴백: JSON 객체 직접 탐색
+        if(!finalJson){
+            const fallback=aiText.match(/\{\s*"ventilation"\s*:\s*\d+[\s\S]*?"confidence"[\s\S]*?\}\s*\}/);
+            if(fallback){
+                try{finalJson=JSON.parse(fallback[0]);aiText=aiText.replace(fallback[0],"");console.log("[DEBUG] 폴백 JSON 파싱 성공");}catch(e){}
+            }
+        }
+        const md=window.markdownit();content.innerHTML=md.render(aiText);
+        loading.style.display='none';content.style.display='block';
+        if(finalJson){
+            chartSection.style.display='block';drawChart(finalJson);
+            renderConfidenceBars(finalJson);
         }
     }catch(error){
         console.error("[CATCH]",error);loading.style.display='none';content.style.display='block';
