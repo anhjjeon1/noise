@@ -26,8 +26,10 @@
  */
 
 // ───── 상수 ─────
-const VERSION = 'v1.0';
-const GEMINI_MODEL = 'gemini-3.1-flash-lite';
+const VERSION = 'v1.1';
+const GEMINI_MODEL = 'gemini-3.1-flash-lite';   // 기본/OCR/폴백용 (저비용)
+// v1.1(2026-09-28): 본분석은 클라이언트가 prompts[].model로 상위 모델 요청 가능. 화이트리스트만 허용.
+const ALLOWED_MODELS = ['gemini-3.1-flash-lite', 'gemini-3.7-flash'];
 const ADMIN_TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
 const SERVICE_NAME = '청개구리-소음진단-Backend';
 
@@ -80,7 +82,7 @@ function handleAi(p) {
   const apiKey = props_().getProperty('GEMINI_API_KEY');
   if (!apiKey) return { error: 'no_api_key', message: 'GEMINI_API_KEY 미설정' };
 
-  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent?key=' + apiKey;
+  const apiBase = 'https://generativelanguage.googleapis.com/v1beta/models/';
   const results = [];
   for (let i = 0; i < prompts.length; i++) {
     const item = prompts[i] || {};
@@ -95,14 +97,20 @@ function handleAi(p) {
       contents: [{ parts: parts }],
       generationConfig: Object.assign(defaultConfig, item.config || {})
     };
+    // 요청 모델: 화이트리스트면 사용, 아니면 기본 lite
+    const reqModel = (item.model && ALLOWED_MODELS.indexOf(item.model) >= 0) ? item.model : GEMINI_MODEL;
+    const opts = {
+      method: 'post', contentType: 'application/json',
+      payload: JSON.stringify(payload), muteHttpExceptions: true
+    };
     try {
-      const res = UrlFetchApp.fetch(url, {
-        method: 'post',
-        contentType: 'application/json',
-        payload: JSON.stringify(payload),
-        muteHttpExceptions: true
-      });
-      const code = res.getResponseCode();
+      let res = UrlFetchApp.fetch(apiBase + reqModel + ':generateContent?key=' + apiKey, opts);
+      let code = res.getResponseCode();
+      // 상위 모델 호출 실패 시 기본(lite) 모델로 1회 폴백 — 모델ID 변경/일시오류 안전망
+      if (code !== 200 && reqModel !== GEMINI_MODEL) {
+        res = UrlFetchApp.fetch(apiBase + GEMINI_MODEL + ':generateContent?key=' + apiKey, opts);
+        code = res.getResponseCode();
+      }
       if (code !== 200) {
         results.push({ error: 'http_' + code, text: '' });
         continue;
