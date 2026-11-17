@@ -85,7 +85,7 @@
         .photo-stack { display:flex; flex-direction:column; gap:15px; }
         .upload-group { background:#fff; }
         .upload-group .input-label { text-align:left; color:var(--primary-dark); font-size:0.85rem; margin-bottom:6px; }
-        .upload-box { border:2px dashed #cbd5e1; background-color:#f8fafc; border-radius:12px; width:100%; aspect-ratio:4/3; text-align:center; color:#94a3b8; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative; overflow:hidden; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); }
+        .upload-box { box-sizing:border-box; border:2px dashed #cbd5e1; background-color:#f8fafc; border-radius:12px; width:100%; aspect-ratio:4/3; text-align:center; color:#94a3b8; cursor:pointer; display:flex; flex-direction:column; justify-content:center; align-items:center; position:relative; overflow:hidden; transition:all 0.3s cubic-bezier(0.4,0,0.2,1); }
         .upload-box:hover { border-color:var(--primary-main); background-color:var(--primary-soft); transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.05); }
         .upload-box.filled { border:2px solid var(--primary-main); background:#fff; }
         .upload-icon { font-size:1.8rem; margin-bottom:8px; opacity:0.8; color:var(--text-secondary); }
@@ -470,7 +470,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v15.6';
+const APP_VERSION = 'v15.7';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -1883,7 +1883,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v15.6-20261118a';
+const BUILD_ID='v15.7-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
