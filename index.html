@@ -138,7 +138,7 @@
         .footer-btns { display:flex; gap:10px; margin-top:20px; }
         .footer-btn { flex:1; padding:12px; border:none; border-radius:12px; font-size:0.9rem; font-weight:700; cursor:pointer; color:white; display:flex; justify-content:center; align-items:center; box-shadow:0 3px 8px rgba(0,0,0,0.15); transition:transform 0.2s; }
         .footer-btn:active { transform:scale(0.98); }
-        .call-btn { background:linear-gradient(135deg,#2563eb,#1a233a); }
+        .go-btn { background:linear-gradient(135deg,#2563eb,#1a233a); padding:14px 8px; font-size:0.95rem; }
         .save-btn { background:linear-gradient(135deg,#37474f,#263238); }
         .main-footer { background-color:#f8fafc; color:#94a3b8; padding:15px; text-align:center; font-size:0.65rem; line-height:1.4; border-top:1px solid #e2e8f0; word-break:keep-all; }
         .print-legal-footer { display:none; margin-top:30px; border:2px solid #000; padding:15px; text-align:center; }
@@ -165,7 +165,8 @@
         .ft-row .input-label { text-align:left; font-size:0.78rem; }
         .ft-text { width:100%; box-sizing:border-box; margin-top:5px; padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.8rem; }
         .ft-cam { display:flex; align-items:center; gap:5px; }
-        .ft-cam input { width:64px; padding:7px 4px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.85rem; text-align:center; }
+        .ft-cam input[type=number] { width:50px; padding:7px 2px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.85rem; text-align:center; }
+        .ft-cam .ft-btn { margin-left:0; padding:7px 8px; }
         .ft-cam span { font-size:0.75rem; color:#64748b; }
         .ft-btn { margin-left:auto; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:0.72rem; padding:7px 9px; border-radius:8px; }
         /* v15.1 일반 소음 / 창호 진단 주소 분리 */
@@ -174,10 +175,19 @@
         .mode-switch { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:8px 10px 0; }
         .mode-btn { padding:9px 6px; border-radius:10px; border:1.5px solid #cbd5e1; background:#fff; color:#64748b; font-weight:800; font-size:0.85rem; cursor:pointer; }
         .mode-btn.active { background:#2563eb; border-color:#2563eb; color:#fff; }
+        /* v15.8 한 줄 배치 */
+        .line-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+        .line-row > label { flex:0 0 42%; margin:0; text-align:left; line-height:1.25; }
+        .line-row > select { flex:1; min-width:0; }
+        .line-row > .section-title + select { flex:1; min-width:0; }
+        .ft-line { display:flex; gap:6px; align-items:center; }
+        .ft-line > select { flex:0 0 46%; min-width:0; }
+        .ft-line > .ft-text, .ft-cam > .ft-text { flex:1; min-width:0; margin-top:0; }
         .wx-row { display:flex; gap:6px; align-items:stretch; }
         .wx-row input { flex:1; }
-        .win-part-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:4px; }
-        .win-part-grid label { display:flex; align-items:center; gap:5px; font-size:0.8rem; font-weight:700; color:#1a233a; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:7px 6px; }
+        .win-part-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; margin-top:4px; }
+        .win-part-grid label { display:flex; align-items:center; gap:3px; font-size:0.72rem; font-weight:700; color:#1a233a; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:7px 3px; white-space:nowrap; letter-spacing:-0.3px; }
+        .win-part-grid input { margin:0; flex:none; }
         .ft-rec { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-top:6px; }
         .ft-rec-btn { display:block; text-align:center; padding:9px 4px; border:1.5px dashed #2563eb; border-radius:8px; font-size:0.78rem; font-weight:800; color:#2563eb; background:#eff6ff; cursor:pointer; }
         .ft-rec-btn.done { border-style:solid; background:#2563eb; color:#fff; }
@@ -276,7 +286,6 @@
                     <input type="file" id="img-thermal" class="file-input" accept="image/*" onchange="handleSoundMeterImage(this)">
                     <div id="db-ocr-status" style="display:none;margin-top:6px;padding:8px 10px;border-radius:8px;font-size:0.75rem;font-weight:700;text-align:center;"></div>
                 </div>
-                <div style="font-size:0.75rem;color:#64748b;margin-bottom:5px;text-align:center;"><i class="fas fa-keyboard" style="color:#2563eb;"></i> 소음계 측정값</div>
                 <div class="db-input-row">
                     <div><label class="input-label">최대값(dB)</label><input type="text" id="db-max" placeholder="예:52"></div>
                     <div><label class="input-label">평균값(dB)</label><input type="text" id="db-avg" placeholder="예:38"></div>
@@ -289,14 +298,14 @@
         <div class="section win-only">
             <div class="section-title"><i class="fas fa-window-maximize"></i> 의심 부위</div>
             <div class="win-part-grid">
-                <label><input type="checkbox" class="win-part" value="창짝 둘레(가스켓)"> 창짝 둘레</label>
-                <label><input type="checkbox" class="win-part" value="여밈대(창짝 맞닿는 곳)"> 여밈대</label>
-                <label><input type="checkbox" class="win-part" value="상부"> 상부</label>
-                <label><input type="checkbox" class="win-part" value="하부·레일"> 하부 · 레일</label>
-                <label><input type="checkbox" class="win-part" value="배수구·물구멍"> 배수구 · 물구멍</label>
-                <label><input type="checkbox" class="win-part" value="고정창·유리 둘레"> 고정창 · 유리 둘레</label>
-                <label><input type="checkbox" class="win-part" value="창끼리 연결부(커플링바)"> 창끼리 연결부</label>
-                <label><input type="checkbox" class="win-part" value="창틀과 벽 사이(실란트·우레탄)"> 창틀과 벽 사이</label>
+                <label><input type="checkbox" class="win-part" value="창짝 둘레(가스켓)">창짝둘레</label>
+                <label><input type="checkbox" class="win-part" value="여밈대(창짝 맞닿는 곳)">여밈대</label>
+                <label><input type="checkbox" class="win-part" value="상부">상부</label>
+                <label><input type="checkbox" class="win-part" value="하부·레일">하부레일</label>
+                <label><input type="checkbox" class="win-part" value="배수구·물구멍">배수구</label>
+                <label><input type="checkbox" class="win-part" value="고정창·유리 둘레">유리둘레</label>
+                <label><input type="checkbox" class="win-part" value="창끼리 연결부(커플링바)">연결부</label>
+                <label><input type="checkbox" class="win-part" value="창틀과 벽 사이(실란트·우레탄)">벽 사이</label>
             </div>
         </div>
 
@@ -315,17 +324,21 @@
 
         <!-- ★ NEW: 소음 특성 패턴 -->
         <div class="section">
-            <div class="section-title"><i class="fas fa-wave-square"></i> 소음 특성 패턴</div>
-            <div class="pattern-grid">
-                <div class="pattern-checkbox-wrapper gen-only"><input type="checkbox" id="pt-boom" class="pattern-selector" value="쿵쿵/탕탕(충격음,저주파20~100Hz)"><label for="pt-boom" class="pattern-label"><i class="fas fa-drum"></i><span>쿵쿵 / 탕탕</span></label></div>
-                <div class="pattern-checkbox-wrapper"><input type="checkbox" id="pt-hum" class="pattern-selector" value="웅웅/윙윙(공진음,저주파50~200Hz)"><label for="pt-hum" class="pattern-label"><i class="fas fa-compact-disc"></i><span>웅웅 / 윙윙</span></label></div>
-                <div class="pattern-checkbox-wrapper"><input type="checkbox" id="pt-whistle" class="pattern-selector" value="삐이/피이(풍절음,중고주파500~4000Hz)"><label for="pt-whistle" class="pattern-label"><i class="fas fa-wind"></i><span>삐이 / 피이</span></label></div>
-                <div class="pattern-checkbox-wrapper"><input type="checkbox" id="pt-tick" class="pattern-selector" value="틱틱/딱딱(열팽창Stick-slip)"><label for="pt-tick" class="pattern-label"><i class="fas fa-hand-pointer"></i><span>틱틱 / 딱딱</span></label></div>
-                <div class="pattern-checkbox-wrapper gen-only"><input type="checkbox" id="pt-water" class="pattern-selector" value="졸졸/쏴아(유체이동음)"><label for="pt-water" class="pattern-label"><i class="fas fa-water"></i><span>졸졸 / 쏴아</span></label></div>
-                <div class="pattern-checkbox-wrapper"><input type="checkbox" id="pt-rattle" class="pattern-selector" value="덜컹/파닥(기밀불량,역풍)"><label for="pt-rattle" class="pattern-label"><i class="fas fa-door-open"></i><span>덜컹 / 파닥</span></label></div>
-                <div class="pattern-checkbox-wrapper gen-only"><input type="checkbox" id="pt-buzz" class="pattern-selector" value="지잉/찌잉(전기노이즈)"><label for="pt-buzz" class="pattern-label"><i class="fas fa-bolt"></i><span>지잉 / 찌잉</span></label></div>
-                <div class="pattern-checkbox-wrapper gen-only"><input type="checkbox" id="pt-vibration" class="pattern-selector" value="진동/떨림(고체전달음,구조체공진)"><label for="pt-vibration" class="pattern-label"><i class="fas fa-arrows-alt-v"></i><span>진동 / 떨림</span></label></div>
-                <div class="pattern-checkbox-wrapper win-only"><input type="checkbox" id="pt-hiss" class="pattern-selector" value="쉬이/쏴(틈 바람소리,고주파1~4kHz)"><label for="pt-hiss" class="pattern-label"><i class="fas fa-wind"></i><span>쉬이 / 쏴</span></label></div>
+            <!-- v15.8 소음 특성 패턴 = 목록에서 고르기(한 줄) -->
+            <div class="line-row">
+                <div class="section-title" style="margin-bottom:0;flex:0 0 auto;"><i class="fas fa-wave-square"></i> 소음 특성 패턴</div>
+                <select class="env-select" id="pattern-select" onchange="if(typeof saRender==='function')saRender()">
+                    <option value="">선택</option>
+                    <option class="gen-opt" value="쿵쿵/탕탕(충격음,저주파20~100Hz)">쿵쿵 / 탕탕</option>
+                    <option value="웅웅/윙윙(공진음,저주파50~200Hz)">웅웅 / 윙윙</option>
+                    <option value="삐이/피이(풍절음,중고주파500~4000Hz)">삐이 / 피이</option>
+                    <option class="win-opt" value="쉬이/쏴(틈 바람소리,고주파1~4kHz)">쉬이 / 쏴</option>
+                    <option value="틱틱/딱딱(열팽창Stick-slip)">틱틱 / 딱딱</option>
+                    <option value="덜컹/파닥(기밀불량,역풍)">덜컹 / 파닥</option>
+                    <option class="gen-opt" value="졸졸/쏴아(유체이동음)">졸졸 / 쏴아</option>
+                    <option class="gen-opt" value="지잉/찌잉(전기노이즈)">지잉 / 찌잉</option>
+                    <option class="gen-opt" value="진동/떨림(고체전달음,구조체공진)">진동 / 떨림</option>
+                </select>
             </div>
         </div>
 
@@ -362,11 +375,13 @@
                     <label class="input-label" style="color:var(--primary-main);">3. FLIR SI1-LD (음향 카메라)</label>
                     <!-- v15.4 촬영 방식: 초음파 발생기 사용 여부 (점의 뜻이 달라짐) -->
                     <div class="cam-mode-box">
-                        <label class="input-label" for="cam-mode" style="text-align:left;">촬영 방식 (초음파 발생기 사용 여부)</label>
-                        <select class="env-select" id="cam-mode" onchange="camModeChanged()"><option value="">선택</option><option value="direct">발생기 없음 — 바람 불 때 직접 촬영</option><option value="gen">초음파 발생기 사용</option><option value="both">둘 다 (사진 1 = 직접 · 사진 2 = 발생기)</option></select>
-                        <div id="cam-gen-wrap" style="display:none;margin-top:6px;">
-                            <label class="input-label" for="cam-gen-pos" style="text-align:left;">발생기 위치</label>
-                            <select class="env-select" id="cam-gen-pos" onchange="camModeChanged()"><option value="">선택</option><option value="실내">실내 (카메라는 실외에서)</option><option value="실외">실외 (카메라는 실내에서)</option><option value="내·외창 사이">내·외창 사이 (이중창, 카메라는 실내에서)</option></select>
+                        <div class="line-row">
+                            <label class="input-label" for="cam-mode">촬영 방식<br><span style="font-size:0.66rem;color:#64748b;font-weight:600;">초음파 발생기 사용 여부</span></label>
+                            <select class="env-select" id="cam-mode" onchange="camModeChanged()"><option value="">선택</option><option value="direct">직접 (발생기 없음)</option><option value="gen">발생기 사용</option><option value="both">둘 다 (1=직접·2=발생기)</option></select>
+                        </div>
+                        <div id="cam-gen-wrap" class="line-row" style="display:none;">
+                            <label class="input-label" for="cam-gen-pos">발생기 위치</label>
+                            <select class="env-select" id="cam-gen-pos" onchange="camModeChanged()"><option value="">선택</option><option value="실내">실내 (카메라 실외)</option><option value="실외">실외 (카메라 실내)</option><option value="내·외창 사이">내·외창 사이</option></select>
                         </div>
                         <div id="cam-mode-note" class="sa-note" style="line-height:1.5;margin:4px 0 6px;"></div>
                     </div>
@@ -402,8 +417,10 @@
         <div class="section win-only">
             <div class="section-title"><i class="fas fa-clipboard-check"></i> 현장 확인 테스트</div>
             <div class="ft-row">
-                <label class="input-label" for="ft-open">① 창 조금 열기 (소리 날 때)</label>
-                <select class="env-select" id="ft-open" onchange="saRecAutoSet=false;saRender()"><option value="">안 해 봄</option><option value="사라지거나 바뀜">소리가 사라지거나 바뀜</option><option value="더 커짐">소리가 더 커짐</option><option value="변화 없음">변화 없음</option></select>
+                <div class="line-row">
+                    <label class="input-label" for="ft-open">① 창 조금 열기<br><span style="font-size:0.66rem;color:#64748b;font-weight:600;">소리 날 때</span></label>
+                    <select class="env-select" id="ft-open" onchange="saRecAutoSet=false;saRender()"><option value="">안 해 봄</option><option value="사라지거나 바뀜">사라짐 · 바뀜</option><option value="더 커짐">더 커짐</option><option value="변화 없음">변화 없음</option></select>
+                </div>
                 <div class="sa-note" style="margin-top:6px;line-height:1.5"><b>같은 벽면의 다른 창</b>을 엽니다 · 방문 닫고 배기팬 끔 · 같은 자리에서 1~2분씩</div>
                 <div class="ft-rec">
                     <label for="ft-rec-0" class="ft-rec-btn" id="ft-rec-lbl-0">① 닫음</label><input type="file" id="ft-rec-0" class="file-input" accept="video/*,audio/*" onchange="saRecLoad(0,this)">
@@ -414,28 +431,27 @@
             </div>
             <div class="ft-row">
                 <label class="input-label" for="ft-smoke">② 실내 감압 + 연기 (배기팬 강, 창틀 둘레에 가는 연기)</label>
-                <select class="env-select" id="ft-smoke" onchange="saRender()"><option value="">안 해 봄</option><option value="연기가 빨려 든 자리 있음">연기가 빨려 든 자리 있음</option><option value="빨려 든 자리 없음">빨려 든 자리 없음</option></select>
-                <input type="text" id="ft-smoke-pos" class="ft-text" placeholder="연기가 빨려 든 자리 (예: 상부 고정창 오른쪽 위 모서리)" oninput="saRender()">
+                <div class="ft-line">
+                    <select class="env-select" id="ft-smoke" onchange="saRender()"><option value="">안 해 봄</option><option value="연기가 빨려 든 자리 있음">빨려 든 자리 있음</option><option value="빨려 든 자리 없음">빨려 든 자리 없음</option></select>
+                    <input type="text" id="ft-smoke-pos" class="ft-text" placeholder="빨려 든 자리 (예: 상부 모서리)" oninput="saRender()">
+                </div>
             </div>
             <div class="ft-row">
                 <label class="input-label">③ 초음파카메라 측정 주파수 범위 (kHz)</label>
                 <div class="ft-cam">
                     <input type="number" id="ft-cam-lo" step="0.5" min="0" placeholder="최저" oninput="saRender()"><span>~</span>
-                    <input type="number" id="ft-cam-hi" step="0.5" min="0" placeholder="최고" oninput="saRender()"><span>kHz</span>
-                    <button type="button" class="ft-btn" onclick="saFillCamRange()">추천값 넣기</button>
+                    <input type="number" id="ft-cam-hi" step="0.5" min="0" placeholder="최고" oninput="saRender()">
+                    <button type="button" class="ft-btn" onclick="saFillCamRange()">추천</button>
+                    <input type="text" id="ft-cam-pos" class="ft-text" placeholder="잡힌 자리" oninput="saRender()">
                 </div>
-                <input type="text" id="ft-cam-pos" class="ft-text" placeholder="초음파카메라에 잡힌 자리 (예: 상부 프레임 이음부 2곳)" oninput="saRender()">
             </div>
         </div>
 
-        <!-- 법적 고지 -->
-        <div class="legal-disclaimer-box">
-            <div class="legal-title"><i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i> 분석 시작 전 필수 동의</div>
-            <div class="legal-text">본 앱의 결과는 AI가 웹상의 공개된 기술 자료를 기반으로 분석한 <strong>참고용 소견</strong>입니다. 이는 '기술사법'에 의한 기술사의 공식 감정서가 아니며, <strong>법적 효력(소송 증거 등)이 없습니다.</strong></div>
-            <label class="legal-check-wrapper"><input type="checkbox" id="legal-agree" onchange="toggleAnalyzeBtn()"><span class="legal-check-text">위 면책 조항을 확인하였으며 동의합니다.</span></label>
+        <!-- v15.9 청개구리 전용: 사전 동의 칸·기술지원 버튼 삭제, 분석·PDF 버튼 한 줄 (보고서 끝의 '법적 면책' 문구는 유지) -->
+        <div class="footer-btns" style="margin-top:6px;">
+            <button class="footer-btn go-btn" id="analyze-btn" onclick="startAnalysis()"><i class="fas fa-microchip" style="margin-right:5px;"></i> AI 리포트 생성</button>
+            <button class="footer-btn save-btn" onclick="savePdf()"><i class="fas fa-file-pdf" style="margin-right:5px;"></i> PDF 저장</button>
         </div>
-
-        <button class="analyze-btn" id="analyze-btn" onclick="startAnalysis()" disabled><i class="fas fa-microchip" style="margin-right:8px;"></i> AI 정밀 분석 리포트 생성</button>
 
         <!-- 결과 -->
         <div id="result-area">
@@ -457,10 +473,6 @@
             </div>
         </div>
 
-        <div class="footer-btns">
-            <button class="footer-btn call-btn" onclick="window.location.href='tel:01023220949'"><i class="fas fa-headset" style="margin-right:5px;"></i> 기술지원</button>
-            <button class="footer-btn save-btn" onclick="savePdf()"><i class="fas fa-file-pdf" style="margin-right:5px;"></i> PDF 저장</button>
-        </div>
     </div>
     <footer class="main-footer">청개구리샤시 | 사업자등록번호:123-36-31426 | 대표:전영웅<br>전화 1599-7380 | COPYRIGHT ⓒ 2026 Cheong-gaeguri Corp.</footer>
 </div>
@@ -470,7 +482,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v15.7';
+const APP_VERSION = 'v15.9';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -667,6 +679,8 @@ window.addEventListener('DOMContentLoaded',()=>{
     if(vb) vb.textContent='Ver '+APP_VERSION.replace(/^v/,'');
     // v15.1: 주소별 화면 (일반 소음 / 창호 진단)
     const mb=document.getElementById(IS_WIN?'mode-window':'mode-general'); if(mb) mb.classList.add('active');
+    // v15.8: 소음 특성 패턴 목록 — 주소에 맞지 않는 항목은 목록에서 뺌
+    document.querySelectorAll(IS_WIN?'#pattern-select .gen-opt':'#pattern-select .win-opt').forEach(o=>o.remove());
     const h1=document.querySelector('.main-header h1');
     if(IS_WIN){
         if(h1) h1.innerHTML='<i class="fas fa-frog frog-icon"></i> 청개구리 창호 소음진단';
@@ -821,7 +835,8 @@ function savePdf(){
 function renderReportPhotos(){const g=document.getElementById('report-photo-gallery');g.innerHTML='';const labels={smoke:'연기시험',smoke_add:'연기시험추가',main:'현장메인',main_add:'현장추가',sub:'문제부위',sub_add:'문제부위추가',acoustic:camPhotoLabel(1),acoustic_add:camPhotoLabel(2),thermal:'소음측정기',thermal_add:'소음측정기추가'};let has=false;for(const[k,u]of Object.entries(imageUrls)){if(u){has=true;const d=document.createElement('div');d.className='report-photo-item';d.innerHTML=`<img src="${u}" class="report-photo-img"><div class="report-photo-label">${labels[k]||k}</div>`;g.appendChild(d);}}if(!has)g.innerHTML='<div style="grid-column:span 2;text-align:center;color:#999;font-size:0.8rem;">첨부사진없음</div>';}
 
 function getSelectedNoiseTypes(){return Array.from(document.querySelectorAll('.noise-selector:checked')).map(c=>c.value);}
-function getSelectedPatterns(){return Array.from(document.querySelectorAll('.pattern-selector:checked')).map(c=>c.value);}
+function getSelectedPatterns(){const e=document.getElementById('pattern-select');return e&&e.value?[e.value]:[];}
+function isTickPattern(){const e=document.getElementById('pattern-select');return !!(e&&e.value.indexOf('틱틱')===0);}
 
 function renderConfidenceBars(data){
     const sec=document.getElementById('confidence-section');const con=document.getElementById('confidence-bars');
@@ -1764,8 +1779,7 @@ function wxHTML(forReport){
         h+='<div class="sa-note">5년 중 가장 센 순간풍속: '+wxF1(c.maxGust)+' m/s</div>';
         h+='<div class="sa-h" style="font-size:0.75rem">바람 센 날(순간 15 m/s 이상)의 주된 방향</div><table class="sa-tbl"><tr><th>계절</th><th>1년 평균 일수</th><th>주된 방향</th></tr>'+
            c.seasons.map(s=>'<tr><td>'+s.nm+'</td><td>'+s.days.toFixed(0)+'일</td><td>'+(s.days>=0.5?s.top+' ('+s.share.toFixed(0)+'%)':'-')+'</td></tr>').join('')+'</table>';
-        const tick=document.getElementById('pt-tick');
-        if(tick&&tick.checked)h+='<div class="sa-h" style="font-size:0.75rem">🌡️ 일교차 (틱틱 소리 참고)</div><div>하루 기온 차이 10℃ 이상인 날: 1년 평균 <b>'+c.swing10.toFixed(0)+'일</b>'+(c.swingMonth?' · 일교차가 가장 큰 달: <b>'+c.swingMonth[0]+'월</b>(평균 '+c.swingMonth[1].toFixed(1)+'℃)':'')+'</div>';
+        if(isTickPattern())h+='<div class="sa-h" style="font-size:0.75rem">🌡️ 일교차 (틱틱 소리 참고)</div><div>하루 기온 차이 10℃ 이상인 날: 1년 평균 <b>'+c.swing10.toFixed(0)+'일</b>'+(c.swingMonth?' · 일교차가 가장 큰 달: <b>'+c.swingMonth[0]+'월</b>(평균 '+c.swingMonth[1].toFixed(1)+'℃)':'')+'</div>';
     }
     h+='<div class="sa-note" style="margin-top:4px">고층은 지상 10m보다 바람이 더 셉니다(숫자로 환산하지 않음). 섬·바닷가는 격자 자료와 실제 바람의 차이가 클 수 있습니다.</div></div>';
     return h;
@@ -1777,7 +1791,7 @@ function wxSummaryText(){
         if(W.clim&&W.clim.strongerPct!=null)s+=' / 이날 하루 최대 순간풍속 '+wxF1(r.dayMaxGust)+'m/s보다 센 날은 5년 중 '+W.clim.strongerPct.toFixed(0)+'%';s+='\n';}
     if(W.clim){const c=W.clim;s+='- 최근 5년('+c.from+'~'+c.to+') 1년 평균: 순간 10m/s↑ '+c.g10.toFixed(0)+'일, 15m/s↑ '+c.g15.toFixed(0)+'일, 강풍주의보 수준 '+c.warn.toFixed(0)+'일, 5년 최대 순간 '+wxF1(c.maxGust)+'m/s\n';
         s+='- 바람 센 날(순간 15m/s↑) 계절별 주된 방향: '+c.seasons.map(x=>x.nm+' '+(x.days>=0.5?x.top+'('+x.days.toFixed(0)+'일/년)':'거의 없음')).join(', ')+'\n';
-        const tick=document.getElementById('pt-tick');if(tick&&tick.checked)s+='- 일교차 10℃↑ 1년 평균 '+c.swing10.toFixed(0)+'일'+(c.swingMonth?', 가장 큰 달 '+c.swingMonth[0]+'월':'')+'\n';}
+        if(isTickPattern())s+='- 일교차 10℃↑ 1년 평균 '+c.swing10.toFixed(0)+'일'+(c.swingMonth?', 가장 큰 달 '+c.swingMonth[0]+'월':'')+'\n';}
     s+='[기상 자료를 쓰는 규칙] 참고값임을 밝히고, 고층 풍속을 숫자로 환산하지 마십시오. 녹화 시각 바람이 약했으면 그 녹화만으로 "소리 없음"을 단정하지 말고, 1년에 증상이 날 만한 날 수와 주된 바람 방향(바람을 정면으로 받는 벽면)을 설명에 활용하십시오.\n';
     return s;
 }
@@ -1883,7 +1897,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v15.7-20261118a';
+const BUILD_ID='v15.9-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
