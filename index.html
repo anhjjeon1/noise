@@ -226,6 +226,11 @@
         <!-- 기본 정보 -->
         <div class="section">
             <div class="section-title"><i class="fas fa-info"></i> 기본 정보 (Basic Info)</div>
+            <!-- v15.5 주소를 기본 정보 맨 위로 (창호 진단 주소에서는 기상 자동 조회) -->
+            <div class="wx-row" style="margin-bottom:8px;">
+                <input type="text" id="wx-addr" class="ft-text" style="margin-top:0" placeholder="주소 — 단지 이름이나 동네까지 (예: 안산시 대부도)">
+                <button type="button" class="ft-btn win-only" style="margin-left:0" onclick="wxFetch()">기상 조회</button>
+            </div>
             <div class="info-grid-row">
                 <div>
                     <div class="mic-input-wrap with-suffix">
@@ -251,6 +256,13 @@
                 <input type="hidden" id="date">
             </div>
             <div class="mic-status" id="mic-status"></div>
+            <!-- v15.5 녹화 일시는 소리 파일에서 자동으로 (틀릴 때만 고치기) -->
+            <div class="win-only" style="margin-top:6px;">
+                <div class="sa-note" id="wx-time-view">녹화 일시: 소리 파일을 넣으면 자동으로 들어갑니다.</div>
+                <div id="wx-time-edit" style="display:none;margin-top:4px;"><input type="datetime-local" id="wx-time" class="ft-text" style="margin-top:0" onchange="wxTimeEdited=true;wxTimeShow('직접 고침');if((document.getElementById('wx-addr').value||'').trim())wxFetch();"></div>
+                <div id="wx-status" class="sa-note"></div>
+                <div id="wx-box"></div>
+            </div>
             <div style="margin-top:8px;">
                 <label class="input-label" style="text-align:left;">소음 내용 <span style="font-size:0.7rem;color:#94a3b8;font-weight:500;">(음성 최대 20초 자동 종료)</span></label>
                 <div class="mic-input-wrap textarea-wrap">
@@ -296,20 +308,8 @@
 
         <!-- v15.1 창호 진단 전용: 창 종류·의심 부위 -->
         <div class="section win-only">
-            <div class="section-title"><i class="fas fa-window-maximize"></i> 창 정보</div>
-            <!-- v15.2 주소 + 녹화 일시 → 기상 자동 조회 -->
-            <label class="input-label" for="wx-addr" style="text-align:left;">주소 <span style="font-size:0.68rem;color:#64748b;font-weight:500;">(단지 이름이나 동네까지만 — 동·호수는 빼고)</span></label>
-            <div class="wx-row">
-                <input type="text" id="wx-addr" class="ft-text" style="margin-top:0" placeholder="예: 안산시 대부도 / 의왕 풍경채어바니티">
-                <button type="button" class="ft-btn" style="margin-left:0" onclick="wxFetch()">기상 조회</button>
-            </div>
-            <label class="input-label" for="wx-time" style="text-align:left;margin-top:8px;">녹화 일시 <span style="font-size:0.68rem;color:#64748b;font-weight:500;">(소리 파일을 넣으면 자동 입력 · 틀리면 고치세요)</span></label>
-            <input type="datetime-local" id="wx-time" class="ft-text" style="margin-top:0" onchange="wxTimeEdited=true">
-            <div id="wx-status" class="sa-note"></div>
-            <div id="wx-box"></div>
-            <label class="input-label" for="win-type" style="text-align:left;margin-top:10px;">창 종류</label>
-            <select class="env-select" id="win-type"><option value="">선택</option><option value="시스템창(틸트앤턴·여닫이, 압착 가스켓)">시스템창 (틸트앤턴·여닫이)</option><option value="미서기 단창(모헤어)">미서기 단창</option><option value="미서기 이중창(내창+외창)">미서기 이중창</option><option value="고정창·연결창(커플링바로 이어 붙인 창)">고정창 · 연결창</option><option value="모름">모름</option></select>
-            <label class="input-label" style="text-align:left;margin-top:10px;">의심 부위 (여러 개 가능)</label>
+            <div class="section-title"><i class="fas fa-window-maximize"></i> 의심 부위</div>
+            <div style="font-size:0.7rem;color:#64748b;margin-bottom:2px;">* 여러 개 고를 수 있습니다.</div>
             <div class="win-part-grid">
                 <label><input type="checkbox" class="win-part" value="창짝 둘레(가스켓)"> 창짝 둘레</label>
                 <label><input type="checkbox" class="win-part" value="여밈대(창짝 맞닿는 곳)"> 여밈대</label>
@@ -497,7 +497,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v15.4';
+const APP_VERSION = 'v15.5';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -697,6 +697,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     const h1=document.querySelector('.main-header h1');
     if(IS_WIN){
         if(h1) h1.innerHTML='<i class="fas fa-frog frog-icon"></i> 청개구리 창호 소음진단';
+        const loc=document.getElementById('location'); if(loc) loc.placeholder='거실 시스템창';
         document.title='청개구리 창호 소음진단';
         const lt=document.getElementById('loading-text'); if(lt) lt.textContent='창호 소리 분석 중...';
     }
@@ -873,7 +874,7 @@ async function startAnalysis(){
     const dong=document.getElementById('dong').value;const ho=document.getElementById('ho').value;
     const selectedNoiseTypes=IS_WIN?['창호(Window)']:getSelectedNoiseTypes();
     if(selectedNoiseTypes.length===0){alert("소음 발생 부위를 최소 하나 선택해주세요.");return;}
-    const winType=IS_WIN?(document.getElementById('win-type').value||'미선택'):'';
+    const winType=IS_WIN?((document.getElementById('location').value||'').trim()||'미입력'):'';   // v15.5: 창 종류 칸 삭제 → 장소 칸(예: 거실 시스템창)으로
     const winParts=IS_WIN?Array.from(document.querySelectorAll('.win-part:checked')).map(c=>c.value):[];
     const selectedPatterns=getSelectedPatterns();
 
@@ -921,9 +922,9 @@ async function startAnalysis(){
     // 요약 박스
     summaryBox.innerHTML=`
         <div class="report-summary-item"><span class="report-summary-label">진단 일자</span><span class="report-summary-value">${dateInput}</span></div>
-        <div class="report-summary-item"><span class="report-summary-label">현장 위치</span><span class="report-summary-value">${dong}동 ${ho}호</span></div>
+        <div class="report-summary-item"><span class="report-summary-label">현장 위치</span><span class="report-summary-value">${(()=>{const a=(document.getElementById('wx-addr').value||'').trim();return a?saEsc(a)+' ':'';})()}${dong}동 ${ho}호</span></div>
         <div class="report-summary-item"><span class="report-summary-label">중점 분석 대상</span><span class="report-summary-value" style="color:var(--primary-main);">${selectedNoiseTypes.join(', ')}</span></div>
-        ${IS_WIN?`<div class="report-summary-item"><span class="report-summary-label">창 종류</span><span class="report-summary-value">${saEsc(winType)}</span></div><div class="report-summary-item"><span class="report-summary-label">의심 부위</span><span class="report-summary-value">${winParts.length?saEsc(winParts.join(', ')):'미선택'}</span></div>`:''}
+        ${IS_WIN?`<div class="report-summary-item"><span class="report-summary-label">장소·창 종류</span><span class="report-summary-value">${saEsc(winType)}</span></div><div class="report-summary-item"><span class="report-summary-label">의심 부위</span><span class="report-summary-value">${winParts.length?saEsc(winParts.join(', ')):'미선택'}</span></div>`:''}
         ${selectedPatterns.length>0?`<div class="report-summary-item"><span class="report-summary-label">소음 패턴</span><span class="report-summary-value" style="color:#2563eb;">${selectedPatterns.map(p=>p.split('(')[0]).join(', ')}</span></div>`:''}
         ${noiseTime?`<div class="report-summary-item"><span class="report-summary-label">발생 시간대</span><span class="report-summary-value">${noiseTime}</span></div>`:''}
         ${floorInfo?`<div class="report-summary-item"><span class="report-summary-label">건물 위치</span><span class="report-summary-value">${floorInfo}</span></div>`:''}
@@ -1044,7 +1045,7 @@ CHART_DATA_END
 ${referenceString}
 \`\`\`
 ### 2. 창 정보
-- 창 종류: ${winType}
+- 장소·창 종류(현장 입력 그대로): ${winType}
 - 의심 부위: ${winParts.length?winParts.join(', '):'미선택'}
 ### 3. 환경·측정
 ${envInfo}${dbInfo}${patternInfo}
@@ -1677,7 +1678,13 @@ async function handleMedia(input){
 //   ① 녹화 시각의 풍속·순간풍속·풍향  ② 최근 5년 바람 기록  ③ 일교차(틱틱 소리 고를 때)
 //   자료: Open-Meteo (재분석 격자 약 9~25km, 지상 10m 기준) — 참고값. 주소는 동·호수를 빼고 보냄
 // ================================================================
-let SA_WX=null, wxTimeEdited=false;
+let SA_WX=null, wxTimeEdited=false, wxTimeSrc='';
+// v15.5: 녹화 일시는 자동 — 화면엔 글자로만 보이고, '고치기'를 누를 때만 입력칸이 열림
+function wxTimeOpen(){document.getElementById('wx-time-edit').style.display='block';}
+function wxTimeShow(src){
+    const v=document.getElementById('wx-time').value,el=document.getElementById('wx-time-view');if(!el)return;
+    el.innerHTML=v?'녹화 일시: <b>'+saEsc(v.replace('T',' '))+'</b> ('+saEsc(src||wxTimeSrc)+') <a href="javascript:void(0)" onclick="wxTimeOpen()" style="color:#2563eb;font-weight:700">고치기</a>':'녹화 일시: 소리 파일을 넣으면 자동으로 들어갑니다.';
+}
 const WX_DIR16=['북','북북동','북동','동북동','동','동남동','남동','남남동','남','남남서','남서','서남서','서','서북서','북서','북북서'];
 const WX_DIR8=['북','북동','동','남동','남','남서','서','북서'];
 const wxDir16=d=>d==null?'-':WX_DIR16[Math.round(d/22.5)%16];
@@ -1720,8 +1727,9 @@ async function saFileTime(f){
 }
 function wxSetTime(t){
     const el=document.getElementById('wx-time');if(!el||!t||(wxTimeEdited&&el.value))return;
+    wxTimeSrc=t.src;
     const d=t.d;el.value=`${wxYmd(d)}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
-    const st=document.getElementById('wx-status');if(st&&!SA_WX)st.textContent='녹화 일시를 '+t.src+'에서 읽었습니다.';
+    wxTimeShow(t.src);
     if((document.getElementById('wx-addr').value||'').trim())wxFetch();
 }
 async function wxFetch(){
@@ -1903,7 +1911,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v15.4-20261118a';
+const BUILD_ID='v15.5-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
