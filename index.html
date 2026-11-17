@@ -54,6 +54,8 @@
         .env-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:8px; }
         .env-select { width:100%; padding:8px 4px; border:1px solid #e2e8f0; border-radius:10px; background-color:#f8fafc; font-size:0.78rem; color:var(--text-primary); font-weight:600; text-align:center; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 8px center; }
         .env-select:focus { border-color:var(--primary-main); outline:none; box-shadow:0 0 0 3px rgba(37,99,235,0.1); }
+        .noise-in-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+        .noise-in-row .input-label { text-align:left; }
         .db-input-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; margin-top:8px; }
         .db-input-group input { font-size:1rem; font-weight:800; color:var(--primary-main); }
 
@@ -279,19 +281,30 @@
                     <select class="env-select" id="floor-info"><option value="">선택</option><option value="저층(1~5F)">저층 (1~5F)</option><option value="중층(6~15F)">중층 (6~15F)</option><option value="고층(16~30F)">고층 (16~30F)</option><option value="초고층(31F이상)">초고층 (31F↑)</option><option value="최상층">최상층</option></select>
                 </div>
             </div>
-            <div style="margin-top:10px;padding-top:8px;border-top:1px dashed #e2e8f0;">
-                <div style="margin-bottom:10px;">
-                    <label class="input-label" style="text-align:left;font-size:0.8rem;color:var(--primary-dark);"><i class="fas fa-volume-up" style="color:#2563eb;margin-right:4px;"></i>소음측정기 앱 화면 </label>
-                    <label for="img-thermal" class="upload-box media-box-style" id="box-thermal" style="aspect-ratio:unset!important;height:50px;flex-direction:row!important;gap:8px;padding:4px 10px;"><i class="fas fa-volume-up upload-icon" style="font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="font-size:0.8rem;">소음측정기 스크린샷 업로드</span><img id="view-thermal" class="preview-img"></label>
-                    <input type="file" id="img-thermal" class="file-input" accept="image/*" onchange="handleSoundMeterImage(this)">
-                    <div id="db-ocr-status" style="display:none;margin-top:6px;padding:8px 10px;border-radius:8px;font-size:0.75rem;font-weight:700;text-align:center;"></div>
+        </div>
+
+        <!-- v15.11 현장 소음: 녹화(어떤 소리) + 측정기 화면(얼마나 큰가) 한 묶음 -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-volume-up"></i> 현장 소음</div>
+            <div class="noise-in-row">
+                <div>
+                    <label class="input-label">소리 녹화 <span style="font-size:0.65rem;color:#64748b;font-weight:500;">30초~2분</span></label>
+                    <label for="file-media" class="upload-box media-box-style" id="box-media" style="aspect-ratio:unset!important;min-height:52px;height:auto;flex-direction:row!important;gap:6px;padding:6px 6px;"><i class="fas fa-video upload-icon" style="color:#2563eb;font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="color:#1a233a;font-size:0.8rem;">동영상/음성</span><div id="media-preview-text" style="display:none;font-size:0.68rem;font-weight:bold;color:#1a233a;text-align:center;line-height:1.3;word-break:break-all;"></div></label>
+                    <input type="file" id="file-media" class="file-input" accept="video/*,audio/*" onchange="handleMedia(this)">
                 </div>
-                <div class="db-input-row">
+                <div>
+                    <label class="input-label">소음측정기 화면</label>
+                    <label for="img-thermal" class="upload-box media-box-style" id="box-thermal" style="aspect-ratio:unset!important;min-height:52px;height:auto;flex-direction:row!important;gap:6px;padding:6px 6px;"><i class="fas fa-volume-up upload-icon" style="font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="font-size:0.8rem;">측정기 화면</span><img id="view-thermal" class="preview-img"></label>
+                    <input type="file" id="img-thermal" class="file-input" accept="image/*" onchange="handleSoundMeterImage(this)">
+                </div>
+            </div>
+            <div id="db-ocr-status" style="display:none;margin-top:6px;padding:8px 10px;border-radius:8px;font-size:0.75rem;font-weight:700;text-align:center;"></div>
+            <div class="db-input-row">
                     <div><label class="input-label">최대값(dB)</label><input type="text" id="db-max" placeholder="예:52"></div>
                     <div><label class="input-label">평균값(dB)</label><input type="text" id="db-avg" placeholder="예:38"></div>
                     <div><label class="input-label">배경소음(dB)</label><input type="text" id="db-bg" placeholder="예:30"></div>
                 </div>
-            </div>
+            <div id="sa-panel" class="sa-panel" style="display:none;"></div>
         </div>
 
         <!-- v15.1 창호 진단 전용: 창 종류·의심 부위 -->
@@ -357,12 +370,6 @@
                         <label for="img-sub" class="upload-box" id="box-sub"><i class="fas fa-search-plus upload-icon"></i><span class="upload-text-main">터치하여 근접 촬영</span><img id="view-sub" class="preview-img"></label>
                         <input type="file" id="img-sub" class="file-input" accept="image/*" onchange="handleImage(this,'sub','view-sub','box-sub')">
                     </div>
-                </div>
-                <div class="upload-group" style="margin-top:5px;">
-                    <label class="input-label" style="color:#2563eb;text-align:left;"><i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성) <span style="font-size:0.65rem;color:#64748b;font-weight:500;">30초~2분</span></label>
-                    <label for="file-media" class="upload-box media-box-style" id="box-media" style="aspect-ratio:unset!important;height:50px;flex-direction:row!important;gap:8px;padding:4px 10px;"><i class="fas fa-video upload-icon" style="color:#2563eb;font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="color:#1a233a;font-size:0.8rem;">동영상/음성 파일 선택</span><div id="media-preview-text" style="display:none;font-size:0.8rem;font-weight:bold;color:#1a233a;text-align:center;line-height:1.3;"></div></label>
-                    <input type="file" id="file-media" class="file-input" accept="video/*,audio/*" onchange="handleMedia(this)">
-                    <div id="sa-panel" class="sa-panel" style="display:none;"></div>
                 </div>
             </div>
         </div>
@@ -482,7 +489,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v15.10';
+const APP_VERSION = 'v15.11';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -1897,7 +1904,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v15.10-20261118a';
+const BUILD_ID='v15.11-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
