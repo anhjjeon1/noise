@@ -268,6 +268,17 @@
         .save-btn { background:var(--primary-dark); }
         .main-footer { background:transparent; border:none; padding:14px 16px 24px; }
         .upd-badge { bottom:84px; }
+        /* AI 보고서 본문(마크다운) 표·인용 상자 */
+        #analysis-content table { width:100%; border-collapse:separate; border-spacing:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; font-size:0.85rem; margin:8px 0 14px; background:#fff; }
+        #analysis-content th, #analysis-content td { padding:8px 10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; word-break:keep-all; }
+        #analysis-content th { background:#eef2f7; color:var(--primary-dark); }
+        #analysis-content td:first-child, #analysis-content th:first-child { white-space:nowrap; font-weight:700; color:var(--primary-dark); }
+        #analysis-content tr:last-child td { border-bottom:none; }
+        #analysis-content blockquote { margin:0 0 14px; padding:10px 12px; background:var(--primary-soft); border-left:4px solid var(--primary-main); border-radius:10px; }
+        #analysis-content blockquote p { margin:0; }
+        #analysis-content h3 { font-size:1.02rem; margin:18px 0 8px; color:var(--primary-dark); }
+        #analysis-content ul, #analysis-content ol { padding-left:20px; }
+        #analysis-content li { margin:4px 0; line-height:1.55; }
 
         @media print {
             body { background:white; padding:0; display:block; }
@@ -562,7 +573,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v16.0';
+const APP_VERSION = 'v16.1';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -1977,7 +1988,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v16.0-20261118a';
+const BUILD_ID='v16.1-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
