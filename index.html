@@ -198,10 +198,83 @@
         .fac-tbl th { background:#1a233a; color:#fff; }
         .upd-badge { position:fixed; left:50%; transform:translateX(-50%); bottom:14px; background:#2563eb; color:#fff; font-weight:800; font-size:0.8rem; padding:9px 16px; border-radius:20px; box-shadow:0 4px 12px rgba(0,0,0,.25); z-index:9999; cursor:pointer; }
 
+        /* ================================================================
+           ★ v16.0 새 디자인 — 밝은 회색 바탕 + 흰 카드, 큰 터치 영역, 아래 고정 버튼
+             색은 3색 규칙 유지(남색 #1a233a · 파랑 #2563eb · 빨강 #dc2626) + 회색
+           ================================================================ */
+        :root { --bg-color:#f2f4f7; --line:#e5e9ef; --field:#f4f6f9; --muted:#8a94a6; --radius:18px; }
+        body { background:var(--bg-color); padding:0; -webkit-font-smoothing:antialiased; }
+        .mobile-container { max-width:520px; margin:0 auto; background:transparent; box-shadow:none; border:none; border-radius:0; overflow:visible; }
+        /* 머리: 위에 붙는 흰 반투명 막대 */
+        .main-header { position:sticky; top:0; z-index:50; background:rgba(255,255,255,0.86); -webkit-backdrop-filter:saturate(180%) blur(14px); backdrop-filter:saturate(180%) blur(14px); color:var(--primary-dark); border-radius:0; box-shadow:0 1px 0 var(--line); padding:13px 16px; }
+        .main-header h1 { font-size:1.05rem; color:var(--primary-dark); }
+        .main-header h1 i.frog-icon { filter:none; }
+        .version-badge { background:var(--field); color:var(--muted); border:none; font-weight:700; }
+        /* 일반 소음 / 창호 진단: 미끄럼 단추 모양 */
+        .mode-switch { margin:12px 12px 0; padding:4px; gap:4px; background:#e6eaf0; border-radius:14px; }
+        .mode-btn { border:none; background:transparent; color:var(--muted); border-radius:11px; padding:10px 6px; font-size:0.88rem; transition:all .2s; }
+        .mode-btn.active { background:#fff; color:var(--primary-main); box-shadow:0 1px 3px rgba(16,24,40,.12); }
+        /* 내용: 묶음마다 흰 카드 */
+        .content { background:transparent; padding:12px 12px 8px; }
+        .content > .section { background:#fff; border:none; border-radius:var(--radius); padding:16px 14px; margin-bottom:12px; box-shadow:0 1px 2px rgba(16,24,40,.04); }
+        .section-title { font-size:1rem; margin-bottom:12px; color:var(--primary-dark); }
+        .section-title i { background:var(--primary-soft); color:var(--primary-main); width:30px; height:30px; border-radius:10px; font-size:0.85rem; box-shadow:none; }
+        .input-label { text-align:left; color:#5b6575; font-size:0.76rem; font-weight:700; margin-bottom:6px; }
+        /* 입력칸: 테두리 없는 회색 칸, 누르면 흰색+파란 테두리 */
+        input[type="text"], input[type="number"], input[type="datetime-local"], textarea, .env-select, .ft-text {
+            background:var(--field)!important; border:1.5px solid transparent!important; border-radius:12px!important; min-height:44px; font-size:0.9rem!important; color:var(--text-primary); box-sizing:border-box; }
+        input[type="text"], textarea, .ft-text { text-align:left!important; padding:10px 12px!important; font-weight:500; }
+        .mic-input-wrap > input, .mic-input-wrap > textarea { padding-right:40px!important; }
+        textarea { min-height:76px; line-height:1.5; }
+        input:focus, textarea:focus, .env-select:focus, .ft-text:focus { background:#fff!important; border-color:var(--primary-main)!important; box-shadow:0 0 0 4px rgba(37,99,235,.10)!important; }
+        .env-select { text-align:left!important; padding:10px 32px 10px 12px!important; font-weight:600; -webkit-appearance:none; appearance:none;
+            background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'><path d='M1 1.5l5 5 5-5' stroke='%238a94a6' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>")!important;
+            background-repeat:no-repeat!important; background-position:right 12px center!important; background-size:12px 8px!important; }
+        .env-grid { gap:10px; }
+        .db-input-row { gap:8px; }
+        .db-input-row input { text-align:center!important; font-weight:800; color:var(--primary-main); }
+        .ft-cam input[type=number] { min-height:44px; padding:8px 2px!important; text-align:center!important; }
+        .mic-btn { width:30px; height:30px; border:none; background:#fff; box-shadow:0 1px 3px rgba(16,24,40,.12); }
+        /* 올리기 칸 */
+        .upload-box { border:1.5px dashed #cdd5df!important; background:#f8fafc!important; border-radius:16px!important; transition:border-color .2s, background .2s; }
+        .upload-box:hover { border-color:var(--primary-main)!important; background:var(--primary-soft)!important; }
+        .upload-box.filled { border:1.5px solid var(--primary-main)!important; background:#fff!important; }
+        .upload-text-main { font-weight:700; }
+        /* 의심 부위·소음 부위: 눌리면 파랗게 바뀌는 칩 */
+        .win-part-grid { gap:6px; }
+        .win-part-grid label { background:var(--field); border:1.5px solid transparent; border-radius:12px; padding:10px 4px; justify-content:center; min-height:40px; box-sizing:border-box; color:#3b4556; }
+        .win-part-grid input { position:absolute; opacity:0; pointer-events:none; }
+        .win-part-grid label:has(input:checked) { background:var(--primary-soft); border-color:var(--primary-main); color:var(--primary-main); }
+        .noise-checkbox-label { border:1.5px solid transparent; background:var(--field); border-radius:14px; }
+        /* 작은 버튼 */
+        .ft-btn { border-radius:12px; min-height:44px; padding:0 14px; font-weight:800; }
+        .ft-rec-btn { border-radius:12px; padding:12px 4px; border-width:1.5px; }
+        /* 결과 카드·표 */
+        .sa-panel { background:#f8fafc; border:none; border-radius:16px; padding:12px; }
+        .sa-verdict { border-radius:14px; border-width:1.5px; }
+        .sa-tbl, .fac-tbl { border-collapse:separate; border-spacing:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#fff; }
+        .sa-tbl th, .fac-tbl th { background:#eef2f7; color:var(--primary-dark); border:none; border-bottom:1px solid var(--line); }
+        .sa-tbl td, .fac-tbl td { border:none; border-bottom:1px solid var(--line); }
+        .sa-tbl tr:last-child td, .fac-tbl tr:last-child td { border-bottom:none; }
+        .sa-cam { border:none; background:var(--primary-soft); border-radius:14px; }
+        #result-area { border:none; border-radius:var(--radius); box-shadow:0 1px 2px rgba(16,24,40,.04); margin-top:0; margin-bottom:12px; padding:16px 14px; }
+        .data-source-badge { border:none; border-radius:12px; }
+        .report-summary-box { border:none; border-radius:14px; background:#f8fafc; }
+        /* 아래에 붙는 버튼 막대 */
+        .footer-btns { position:fixed; bottom:0; left:50%; transform:translateX(-50%); width:100%; max-width:520px; box-sizing:border-box; z-index:40; margin:0!important; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:rgba(242,244,247,0.9); -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px); gap:8px; box-shadow:0 -1px 0 var(--line); }
+        .mobile-container { padding-bottom:80px; }
+        .footer-btn { min-height:52px; border-radius:14px; font-size:0.98rem; font-weight:800; box-shadow:none; }
+        .go-btn { background:var(--primary-main); }
+        .save-btn { background:var(--primary-dark); }
+        .main-footer { background:transparent; border:none; padding:14px 16px 24px; }
+        .upd-badge { bottom:84px; }
+
         @media print {
             body { background:white; padding:0; display:block; }
-            .mobile-container { max-width:100%; width:100%; box-shadow:none; margin:0; border:none; border-radius:0; overflow:visible!important; }
-            .main-header { border-radius:0; }
+            .mobile-container { max-width:100%; width:100%; box-shadow:none; margin:0; border:none; border-radius:0; overflow:visible!important; padding-bottom:0!important; }
+            .main-header { border-radius:0; position:static!important; background:#fff!important; -webkit-backdrop-filter:none!important; backdrop-filter:none!important; }
+            .mode-switch, .footer-btns { display:none!important; }
+            #result-area { box-shadow:none!important; }
             .content { overflow:visible!important; }
             .content > .section { display:none!important; }
             .analyze-btn,.footer-btns,.file-input,.legal-disclaimer-box,.noise-type-grid,.pattern-grid,.env-grid,.sub-photo-row,.main-footer { display:none!important; }
@@ -489,7 +562,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v15.11';
+const APP_VERSION = 'v16.0';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -1828,7 +1901,7 @@ function camRuleText(){const c=camMode();
     return s;}
 function camModeChanged(){
     const c=camMode();
-    document.getElementById('cam-gen-wrap').style.display=(c.mode==='gen'||c.mode==='both')?'block':'none';
+    document.getElementById('cam-gen-wrap').style.display=(c.mode==='gen'||c.mode==='both')?'flex':'none';
     const note=document.getElementById('cam-mode-note');
     note.innerHTML=c.mode==='direct'?'점 = <b>소리 나는 자리</b> · 점이 없어도 틈이 없다는 뜻은 아님'
         :c.mode==='gen'?'점 = <b>발생기 소리가 새는 틈</b> · 카메라는 발생기 주파수에 맞춤'
@@ -1904,7 +1977,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v15.11-20261118a';
+const BUILD_ID='v16.0-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
