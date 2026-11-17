@@ -143,6 +143,32 @@
         .main-footer { background-color:#f8fafc; color:#94a3b8; padding:15px; text-align:center; font-size:0.65rem; line-height:1.4; border-top:1px solid #e2e8f0; word-break:keep-all; }
         .print-legal-footer { display:none; margin-top:30px; border:2px solid #000; padding:15px; text-align:center; }
         .print-legal-content { font-size:11px; text-align:justify; line-height:1.6; color:#000; }
+        /* v15.0 주파수 분석 */
+        .sa-panel { margin-top:8px; border:1px solid #cbd5e1; border-radius:10px; padding:10px; background:#f8fafc; font-size:0.78rem; color:#1a233a; line-height:1.5; word-break:keep-all; }
+        .sa-panel canvas, .sa-spec-img { width:100%; height:auto; display:block; border-radius:6px; background:#000; margin:6px 0; }
+        .sa-verdict { border:2px solid #2563eb; border-radius:8px; padding:8px 10px; background:#fff; margin-bottom:6px; }
+        .sa-verdict .t { font-weight:800; font-size:0.92rem; }
+        .sa-verdict .s { display:inline-block; font-size:0.7rem; font-weight:800; padding:1px 8px; border-radius:10px; margin:3px 0; color:#fff; }
+        .sa-h { font-weight:800; margin:8px 0 3px; font-size:0.8rem; color:#1a233a; }
+        .sa-tbl { width:100%; border-collapse:collapse; font-size:0.72rem; background:#fff; }
+        .sa-tbl th, .sa-tbl td { border:1px solid #e2e8f0; padding:3px 4px; text-align:center; }
+        .sa-tbl th { background:#1a233a; color:#fff; font-weight:700; }
+        .sa-bar { display:flex; align-items:center; gap:6px; margin:2px 0; font-size:0.72rem; }
+        .sa-bar .n { width:92px; flex:none; }
+        .sa-bar .b { flex:1; height:9px; background:#e2e8f0; border-radius:5px; overflow:hidden; }
+        .sa-bar .b i { display:block; height:100%; background:#2563eb; }
+        .sa-bar .p { width:34px; text-align:right; font-weight:800; }
+        .sa-note { font-size:0.7rem; color:#64748b; margin-top:4px; }
+        .sa-warn { font-size:0.72rem; color:#dc2626; margin-top:4px; font-weight:700; }
+        .sa-cam { border:1px dashed #2563eb; border-radius:8px; padding:6px 8px; background:#eff6ff; margin-top:6px; }
+        .ft-row { margin-bottom:10px; }
+        .ft-row .input-label { text-align:left; font-size:0.78rem; }
+        .ft-text { width:100%; box-sizing:border-box; margin-top:5px; padding:8px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.8rem; }
+        .ft-cam { display:flex; align-items:center; gap:5px; }
+        .ft-cam input { width:64px; padding:7px 4px; border:1px solid #cbd5e1; border-radius:8px; font-size:0.85rem; text-align:center; }
+        .ft-cam span { font-size:0.75rem; color:#64748b; }
+        .ft-btn { margin-left:auto; border:none; background:#2563eb; color:#fff; font-weight:700; font-size:0.72rem; padding:7px 9px; border-radius:8px; }
+        .upd-badge { position:fixed; left:50%; transform:translateX(-50%); bottom:14px; background:#2563eb; color:#fff; font-weight:800; font-size:0.8rem; padding:9px 16px; border-radius:20px; box-shadow:0 4px 12px rgba(0,0,0,.25); z-index:9999; cursor:pointer; }
 
         @media print {
             body { background:white; padding:0; display:block; }
@@ -163,6 +189,8 @@
             .confidence-section { display:block!important; page-break-inside:avoid; }
             .print-legal-footer { display:block!important; page-break-inside:avoid; }
             #db-ocr-status { display:none!important; }
+            #report-freq .sa-panel { page-break-inside:avoid; background:#fff; }
+            .upd-badge { display:none!important; }
         }
     </style>
 </head>
@@ -291,9 +319,10 @@
                     </div>
                 </div>
                 <div class="upload-group" style="margin-top:5px;">
-                    <label class="input-label" style="color:#2563eb;text-align:left;"><i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성) <span style="font-size:0.65rem;color:#64748b;font-weight:500;">* 10초 이내 짧은 파일 권장</span></label>
+                    <label class="input-label" style="color:#2563eb;text-align:left;"><i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성) <span style="font-size:0.65rem;color:#64748b;font-weight:500;">* 소리 날 때 30초~2분 녹화 권장 · 폰 안에서 바로 주파수 분석</span></label>
                     <label for="file-media" class="upload-box media-box-style" id="box-media" style="aspect-ratio:unset!important;height:50px;flex-direction:row!important;gap:8px;padding:4px 10px;"><i class="fas fa-video upload-icon" style="color:#2563eb;font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="color:#1a233a;font-size:0.8rem;">동영상/음성 파일 선택</span><div id="media-preview-text" style="display:none;font-size:0.8rem;font-weight:bold;color:#1a233a;text-align:center;line-height:1.3;"></div></label>
                     <input type="file" id="file-media" class="file-input" accept="video/*,audio/*" onchange="handleMedia(this)">
+                    <div id="sa-panel" class="sa-panel" style="display:none;"></div>
                 </div>
             </div>
         </div>
@@ -319,6 +348,30 @@
             </div>
         </div>
 
+        <!-- v15.0 현장 확인 테스트 -->
+        <div class="section">
+            <div class="section-title"><i class="fas fa-clipboard-check"></i> 현장 확인 테스트</div>
+            <div style="font-size:0.7rem;color:#64748b;margin-bottom:8px;text-align:center;">* 해 본 것만 고르세요. 결과가 주파수 판정에 바로 반영됩니다.</div>
+            <div class="ft-row">
+                <label class="input-label" for="ft-open">① 창 조금 열기 (소리 날 때)</label>
+                <select class="env-select" id="ft-open" onchange="saRender()"><option value="">안 해 봄</option><option value="사라지거나 바뀜">소리가 사라지거나 바뀜</option><option value="더 커짐">소리가 더 커짐</option><option value="변화 없음">변화 없음</option></select>
+            </div>
+            <div class="ft-row">
+                <label class="input-label" for="ft-smoke">② 실내 감압 + 연기 (배기팬 강, 창틀 둘레에 가는 연기)</label>
+                <select class="env-select" id="ft-smoke" onchange="saRender()"><option value="">안 해 봄</option><option value="연기가 빨려 든 자리 있음">연기가 빨려 든 자리 있음</option><option value="빨려 든 자리 없음">빨려 든 자리 없음</option></select>
+                <input type="text" id="ft-smoke-pos" class="ft-text" placeholder="연기가 빨려 든 자리 (예: 상부 고정창 오른쪽 위 모서리)" oninput="saRender()">
+            </div>
+            <div class="ft-row">
+                <label class="input-label">③ 초음파카메라 측정 주파수 범위 (kHz)</label>
+                <div class="ft-cam">
+                    <input type="number" id="ft-cam-lo" step="0.5" min="0" placeholder="최저" oninput="saRender()"><span>~</span>
+                    <input type="number" id="ft-cam-hi" step="0.5" min="0" placeholder="최고" oninput="saRender()"><span>kHz</span>
+                    <button type="button" class="ft-btn" onclick="saFillCamRange()">추천값 넣기</button>
+                </div>
+                <input type="text" id="ft-cam-pos" class="ft-text" placeholder="초음파카메라에 잡힌 자리 (예: 상부 프레임 이음부 2곳)" oninput="saRender()">
+            </div>
+        </div>
+
         <!-- 법적 고지 -->
         <div class="legal-disclaimer-box">
             <div class="legal-title"><i class="fas fa-exclamation-triangle" style="margin-right:5px;"></i> 분석 시작 전 필수 동의</div>
@@ -335,6 +388,7 @@
             <div id="report-summary-box" class="report-summary-box" style="display:none;"></div>
             <div class="section-title" style="margin-top:15px;font-size:0.9rem;"><i class="fas fa-images" style="background:var(--text-secondary);"></i> 현장 채증 사진첩</div>
             <div id="report-photo-gallery" class="report-photo-gallery"></div>
+            <div id="report-freq" style="display:none;"></div>
             <div id="loading-spinner" style="text-align:center;padding:20px;display:none;"><i class="fas fa-spinner fa-spin" style="font-size:2rem;color:var(--primary-main);"></i><p id="loading-text" style="margin-top:10px;font-weight:bold;font-size:0.85rem;color:var(--text-secondary);">KS F 2810 / ISO 16283 기준 대조 분석 중...</p></div>
             <div id="analysis-content"></div>
             <div id="confidence-section" class="confidence-section" style="display:none;"><div class="section-title"><i class="fas fa-chart-bar"></i> 진단 신뢰도 분석</div><div id="confidence-bars"></div></div>
@@ -358,7 +412,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v14.1';
+const APP_VERSION = 'v15.0';
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
 let _fp = localStorage.getItem('noise_fp') || '';
@@ -456,7 +510,7 @@ severity_weight:0.6,construction_defect_ratio:60,env_factor_ratio:40},
 diagnosis:"헬름홀츠 공명/카르만 와류 풍절음(Helmholtz Resonance/Kármán Vortex) - KS F 2235 참조",
 mechanism:"강풍(풍속10m/s이상)이 특정 구멍(옥상난간,물구멍Weep Hole)이나 돌출구조물을 지나갈때 공기진동으로 특정주파수 소음 증폭. 공명주파수 f=V/2π×√(A/VL). 고층일수록 풍속증가에 비례하여 심화.",
 legal_standard:"KS F 2235: 창호기밀성 1등급(1m³/h·m²이하) / ISO 10140 차음성능",
-solution:"1.FLIR Si1 초음파카메라(20~40kHz LD모드, 풍속3m/s이상 조건)로 소음원 위치 시각화 특정 2.옥상난간 핸드레일 하부 구멍 폼충진/메쉬스크린 설치 3.창틀 물구멍 방풍캡 설치 4.모헤어 마모점검 및 교체(정상5mm이상) 5.Blower Door Test로 기밀등급 재측정 6.카르만와류 저감 Spoiler 검토",
+solution:"1.초음파(음향)카메라를 앱이 추천한 휘파람 대역(예: 2~7kHz)으로 수동 설정하고 바람 불 때 소음원 위치 시각화 특정(바람 없는 날은 실내 감압+가는 연기로 틈 확인) 2.옥상난간 핸드레일 하부 구멍 폼충진/메쉬스크린 설치 3.창틀 물구멍 방풍캡 설치 4.모헤어 마모점검 및 교체(정상5mm이상) 5.Blower Door Test로 기밀등급 재측정 6.카르만와류 저감 Spoiler 검토",
 severity_weight:0.7,construction_defect_ratio:50,env_factor_ratio:50},
 
 {types:["창호(Window)"],symptom_keywords:["바람소리","쉬이","새는","외풍","틈새","기밀"],frequency_range:"500~4000Hz(고주파누기음)",
@@ -628,7 +682,6 @@ async function extractDbFromImage(base64Data){
 }
 
 function handleSubImage(input,type,btnId){if(input.files&&input.files[0]){const r=new FileReader();r.onload=function(e){const b=document.getElementById(btnId);b.innerHTML='<i class="fas fa-check"></i> 추가됨';b.classList.add('filled');images[type]=e.target.result.split(',')[1];imageUrls[type]=e.target.result;};r.readAsDataURL(input.files[0]);}}
-function handleMedia(input){if(input.files&&input.files[0]){const f=input.files[0];if(f.size>10*1024*1024){alert("10MB이내 파일만 가능");input.value="";return;}const r=new FileReader();r.onload=function(e){const box=document.getElementById('box-media');box.querySelector('.upload-icon').style.display='none';box.querySelector('.upload-text-main').style.display='none';const p=document.getElementById('media-preview-text');p.style.display='block';p.innerHTML=`<i class="fas fa-file-audio"></i> ${f.name}<br><span style="font-size:0.7rem;">(준비완료)</span>`;box.classList.add('filled');images.media=e.target.result.split(',')[1];images.media_mime=f.type;};r.readAsDataURL(f);}}
 function toggleAnalyzeBtn(){const b=document.getElementById('analyze-btn');if(document.getElementById('legal-agree').checked){b.classList.add('active');b.disabled=false;}else{b.classList.remove('active');b.disabled=true;}}
 function savePdf(){
     const dong=document.getElementById('dong').value||'000';const ho=document.getElementById('ho').value||'0000';
@@ -772,11 +825,12 @@ async function startAnalysis(){
         ${noiseTime?`<div class="report-summary-item"><span class="report-summary-label">발생 시간대</span><span class="report-summary-value">${noiseTime}</span></div>`:''}
         ${floorInfo?`<div class="report-summary-item"><span class="report-summary-label">건물 위치</span><span class="report-summary-value">${floorInfo}</span></div>`:''}
         ${dbMax?`<div class="report-summary-item"><span class="report-summary-label">측정 Lmax</span><span class="report-summary-value" style="color:#dc2626;">${dbMax} dB(A)</span></div>`:''}
-        <div class="report-summary-item"><span class="report-summary-label">소음 파일</span><span class="report-summary-value" style="color:${images.media?'#2563eb':'#94a3b8'}">${images.media?'<i class="fas fa-check-circle"></i> 포함':'없음'}</span></div>`;
+        <div class="report-summary-item"><span class="report-summary-label">소음 파일</span><span class="report-summary-value" style="color:${SA.res?'#2563eb':'#94a3b8'}">${SA.res?'<i class="fas fa-check-circle"></i> 주파수 분석 포함':'없음'}</span></div>`;
     summaryBox.style.display='block';
 
     resultArea.style.display='block';loading.style.display='block';content.style.display='none';chartSection.style.display='none';
     document.getElementById('confidence-section').style.display='none';
+    {const rf=document.getElementById('report-freq');if(SA.res){rf.innerHTML=saPanelHTML(SA.res,SA.specUrl,true);rf.style.display='block';}else{rf.innerHTML='';rf.style.display='none';}}
     renderReportPhotos();resultArea.scrollIntoView({behavior:"smooth"});
 
     if(!images.main){alert("현장 메인 사진은 필수입니다.");loading.style.display='none';return;}
@@ -871,14 +925,15 @@ CHART_DATA_END
 - confidence.acoustic: 음향데이터 신뢰도(0~100, 음향카메라/음성파일 유무에 따라, 없으면 30 이하)
 - confidence.overall: 종합 진단 신뢰도(0~100, 데이터 충분도에 따라)
 - ${!images.acoustic ? '⚠️ 음향카메라 데이터가 없으므로 acoustic 신뢰도를 25 이하로 설정' : ''}
-- ${!images.media ? '⚠️ 소음 음원 파일이 없으므로 overall 신뢰도를 65 이하로 설정' : ''}
+- ${!SA.res ? '⚠️ 소음 음원 파일(주파수 분석)이 없으므로 overall 신뢰도를 65 이하로 설정' : ''}
 - ${!dbMax ? '⚠️ dB 측정값이 없으므로 정량분석 불가, overall 신뢰도를 60 이하로 설정' : ''}
 `;
 
     let parts=[{text:prompt}];
+    if(SA.res){parts.push({text:saSummaryText()});if(SA.specUrl){parts.push({inline_data:{mime_type:'image/jpeg',data:SA.specUrl.split(',')[1]}});parts.push({text:'[증거이미지: 앱이 계산한 스펙트로그램 — 가로=시간, 세로=0.5~8kHz, 밝은 가는 가로줄=휘파람 소리, 오른쪽 번호=검출된 줄]'});}}
     for(const[key,value]of Object.entries(images)){
         if(value){
-            if(key==='media'){parts.push({inline_data:{mime_type:images.media_mime,data:value}});parts.push({text:'[현장 소음 파일 - 주파수 특성, 충격음/연속음 여부, 패턴 분석 필요]'});}
+            if(key==='media')continue;
             else if(key==='media_mime')continue;
             else{parts.push({inline_data:{mime_type:"image/jpeg",data:value}});
                 const imgLabels={main:'현장전경(공간구조,자재상태 분석)',sub:'문제부위근접(틈새,노후화,설치불량 분석)',acoustic:'음향카메라FLIR(초음파누설지점,소음원시각화 분석)',thermal:'소음측정기앱스크린샷(dB수치,최소/평균/최대값,소음파형패턴,측정시간대,소음변동추이 정량분석)',main_add:'현장추가사진',sub_add:'문제부위추가',acoustic_add:'음향추가',thermal_add:'소음측정기추가'};
@@ -1144,6 +1199,317 @@ window.voiceInput = async function(targetId){
         _setMicStatus('🎤 시작 실패: ' + (e.message||''));
     }
 };
+
+// ================================================================
+// ★ v15.0 주파수 분석 — 폰 안에서 직접 계산 (원본 파일은 서버로 보내지 않음)
+//   A: 스펙트로그램 + 휘파람 줄 자동 검출   B: 기준 판정(소음측정기 v1.27 규칙)
+//   C: 현장 확인 테스트 반영   D: 초음파카메라 대역 추천   E: 보고서 포함
+// ================================================================
+const CAMERA_MIN_HZ = 2000;      // 초음파(음향)카메라 최저 측정 주파수 — 카메라 설정 화면에서 확인
+const SA_MAX_SEC = 180;          // 앞 3분까지만 분석
+const SA = { res:null, specUrl:null, fileName:'' };
+const TOB_FC=[25,31.5,40,50,63,80,100,125,160,200,250,315,400,500,630,800,1000,1250,1600,2000,2500,3150,4000,5000,6300,8000,10000,12500,16000];
+const CAUSE_GROUPS=[{nm:"저음 50~250Hz",lo:50,hi:250},{nm:"중음 315~800Hz",lo:315,hi:800},{nm:"고음 1k~4kHz",lo:1000,hi:4000},{nm:"초고음 5k~10k",lo:5000,hi:10000}];
+function aWeightDb(f){const f2=f*f;const ra=(Math.pow(12194,2)*f2*f2)/((f2+Math.pow(20.6,2))*Math.sqrt((f2+Math.pow(107.7,2))*(f2+Math.pow(737.9,2)))*(f2+Math.pow(12194,2)));return 20*Math.log10(ra)+2.0;}
+function hzLab(f){return f>=1000?(f/1000).toFixed(1)+'kHz':Math.round(f)+'Hz';}
+function saEsc(s){return String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+const saTick=()=>new Promise(r=>setTimeout(r,0));
+
+function saFFT(re,im){
+    const n=re.length;
+    for(let i=1,j=0;i<n;i++){let bit=n>>1;for(;j&bit;bit>>=1)j^=bit;j^=bit;if(i<j){let t=re[i];re[i]=re[j];re[j]=t;t=im[i];im[i]=im[j];im[j]=t;}}
+    for(let len=2;len<=n;len<<=1){
+        const h=len>>1,ang=-2*Math.PI/len,wr=Math.cos(ang),wi=Math.sin(ang);
+        for(let i=0;i<n;i+=len){let cr=1,ci=0;
+            for(let j=0;j<h;j++){const a=i+j,b=a+h;const tr=re[b]*cr-im[b]*ci,ti=re[b]*ci+im[b]*cr;
+                re[b]=re[a]-tr;im[b]=im[a]-ti;re[a]+=tr;im[a]+=ti;const nr=cr*wr-ci*wi;ci=cr*wi+ci*wr;cr=nr;}}
+    }
+}
+
+async function saDecode(file){
+    const buf=await file.arrayBuffer();
+    const AC=window.AudioContext||window.webkitAudioContext;
+    let ctx; try{ctx=new AC({sampleRate:44100});}catch(e){ctx=new AC();}
+    const ab=await new Promise((res,rej)=>{try{const p=ctx.decodeAudioData(buf,res,rej);if(p&&p.then)p.then(res,rej);}catch(e){rej(e);}});
+    try{ctx.close();}catch(e){}
+    const sr=ab.sampleRate, n=Math.min(ab.length,Math.floor(SA_MAX_SEC*sr));
+    const x=new Float32Array(n);
+    for(let c=0;c<ab.numberOfChannels;c++){const d=ab.getChannelData(c);for(let i=0;i<n;i++)x[i]+=d[i]/ab.numberOfChannels;}
+    return {x,sr,dur:ab.length/sr,cut:ab.length>n};
+}
+
+function saMedian(arr){const a=Float32Array.from(arr).sort();return a.length?a[a.length>>1]:0;}
+
+async function saAnalyze(x,sr){
+    const N=sr>50000?8192:4096, hop=N>>1, df=sr/N, dt=hop/sr;
+    const T=Math.max(0,Math.floor((x.length-N)/hop)+1);
+    if(T<20) throw new Error('소리가 너무 짧습니다 (3초 이상 필요)');
+    const K=Math.min(N/2,Math.ceil(8500/df));             // 저장은 8.5kHz까지
+    const D=new Float32Array(T*K);                         // dB
+    const Pavg=new Float64Array(N/2);
+    const win=new Float32Array(N);for(let i=0;i<N;i++)win[i]=0.5-0.5*Math.cos(2*Math.PI*i/(N-1));
+    const re=new Float32Array(N),im=new Float32Array(N);
+    const Lh=new Float32Array(T), Llow=new Float32Array(T);
+    const k2k=Math.round(2000/df),k8k=Math.round(8000/df),k30=Math.max(1,Math.round(30/df)),k200=Math.round(200/df);
+    const frameP=[];
+    for(let t=0;t<T;t++){
+        const o=t*hop;for(let i=0;i<N;i++){re[i]=x[o+i]*win[i];im[i]=0;}
+        saFFT(re,im);
+        let eh=0,el=0;const P=new Float32Array(N/2);
+        for(let k=0;k<N/2;k++){const p=re[k]*re[k]+im[k]*im[k];P[k]=p;if(k<K)D[t*K+k]=10*Math.log10(p+1e-12);if(k>=k2k&&k<=k8k)eh+=p;if(k>=k30&&k<=k200)el+=p;}
+        Lh[t]=10*Math.log10(eh+1e-12);Llow[t]=10*Math.log10(el+1e-12);frameP.push(P);
+        if(t%200===199)await saTick();
+    }
+    // 손잡이 소리·딸깍 같은 순간 잡음 프레임 표시 (고음 에너지가 평소보다 12dB↑)
+    const mh=saMedian(Lh);const bad=new Uint8Array(T);let nGood=0;
+    for(let t=0;t<T;t++){if(Lh[t]>mh+12)bad[t]=1;else nGood++;}
+    for(let t=0;t<T;t++){if(bad[t])continue;const P=frameP[t];for(let k=0;k<N/2;k++)Pavg[k]+=P[k]/Math.max(1,nGood);}
+    frameP.length=0;
+    // 주파수별 평소 크기(중앙값) — 그림 대비 보정용
+    const med=new Float32Array(K);const col=new Float32Array(T);
+    for(let k=0;k<K;k++){for(let t=0;t<T;t++)col[t]=D[t*K+k];med[k]=saMedian(col);}
+    await saTick();
+
+    // ---- 휘파람 줄(뾰족한 음) 검출: 프레임마다 이웃 주파수보다 9dB 이상 솟은 봉우리 ----
+    const kLo=Math.round(700/df),kHi=Math.min(K-21,Math.round(8000/df));
+    const W1=Math.max(4,Math.round(45/df)),W2=Math.max(W1+6,Math.round(220/df));
+    const PROM=9;
+    let tracks=[],active=[];
+    const pre=new Float64Array(K+1);
+    for(let t=0;t<T;t++){
+        const pk=[];
+        if(!bad[t]){
+            const b=t*K;pre[0]=0;for(let k=0;k<K;k++)pre[k+1]=pre[k]+D[b+k];
+            for(let k=kLo;k<=kHi;k++){const v=D[b+k];
+                if(v<D[b+k-1]||v<D[b+k+1]||v<D[b+k-2]||v<D[b+k+2])continue;
+                const lo=Math.max(0,k-W2),hi=Math.min(K,k+W2+1);
+                const s=(pre[k-W1+1]-pre[lo])+(pre[hi]-pre[k+W1]);const cnt=(k-W1+1-lo)+(hi-k-W1);
+                const prom=v-s/cnt;if(prom>=PROM){
+                    // 포물선 보간으로 정확한 Hz
+                    const a=D[b+k-1],c=D[b+k+1],den=a-2*v+c;const d=den!==0?0.5*(a-c)/den:0;
+                    pk.push({f:(k+d)*df,prom,lv:v});}
+            }
+            pk.sort((a,b)=>b.prom-a.prom);pk.length=Math.min(pk.length,8);
+        }
+        const used=new Set();const next=[];
+        for(const tr of active){
+            const last=tr.p[tr.p.length-1];const tol=Math.max(30,0.025*last.f);
+            let best=-1,bd=1e9;pk.forEach((p,i)=>{if(used.has(i))return;const d=Math.abs(p.f-last.f);if(d<tol&&d<bd){bd=d;best=i;}});
+            if(best>=0){used.add(best);tr.p.push({t,f:pk[best].f,prom:pk[best].prom});tr.gap=0;next.push(tr);}
+            else if(++tr.gap<=3)next.push(tr);else tracks.push(tr);
+        }
+        pk.forEach((p,i)=>{if(!used.has(i))next.push({p:[{t,f:p.f,prom:p.prom}],gap:0});});
+        active=next;
+    }
+    tracks=tracks.concat(active).filter(tr=>tr.p.length*dt>=0.5);
+    // 같은 줄끼리 묶기: 봉우리 높이(로그 Hz) 분포에서 산 꼭대기를 찾아 줄 중심으로 삼고, 각 조각을 가장 가까운 중심에 붙임
+    // (줄들이 바람 따라 ±10%씩 오르내려 범위가 이어지므로 범위 겹침으로 묶으면 여러 줄이 한 줄로 뭉침)
+    const HB=420,hb=f=>Math.round(Math.log2(f/500)*100);
+    const hist=new Float64Array(HB);
+    tracks.forEach(tr=>{const fs=tr.p.map(q=>q.f).sort((a,b)=>a-b);tr.med=fs[fs.length>>1];tr.p.forEach(q=>{const b=hb(q.f);if(b>=0&&b<HB)hist[b]++;});});
+    const sm=new Float64Array(HB);for(let b=0;b<HB;b++){let s=0,w=0;for(let j=-12;j<=12;j++){const c=b+j;if(c<0||c>=HB)continue;const g=Math.exp(-j*j/(2*16));s+=hist[c]*g;w+=g;}sm[b]=s/w;}
+    const hmax=Math.max(...sm),centers=[];
+    for(let b=0;b<HB;b++){if(sm[b]<hmax*0.12)continue;let isMax=true;for(let j=-12;j<=12;j++){const c=b+j;if(j&&c>=0&&c<HB&&sm[c]>sm[b]){isMax=false;break;}}if(isMax&&(!centers.length||b-centers[centers.length-1]>12))centers.push(b);}
+    const lines=centers.map(()=>({pts:[]}));
+    tracks.forEach(tr=>{const b=hb(tr.med);let bi=-1,bd=1e9;centers.forEach((c,i)=>{const d=Math.abs(c-b);if(d<bd){bd=d;bi=i;}});if(bi>=0&&bd<=20)lines[bi].pts=lines[bi].pts.concat(tr.p);});
+    const Tgood=nGood*dt;
+    let wl=lines.filter(L=>L.pts.length).map(L=>{
+        const fs=L.pts.map(q=>q.f).sort((a,b)=>a-b);const q=p=>fs[Math.min(fs.length-1,Math.floor(p*fs.length))];
+        const frames=new Set(L.pts.map(p=>p.t));
+        const fLo=q(0.1),fHi=q(0.9),fMed=q(0.5);
+        const prom=L.pts.reduce((s,p)=>s+p.prom,0)/L.pts.length;
+        return {fLo,fHi,fMed,dur:frames.size*dt,cov:Math.min(100,frames.size*dt/Math.max(dt,Tgood)*100),glide:(fHi-fLo)/fMed,prom,pts:L.pts};
+    }).filter(l=>l.dur>=1.0);
+    wl.sort((a,b)=>a.fMed-b.fMed);
+    // 배음 관계 확인 (가장 낮은 줄의 정수배인지)
+    let harm=null;
+    if(wl.length>=2){
+        const f0=wl[0].fMed;const non=wl.slice(1).filter(l=>{const r=l.fMed/f0;return Math.round(r)<2||Math.abs(r-Math.round(r))/r>0.04;});
+        harm={non:non.length,all:wl.length-1};
+    }
+    // ---- 1/3옥타브 대역 (평균 스펙트럼) → 소음측정기 v1.27 판별 규칙 ----
+    const bands=TOB_FC.map(fc=>{const a=fc*Math.pow(2,-1/6),b=fc*Math.pow(2,1/6);let e=0,c=0;
+        for(let k=Math.ceil(a/df);k<=Math.floor(b/df)&&k<N/2;k++){e+=Pavg[k];c++;}
+        return c?10*Math.log10(e+1e-15):null;});
+    const ge=CAUSE_GROUPS.map(()=>0);
+    bands.forEach((v,i)=>{if(v==null)return;const fc=TOB_FC[i];const gi=CAUSE_GROUPS.findIndex(g=>fc>=g.lo&&fc<=g.hi);if(gi<0)return;ge[gi]+=Math.pow(10,(v+aWeightDb(fc))/10);});
+    const gt=ge.reduce((a,b)=>a+b,0)||1;const shares=ge.map(e=>e/gt*100);
+    const tonal=[];for(let i=1;i<bands.length-1;i++){const v=bands[i],l=bands[i-1],r=bands[i+1];if(v==null||l==null||r==null)continue;
+        const fc=TOB_FC[i],thr=fc<=125?15:fc<=400?8:5,p=Math.min(v-l,v-r);if(p>=thr)tonal.push({fc,prom:+p.toFixed(1)});}
+    // 폰 마이크에 바람이 직접 부딪힌 잡음: 30~200Hz가 Z가중 에너지의 대부분 + 크기가 심하게 출렁임
+    let eLow=0,eAll=0;for(let k=1;k<N/2;k++){const f=k*df;if(f<20)continue;eAll+=Pavg[k];if(f>=30&&f<=200)eLow+=Pavg[k];}
+    const lowGood=[];for(let t=0;t<T;t++)if(!bad[t])lowGood.push(Llow[t]);
+    const lm=lowGood.reduce((a,b)=>a+b,0)/Math.max(1,lowGood.length);
+    const lsd=Math.sqrt(lowGood.reduce((a,b)=>a+(b-lm)*(b-lm),0)/Math.max(1,lowGood.length));
+    const windMic=(eLow/Math.max(1e-15,eAll))>0.6&&lsd>3;
+    return {sr,N,df,dt,T,K,D,med,bad,nBad:T-nGood,wl,harm,bands,shares,tonal,windMic,lowShare:eLow/Math.max(1e-15,eAll)*100,lowSd:lsd};
+}
+
+// ---- 스펙트로그램 그림 (평소 크기 대비 솟은 정도, 0.5~8kHz) ----
+function saColor(v){ // 0..1 → 검정-남색-빨강-노랑-흰색
+    const st=[[0,0,0,0],[0.25,30,20,90],[0.5,180,40,110],[0.75,250,150,40],[1,255,250,220]];
+    v=Math.max(0,Math.min(1,v));for(let i=1;i<st.length;i++){if(v<=st[i][0]){const a=st[i-1],b=st[i],u=(v-a[0])/(b[0]-a[0]);return [a[1]+u*(b[1]-a[1]),a[2]+u*(b[2]-a[2]),a[3]+u*(b[3]-a[3])];}}return [255,250,220];
+}
+function saDraw(R){
+    const Wd=900,Ht=380,ml=46,mr=70,mt=10,mb=28,pw=Wd-ml-mr,ph=Ht-mt-mb;
+    const cv=document.createElement('canvas');cv.width=Wd;cv.height=Ht;const g=cv.getContext('2d');
+    g.fillStyle='#0b1020';g.fillRect(0,0,Wd,Ht);
+    const fMin=500,fMax=8000;const img=g.createImageData(pw,ph);
+    for(let px=0;px<pw;px++){const t0=Math.floor(px/pw*R.T),t1=Math.max(t0+1,Math.floor((px+1)/pw*R.T));
+        for(let py=0;py<ph;py++){const f=fMax-(py/ph)*(fMax-fMin);const k=Math.min(R.K-1,Math.round(f/R.df));
+            let m=-1e9;for(let t=t0;t<t1&&t<R.T;t++){const v=R.D[t*R.K+k]-R.med[k];if(v>m)m=v;}
+            const c=saColor(m/25);const o=(py*pw+px)*4;img.data[o]=c[0];img.data[o+1]=c[1];img.data[o+2]=c[2];img.data[o+3]=255;}}
+    g.putImageData(img,ml,mt);
+    g.font='12px sans-serif';g.fillStyle='#cbd5e1';g.strokeStyle='rgba(255,255,255,0.18)';
+    for(let f=1000;f<=fMax;f+=1000){const y=mt+(fMax-f)/(fMax-fMin)*ph;g.beginPath();g.moveTo(ml,y);g.lineTo(ml+pw,y);g.stroke();g.textAlign='right';g.fillText((f/1000)+'k',ml-5,y+4);}
+    const dur=R.T*R.dt;const step=dur>90?20:dur>40?10:5;
+    g.textAlign='center';for(let s=0;s<=dur;s+=step){const x=ml+s/dur*pw;g.fillText(s+'초',x,Ht-8);}
+    g.save();g.translate(12,mt+ph/2);g.rotate(-Math.PI/2);g.textAlign='center';g.fillText('높이(Hz)',0,0);g.restore();
+    // 검출된 줄 표시 (오른쪽 번호)
+    R.wl.forEach((l,i)=>{const y=mt+(fMax-l.fMed)/(fMax-fMin)*ph;if(l.fMed<fMin||l.fMed>fMax)return;
+        g.fillStyle='#60a5fa';g.beginPath();g.moveTo(ml+pw+3,y);g.lineTo(ml+pw+11,y-5);g.lineTo(ml+pw+11,y+5);g.fill();
+        g.fillStyle='#fff';g.textAlign='left';g.font='bold 12px sans-serif';g.fillText((i+1)+' '+hzLab(l.fMed),ml+pw+13,y+4);});
+    return cv.toDataURL('image/jpeg',0.85);
+}
+
+// ---- 판정 (B + C 반영) ----
+function saFieldTests(){
+    const v=id=>{const e=document.getElementById(id);return e?String(e.value||'').trim():'';};
+    return {open:v('ft-open'),smoke:v('ft-smoke'),smokePos:v('ft-smoke-pos'),camLo:v('ft-cam-lo'),camHi:v('ft-cam-hi'),camPos:v('ft-cam-pos')};
+}
+function saCamRec(R){
+    const inR=R.wl.filter(l=>l.fHi>=CAMERA_MIN_HZ), below=R.wl.filter(l=>l.fHi<CAMERA_MIN_HZ);
+    if(!inR.length)return {lo:null,hi:null,below};
+    const lo=Math.max(CAMERA_MIN_HZ/1000,Math.floor(Math.min(...inR.map(l=>l.fLo))*0.8/500)*0.5);
+    const hi=Math.ceil(Math.max(...inR.map(l=>l.fHi))*1.25/500)*0.5;
+    return {lo,hi,below};
+}
+function saVerdict(R,ft){
+    const BLUE='#2563eb',RED='#dc2626',NAVY='#1a233a';
+    const glide=R.wl.filter(l=>l.glide>=0.08), steady=R.wl.filter(l=>l.glide<0.08);
+    const lowPk=R.windMic?[]:R.tonal.filter(p=>p.fc<=250), midPk=R.tonal.filter(p=>p.fc>=315&&p.fc<=4000);
+    const hi=R.shares[2]+R.shares[3], lowmid=R.shares[0]+R.shares[1];
+    let t,s,d;
+    if(R.wl.length){
+        t='바람 휘파람 소리(풍절음) '+R.wl.length+'줄 검출';
+        d='좁은 틈이나 모서리를 바람이 지나며 내는 휘파람 소리의 특징입니다. ';
+        if(glide.length)d+=glide.length+'줄은 바람 세기에 따라 높이가 오르내립니다. ';
+        if(steady.length)d+=steady.length+'줄은 높이가 거의 일정합니다(틈 안쪽 울림 또는 기기 소리일 수 있습니다). ';
+        if(R.harm&&R.harm.non>0)d+='줄들이 서로 정수배가 아니어서 <b>소리 나는 자리가 여러 곳일 가능성</b>이 있습니다. ';
+        else if(R.harm)d+='줄들이 가장 낮은 줄의 정수배라 <b>한 자리에서 나는 소리의 배음</b>일 가능성이 있습니다. ';
+        if(ft.open==='사라지거나 바뀜'){s=['✅ 창틈 소리로 확인 (창 열기 테스트)',BLUE];d+='창을 조금 열었을 때 소리가 사라지거나 바뀌었으므로 창 틈으로 새는 바람 소리로 판단합니다.';}
+        else if(ft.open==='변화 없음'){s=['⚠️ 창 밖 구조물 의심',RED];d+='창을 열어도 변화가 없으므로 창 틈보다는 창 밖 구조물(캐노피·마감판·돌출 금속물 등) 모서리에서 나는 풍절음일 가능성이 큽니다.';}
+        else if(ft.open==='더 커짐'){s=['⚠️ 바깥에서 나는 소리',RED];d+='창을 열었을 때 커졌으므로 바깥 구조물에서 나는 소리가 창을 통해 들어오는 것으로 봅니다.';}
+        else{s=['⚠️ 현장 확인 필요',NAVY];d+='창을 조금 열어 소리가 바뀌는지 확인하면 창 틈 소리인지 창 밖 구조물 소리인지 가릴 수 있습니다.';}
+    } else if(lowPk.length){
+        const f=lowPk[0].fc;t='설비 진동음 의심';s=['❌ 창호 범위 밖 (관리사무소)',RED];
+        d=hzLab(f)+'에서 소리가 뾰족하게 솟았습니다(이웃 대역보다 '+lowPk[0].prom+'dB 높음). '+(f===63?'전기 60Hz 계열(변압기·모터)':f===125?'120Hz 전기 울림 또는 펌프·팬 회전음':'펌프·팬·냉각탑 같은 설비 회전음')+'일 가능성이 큽니다.';
+    } else if(hi>=45){
+        t='창틈 기류음 의심';s=['✅ 창호 범위 안',BLUE];d='귀에 들리는 소리의 '+hi.toFixed(0)+'%가 높은 음(1kHz 이상)에 몰려 있습니다. 틈으로 바람이 지나는 "쉬~" 소리의 특징입니다.';
+    } else if(midPk.length){
+        t='특정 음이 솟음';s=['⚠️ 현장 확인 필요',NAVY];d=hzLab(midPk[0].fc)+'에서 소리가 뾰족하게 솟았습니다. 좁은 틈의 휘파람 소리이거나 기기의 순음일 수 있습니다.';
+    } else if(lowmid>=70){
+        t='낮은 소리 위주';s=['⚠️ 현장 확인 필요',NAVY];d='소리의 '+lowmid.toFixed(0)+'%가 낮은~중간 음(800Hz 이하)에 넓게 퍼져 있습니다. 바깥 교통 소음이나 배기 덕트·설비 소리일 수 있습니다.';
+    } else {t='뚜렷한 특징 없음';s=['⚠️ 현장 확인 필요',NAVY];d='여러 대역에 소리가 고르게 섞여 있습니다. 소리가 날 때 다시 녹화하거나 창을 닫고/조금 열고 비교해 주십시오.';}
+    if(!R.wl.length&&ft.open){d+=' (창 열기 테스트: '+ft.open+')';}
+    return {t,s,d};
+}
+
+function saPanelHTML(R,specUrl,forReport){
+    const ft=saFieldTests(),v=saVerdict(R,ft),cam=saCamRec(R);
+    let h='<div class="sa-verdict" style="border-color:'+v.s[1]+'"><div class="t" style="color:'+v.s[1]+'">'+v.t+'</div><span class="s" style="background:'+v.s[1]+'">'+v.s[0]+'</span><div>'+v.d+'</div></div>';
+    h+='<div class="sa-h">소리 높이 지도 (스펙트로그램)</div><img class="sa-spec-img" src="'+specUrl+'" alt="스펙트로그램">';
+    h+='<div class="sa-note">가로=시간, 세로=소리 높이(Hz). 밝을수록 평소보다 크게 솟은 소리입니다. 가는 가로 줄이 휘파람 소리이고, 세로로 번쩍이는 띠는 손잡이 소리·딸깍 같은 순간 잡음입니다.</div>';
+    if(R.wl.length){
+        h+='<div class="sa-h">검출된 휘파람 줄</div><table class="sa-tbl"><tr><th>번호</th><th>높이 범위</th><th>모양</th><th>나온 시간</th></tr>';
+        R.wl.forEach((l,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+hzLab(l.fLo)+' ~ '+hzLab(l.fHi)+'</td><td>'+(l.glide>=0.08?'바람 따라 오르내림':'거의 일정')+'</td><td>'+l.dur.toFixed(1)+'초 ('+l.cov.toFixed(0)+'%)</td></tr>';});
+        h+='</table>';
+        if(R.harm)h+='<div class="sa-note">'+(R.harm.non>0?'서로 정수배가 아닌 줄이 '+R.harm.non+'개 있어 소리 나는 자리가 여러 곳일 가능성이 있습니다.':'모든 줄이 가장 낮은 줄의 정수배여서 한 자리의 배음일 가능성이 있습니다.')+'</div>';
+    }
+    h+='<div class="sa-h">귀에 들리는 소리 비중 (A가중)</div>';
+    CAUSE_GROUPS.forEach((g,i)=>{const p=R.shares[i];h+='<div class="sa-bar"><span class="n">'+g.nm+'</span><span class="b"><i style="width:'+Math.max(2,p).toFixed(0)+'%"></i></span><span class="p">'+p.toFixed(0)+'%</span></div>';});
+    if(R.tonal.length)h+='<div class="sa-note">1/3옥타브에서 뾰족하게 솟은 대역: '+R.tonal.map(p=>hzLab(p.fc)+'(+'+p.prom+'dB)').join(', ')+'</div>';
+    if(R.windMic)h+='<div class="sa-warn">⚠️ 폰 마이크에 바람이 직접 부딪힌 "웅~" 잡음이 많아(30~200Hz가 '+R.lowShare.toFixed(0)+'%), 낮은 음 판정은 하지 않았습니다.</div>';
+    if(R.nBad)h+='<div class="sa-note">순간 잡음 구간 '+(R.nBad*R.dt).toFixed(1)+'초는 비중 계산에서 뺐습니다.</div>';
+    // D: 초음파카메라 추천
+    h+='<div class="sa-cam"><b>🎯 초음파카메라 설정 추천</b><br>';
+    if(cam.lo!=null)h+='측정 주파수 범위를 <b>'+cam.lo+' ~ '+cam.hi+' kHz</b>로 수동 설정하고, 바람이 불 때 소리 나는 쪽을 비추십시오.';
+    else h+='카메라 측정 범위(최저 '+(CAMERA_MIN_HZ/1000)+'kHz) 안에 들어오는 휘파람 줄이 없습니다. 발생기를 창 한쪽에 두고 틈을 찾는 방법을 쓰십시오.';
+    if(cam.below.length)h+='<div class="sa-warn">'+cam.below.map(l=>hzLab(l.fMed)).join(', ')+' 줄은 카메라 최저 주파수('+(CAMERA_MIN_HZ/1000)+'kHz)보다 낮아 화면에 안 잡힐 수 있습니다.</div>';
+    h+='</div>';
+    // C: 현장 확인 결과
+    const fl=[];if(ft.open)fl.push('창 조금 열기: <b>'+saEsc(ft.open)+'</b>');
+    if(ft.smoke)fl.push('감압+연기: <b>'+saEsc(ft.smoke)+'</b>'+(ft.smokePos?' — '+saEsc(ft.smokePos):''));
+    if(ft.camLo||ft.camHi||ft.camPos)fl.push('초음파카메라'+(ft.camLo||ft.camHi?' ('+saEsc(ft.camLo)+'~'+saEsc(ft.camHi)+'kHz)':'')+(ft.camPos?': <b>'+saEsc(ft.camPos)+'</b>':''));
+    if(fl.length)h+='<div class="sa-h">현장 확인 결과</div><div>'+fl.join('<br>')+'</div>';
+    h+='<div class="sa-note" style="margin-top:6px">※ 폰 마이크는 하나라서 소리가 나는 <b>위치</b>는 이 분석으로 알 수 없습니다. 위치는 초음파카메라와 연기 확인으로 정합니다. 폰 녹음은 자동 음량 조절 때문에 dB 크기는 참고만 하고, 소리 높이(Hz)는 믿을 수 있습니다.</div>';
+    if(forReport)h='<div class="section-title" style="margin-top:15px;font-size:0.9rem;"><i class="fas fa-wave-square"></i> 소리 주파수 분석 (앱 직접 계산)</div><div class="sa-panel">'+(SA.fileName?'<div class="sa-note">파일: '+saEsc(SA.fileName)+'</div>':'')+h+'</div>';
+    return h;
+}
+
+function saRender(){
+    const p=document.getElementById('sa-panel');if(!p||!SA.res)return;
+    p.innerHTML=saPanelHTML(SA.res,SA.specUrl,false);
+}
+function saFillCamRange(){
+    if(!SA.res){alert('먼저 동영상/음성 파일을 넣어 주세요.');return;}
+    const c=saCamRec(SA.res);if(c.lo==null){alert('카메라 범위 안에 휘파람 줄이 없습니다.');return;}
+    document.getElementById('ft-cam-lo').value=c.lo;document.getElementById('ft-cam-hi').value=c.hi;saRender();
+}
+
+function saSummaryText(){
+    const R=SA.res;if(!R)return '';
+    const ft=saFieldTests(),v=saVerdict(R,ft),cam=saCamRec(R);
+    let s='[앱이 직접 계산한 소리 주파수 분석 — 기준 판정]\n';
+    s+='- 판정: '+v.t+' / '+v.s[0]+'\n- 설명: '+v.d.replace(/<[^>]+>/g,'')+'\n';
+    if(R.wl.length){s+='- 휘파람 줄 '+R.wl.length+'개:\n';R.wl.forEach((l,i)=>{s+='  '+(i+1)+') '+Math.round(l.fLo)+'~'+Math.round(l.fHi)+'Hz (중앙 '+Math.round(l.fMed)+'Hz), '+(l.glide>=0.08?'바람 따라 오르내림':'거의 일정')+', 나온 시간 '+l.dur.toFixed(1)+'초\n';});
+        if(R.harm)s+='- 배음 관계: '+(R.harm.non>0?'정수배 아닌 줄 '+R.harm.non+'개 → 여러 자리 가능성':'모두 정수배 → 한 자리 배음 가능성')+'\n';}
+    else s+='- 휘파람 줄: 검출 안 됨\n';
+    s+='- 귀에 들리는 소리 비중(A가중): '+CAUSE_GROUPS.map((g,i)=>g.nm+' '+R.shares[i].toFixed(0)+'%').join(', ')+'\n';
+    if(R.tonal.length)s+='- 1/3옥타브 뾰족한 대역: '+R.tonal.map(p=>p.fc+'Hz(+'+p.prom+'dB)').join(', ')+'\n';
+    if(R.windMic)s+='- 폰 마이크 바람 잡음 많음 → 낮은 음(250Hz 이하) 판정 제외\n';
+    s+='- 초음파카메라 추천 대역: '+(cam.lo!=null?cam.lo+'~'+cam.hi+'kHz':'해당 없음')+(cam.below.length?' (카메라 하한 아래 줄: '+cam.below.map(l=>Math.round(l.fMed)+'Hz').join(', ')+')':'')+'\n';
+    s+='- 현장 확인: 창 조금 열기='+(ft.open||'안 해 봄')+', 감압+연기='+(ft.smoke||'안 해 봄')+(ft.smokePos?'('+ft.smokePos+')':'')+', 초음파카메라='+((ft.camLo||ft.camHi)?ft.camLo+'~'+ft.camHi+'kHz ':'')+(ft.camPos||'기록 없음')+'\n';
+    s+='[이 분석을 쓰는 규칙]\n1. 위 Hz 수치·줄 개수·판정은 앱이 계산한 값이니 그대로 인용하고 바꾸거나 새 수치를 지어내지 마십시오.\n2. 폰 마이크 1개 녹음이라 소리 나는 위치는 알 수 없습니다. 위치는 연기·초음파카메라 결과가 있을 때만 그 내용대로 쓰고, 없으면 "현장 확인 필요"로 쓰십시오.\n3. 창 열기 테스트 결과가 있으면 그 결과를 원인 판단의 가장 중요한 근거로 쓰십시오.\n4. 휘파람 줄이 있으면 초음파카메라 점검 시 위 추천 대역을 권장 대책에 넣으십시오.\n';
+    return s;
+}
+
+async function handleMedia(input){
+    if(!input.files||!input.files[0])return;
+    const f=input.files[0];
+    if(f.size>400*1024*1024){alert('400MB 이하 파일만 가능합니다.');input.value='';return;}
+    SA.res=null;SA.specUrl=null;SA.fileName=f.name;images.media=null;images.media_mime=null;
+    const box=document.getElementById('box-media');box.querySelector('.upload-icon').style.display='none';box.querySelector('.upload-text-main').style.display='none';
+    const pt=document.getElementById('media-preview-text');pt.style.display='block';pt.innerHTML='<i class="fas fa-file-audio"></i> '+saEsc(f.name);box.classList.add('filled');
+    const panel=document.getElementById('sa-panel');panel.style.display='block';
+    panel.innerHTML='<div style="text-align:center;padding:10px;"><i class="fas fa-spinner fa-spin"></i> 소리를 꺼내는 중...</div>';
+    try{
+        const {x,sr,dur,cut}=await saDecode(f);
+        panel.innerHTML='<div style="text-align:center;padding:10px;"><i class="fas fa-spinner fa-spin"></i> 주파수 분석 중... ('+dur.toFixed(0)+'초)</div>';
+        await saTick();
+        const R=await saAnalyze(x,sr);R.dur=dur;R.cut=cut;
+        SA.res=R;SA.specUrl=saDraw(R);
+        R.D=null;R.med=null; // 그림을 만든 뒤 큰 배열은 버림
+        pt.innerHTML='<i class="fas fa-file-audio"></i> '+saEsc(f.name)+'<br><span style="font-size:0.7rem;">('+dur.toFixed(0)+'초 · 분석 완료'+(cut?' · 앞 '+SA_MAX_SEC/60+'분만':'')+')</span>';
+        saRender();
+    }catch(e){
+        console.error('[주파수 분석]',e);
+        panel.innerHTML='<div class="sa-warn">이 파일에서 소리를 꺼내지 못했습니다 ('+saEsc(e.message||e)+'). 폰 기본 녹음 앱으로 다시 녹음해 넣어 주세요.</div>';
+    }
+}
+
+// ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
+const BUILD_ID='v15.0-20261117a';
+document.addEventListener('visibilitychange',async()=>{
+    if(document.visibilityState!=='visible')return;
+    try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
+        const m=t.match(/const BUILD_ID='([^']+)'/);if(!m||m[1]===BUILD_ID)return;
+        const busy=SA.res||Object.values(images).some(v=>v)||(document.getElementById('defect-content')||{}).value;
+        if(!busy){location.reload();return;}
+        if(document.querySelector('.upd-badge'))return;
+        const b=document.createElement('div');b.className='upd-badge';b.textContent='🔄 새 버전이 있습니다 — 눌러서 새로고침 (입력 내용은 지워집니다)';b.onclick=()=>location.reload();document.body.appendChild(b);
+    }catch(e){}
+});
 
 // 브라우저가 STT 미지원이면 마이크 버튼 자동 숨김
 if(!_SR){
