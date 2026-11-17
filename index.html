@@ -248,7 +248,7 @@
             <div class="mic-status" id="mic-status"></div>
             <!-- v15.5 녹화 일시는 소리 파일에서 자동으로 (틀릴 때만 고치기) -->
             <div class="win-only" style="margin-top:6px;">
-                <div class="sa-note" id="wx-time-view">녹화 일시: 소리 파일을 넣으면 자동으로 들어갑니다.</div>
+                <div class="sa-note" id="wx-time-view"></div>
                 <div id="wx-time-edit" style="display:none;margin-top:4px;"><input type="datetime-local" id="wx-time" class="ft-text" style="margin-top:0" onchange="wxTimeEdited=true;wxTimeShow('직접 고침');if((document.getElementById('wx-addr').value||'').trim())wxFetch();"></div>
                 <div id="wx-status" class="sa-note"></div>
                 <div id="wx-box"></div>
@@ -482,7 +482,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v15.9';
+const APP_VERSION = 'v15.10';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -1670,7 +1670,7 @@ let SA_WX=null, wxTimeEdited=false, wxTimeSrc='';
 function wxTimeOpen(){document.getElementById('wx-time-edit').style.display='block';}
 function wxTimeShow(src){
     const v=document.getElementById('wx-time').value,el=document.getElementById('wx-time-view');if(!el)return;
-    el.innerHTML=v?'녹화 일시: <b>'+saEsc(v.replace('T',' '))+'</b> ('+saEsc(src||wxTimeSrc)+') <a href="javascript:void(0)" onclick="wxTimeOpen()" style="color:#2563eb;font-weight:700">고치기</a>':'녹화 일시: 소리 파일을 넣으면 자동으로 들어갑니다.';
+    el.innerHTML=v?'녹화 일시: <b>'+saEsc(v.replace('T',' '))+'</b> ('+saEsc(src||wxTimeSrc)+') <a href="javascript:void(0)" onclick="wxTimeOpen()" style="color:#2563eb;font-weight:700">고치기</a>':'';
 }
 const WX_DIR16=['북','북북동','북동','동북동','동','동남동','남동','남남동','남','남남서','남서','서남서','서','서북서','북서','북북서'];
 const WX_DIR8=['북','북동','동','남동','남','남서','서','북서'];
@@ -1897,7 +1897,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v15.9-20261118a';
+const BUILD_ID='v15.10-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
