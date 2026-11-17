@@ -174,6 +174,8 @@
         .mode-switch { display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:8px 10px 0; }
         .mode-btn { padding:9px 6px; border-radius:10px; border:1.5px solid #cbd5e1; background:#fff; color:#64748b; font-weight:800; font-size:0.85rem; cursor:pointer; }
         .mode-btn.active { background:#2563eb; border-color:#2563eb; color:#fff; }
+        .wx-row { display:flex; gap:6px; align-items:stretch; }
+        .wx-row input { flex:1; }
         .win-part-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:4px; }
         .win-part-grid label { display:flex; align-items:center; gap:5px; font-size:0.8rem; font-weight:700; color:#1a233a; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:7px 6px; }
         .ft-rec { display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-top:6px; }
@@ -295,7 +297,17 @@
         <!-- v15.1 창호 진단 전용: 창 종류·의심 부위 -->
         <div class="section win-only">
             <div class="section-title"><i class="fas fa-window-maximize"></i> 창 정보</div>
-            <label class="input-label" for="win-type" style="text-align:left;">창 종류</label>
+            <!-- v15.2 주소 + 녹화 일시 → 기상 자동 조회 -->
+            <label class="input-label" for="wx-addr" style="text-align:left;">주소 <span style="font-size:0.68rem;color:#64748b;font-weight:500;">(단지 이름이나 동네까지만 — 동·호수는 빼고)</span></label>
+            <div class="wx-row">
+                <input type="text" id="wx-addr" class="ft-text" style="margin-top:0" placeholder="예: 안산시 대부도 / 의왕 풍경채어바니티">
+                <button type="button" class="ft-btn" style="margin-left:0" onclick="wxFetch()">기상 조회</button>
+            </div>
+            <label class="input-label" for="wx-time" style="text-align:left;margin-top:8px;">녹화 일시 <span style="font-size:0.68rem;color:#64748b;font-weight:500;">(소리 파일을 넣으면 자동 입력 · 틀리면 고치세요)</span></label>
+            <input type="datetime-local" id="wx-time" class="ft-text" style="margin-top:0" onchange="wxTimeEdited=true">
+            <div id="wx-status" class="sa-note"></div>
+            <div id="wx-box"></div>
+            <label class="input-label" for="win-type" style="text-align:left;margin-top:10px;">창 종류</label>
             <select class="env-select" id="win-type"><option value="">선택</option><option value="시스템창(틸트앤턴·여닫이, 압착 가스켓)">시스템창 (틸트앤턴·여닫이)</option><option value="미서기 단창(모헤어)">미서기 단창</option><option value="미서기 이중창(내창+외창)">미서기 이중창</option><option value="고정창·연결창(커플링바로 이어 붙인 창)">고정창 · 연결창</option><option value="모름">모름</option></select>
             <label class="input-label" style="text-align:left;margin-top:10px;">의심 부위 (여러 개 가능)</label>
             <div class="win-part-grid">
@@ -460,7 +472,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v15.1';
+const APP_VERSION = 'v15.2';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -890,7 +902,8 @@ async function startAnalysis(){
 
     resultArea.style.display='block';loading.style.display='block';content.style.display='none';chartSection.style.display='none';
     document.getElementById('confidence-section').style.display='none';
-    {const rf=document.getElementById('report-freq');if(SA.res){rf.innerHTML=saPanelHTML(SA.res,SA.specUrl,true);rf.style.display='block';}else{rf.innerHTML='';rf.style.display='none';}}
+    {const rf=document.getElementById('report-freq');const wxh=(IS_WIN&&SA_WX)?'<div class="section-title" style="margin-top:15px;font-size:0.9rem;"><i class="fas fa-wind"></i> 기상 자동 조회 (참고값)</div>'+wxHTML(true):'';
+     if(SA.res||wxh){rf.innerHTML=(SA.res?saPanelHTML(SA.res,SA.specUrl,true):'')+wxh;rf.style.display='block';}else{rf.innerHTML='';rf.style.display='none';}}
     renderReportPhotos();resultArea.scrollIntoView({behavior:"smooth"});
 
     if(!images.main){alert("현장 메인 사진은 필수입니다.");loading.style.display='none';return;}
@@ -1005,7 +1018,8 @@ ${referenceString}
 ${envInfo}${dbInfo}${patternInfo}
 - 계절: ${seasonPrompt}
 - 현장 메모: ${document.getElementById('defect-content').value || '없음'}
-### 4. 앱이 직접 계산한 소리 주파수 분석·현장 확인 결과는 아래에 따로 첨부됩니다.
+### 4. 앱이 직접 계산한 소리 주파수 분석·현장 확인 결과와 기상 자동 조회(있으면)는 아래에 따로 첨부됩니다.
+- 기상 자료가 있으면 "녹화 시각의 바람 세기·방향", "1년에 증상이 날 만한 날 수", "바람을 정면으로 받는 벽면"을 2번·4번 섹션에 반영합니다. 기상 자료는 참고값이며 고층 풍속을 숫자로 환산하지 않습니다.
 
 ##[판단 순서]
 1단계 — 창호 범위 안/밖: 앱 판정이 "창호 범위 밖"이거나, 휘파람 줄이 없고 낮은 음 위주이며 창 열기 결과도 창호를 가리키지 않으면, 창호 문제가 아닐 가능성을 먼저 씁니다. 이때는 보고서를 짧게 끝냅니다(아래 1·4·6번 섹션만, 4번에는 범위 밖으로 보는 근거와 확인할 곳(관리사무소·설비 담당)만).
@@ -1043,6 +1057,7 @@ CHART_DATA_END
     const prompt=IS_WIN?promptWindow:promptGeneral;
 
     let parts=[{text:prompt}];
+    if(IS_WIN&&SA_WX)parts.push({text:wxSummaryText()});
     if(SA.res){parts.push({text:saSummaryText()});if(SA.specUrl){parts.push({inline_data:{mime_type:'image/jpeg',data:SA.specUrl.split(',')[1]}});parts.push({text:'[증거이미지: 앱이 계산한 스펙트로그램 — 가로=시간, 세로=0.5~8kHz, 밝은 가는 가로줄=휘파람 소리, 오른쪽 번호=검출된 줄]'});}}
     for(const[key,value]of Object.entries(images)){
         if(value){
@@ -1603,6 +1618,7 @@ async function handleMedia(input){
     const pt=document.getElementById('media-preview-text');pt.style.display='block';pt.innerHTML='<i class="fas fa-file-audio"></i> '+saEsc(f.name);box.classList.add('filled');
     const panel=document.getElementById('sa-panel');panel.style.display='block';
     panel.innerHTML='<div style="text-align:center;padding:10px;"><i class="fas fa-spinner fa-spin"></i> 소리를 꺼내는 중...</div>';
+    if(IS_WIN){try{wxSetTime(await saFileTime(f));}catch(e){}}
     try{
         const {x,sr,dur,cut}=await saDecode(f);
         panel.innerHTML='<div style="text-align:center;padding:10px;"><i class="fas fa-spinner fa-spin"></i> 주파수 분석 중... ('+dur.toFixed(0)+'초)</div>';
@@ -1616,6 +1632,136 @@ async function handleMedia(input){
         console.error('[주파수 분석]',e);
         panel.innerHTML='<div class="sa-warn">이 파일에서 소리를 꺼내지 못했습니다 ('+saEsc(e.message||e)+'). 폰 기본 녹음 앱으로 다시 녹음해 넣어 주세요.</div>';
     }
+}
+
+// ================================================================
+// ★ v15.2 주소 + 녹화 일시 → 기상 자동 조회 (창호 진단 주소 전용)
+//   ① 녹화 시각의 풍속·순간풍속·풍향  ② 최근 5년 바람 기록  ③ 일교차(틱틱 소리 고를 때)
+//   자료: Open-Meteo (재분석 격자 약 9~25km, 지상 10m 기준) — 참고값. 주소는 동·호수를 빼고 보냄
+// ================================================================
+let SA_WX=null, wxTimeEdited=false;
+const WX_DIR16=['북','북북동','북동','동북동','동','동남동','남동','남남동','남','남남서','남서','서남서','서','서북서','북서','북북서'];
+const WX_DIR8=['북','북동','동','남동','남','남서','서','북서'];
+const wxDir16=d=>d==null?'-':WX_DIR16[Math.round(d/22.5)%16];
+const wxDir8=d=>WX_DIR8[Math.round(d/45)%8];
+const wxYmd=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const wxF1=x=>(x==null||isNaN(x))?'-':(+x).toFixed(1);
+function wxCleanAddr(a){ // 동·호수 같은 세대 정보는 외부 지도 서비스로 보내지 않음
+    return String(a||'').replace(/\d+\s*동\s*\d+\s*호/g,' ').replace(/\d+\s*호/g,' ').replace(/\b\d+\s*동\b/g,' ').replace(/[○◯]+/g,' ').replace(/\s+/g,' ').trim();
+}
+async function wxGeocode(addr){
+    let words=wxCleanAddr(addr).split(' ').filter(Boolean);
+    while(words.length){const q=words.join(' ');
+        try{const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=kr&accept-language=ko&q=${encodeURIComponent(q)}`);
+            if(r.ok){const j=await r.json();if(j&&j[0])return {lat:+j[0].lat,lon:+j[0].lon,matched:q};}}catch(e){}
+        words.pop();}
+    return null;
+}
+async function wxGet(path,q){
+    for(const host of ['https://archive-api.open-meteo.com/v1/archive','https://api.open-meteo.com/v1/forecast']){
+        if(host.includes('forecast')&&path==='climate')continue;
+        try{const r=await fetch(`${host}?${q}`);if(r.ok){const j=await r.json();if((j.hourly&&j.hourly.time&&j.hourly.time.length)||(j.daily&&j.daily.time&&j.daily.time.length))return j;}}catch(e){}
+    }
+    return null;
+}
+// 녹화 일시: 파일 이름(폰 기본 이름) → 영상 안 촬영 시각(mvhd) → 파일 수정 시각 순서
+async function saFileTime(f){
+    const n=f.name||'';let m;
+    if((m=n.match(/(20\d\d)[-_.]?(\d\d)[-_.]?(\d\d)[ _T-]?(\d\d)[-_.:]?(\d\d)/)))return {d:new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]),src:'파일 이름'};
+    try{
+        const parts=[f.slice(0,Math.min(f.size,4e6))];if(f.size>4e6)parts.push(f.slice(Math.max(0,f.size-4e6)));
+        for(const p of parts){const u=new Uint8Array(await p.arrayBuffer());
+            for(let i=4;i<u.length-24;i++){if(u[i]===0x6d&&u[i+1]===0x76&&u[i+2]===0x68&&u[i+3]===0x64){
+                const v=u[i+4];const dv=new DataView(u.buffer,u.byteOffset+i+8);
+                const sec=v===1?Number(dv.getBigUint64(0)):dv.getUint32(0);
+                if(sec>3.5e9){const d=new Date((sec-2082844800)*1000);if(d.getFullYear()>2010&&d.getFullYear()<2100)return {d,src:'영상 안 촬영 시각'};}
+                break;}}}
+    }catch(e){}
+    if(f.lastModified)return {d:new Date(f.lastModified),src:'파일 저장 시각(정확하지 않을 수 있음)'};
+    return null;
+}
+function wxSetTime(t){
+    const el=document.getElementById('wx-time');if(!el||!t||(wxTimeEdited&&el.value))return;
+    const d=t.d;el.value=`${wxYmd(d)}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const st=document.getElementById('wx-status');if(st&&!SA_WX)st.textContent='녹화 일시를 '+t.src+'에서 읽었습니다.';
+    if((document.getElementById('wx-addr').value||'').trim())wxFetch();
+}
+async function wxFetch(){
+    const st=document.getElementById('wx-status'),box=document.getElementById('wx-box');
+    const addr=(document.getElementById('wx-addr').value||'').trim();
+    if(!addr){st.textContent='주소를 입력하세요.';return;}
+    st.innerHTML='<i class="fas fa-spinner fa-spin"></i> 위치 찾는 중...';
+    const geo=await wxGeocode(addr);
+    if(!geo){st.textContent='⚠ 주소 위치를 찾지 못했습니다. 시·구·동네 이름으로 다시 입력해 주십시오.';SA_WX=null;box.innerHTML='';return;}
+    st.innerHTML='<i class="fas fa-spinner fa-spin"></i> 기상 자료 가져오는 중... ('+saEsc(geo.matched)+')';
+    const base=`latitude=${geo.lat.toFixed(3)}&longitude=${geo.lon.toFixed(3)}&wind_speed_unit=ms&timezone=Asia%2FSeoul`;
+    // ① 녹화 시각
+    let rec=null;const tv=document.getElementById('wx-time').value;
+    if(tv){const t=new Date(tv);const day=wxYmd(t);
+        const j=await wxGet('hour',`${base}&hourly=wind_speed_10m,wind_gusts_10m,wind_direction_10m,temperature_2m&start_date=${day}&end_date=${day}`);
+        if(j){const H=j.hourly,i=Math.min(H.time.length-1,t.getHours());
+            rec={time:tv.replace('T',' '),ws:H.wind_speed_10m[i],gust:H.wind_gusts_10m[i],dir:H.wind_direction_10m[i],temp:H.temperature_2m[i],
+                 dayMaxGust:Math.max(...H.wind_gusts_10m.filter(x=>x!=null))};}}
+    // ② 최근 5년 (자료 지연을 생각해 7일 전까지)
+    const end=new Date();end.setDate(end.getDate()-7);const start=new Date(end);start.setFullYear(start.getFullYear()-5);start.setDate(start.getDate()+1);
+    const c=await wxGet('climate',`${base}&daily=wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,temperature_2m_max,temperature_2m_min&start_date=${wxYmd(start)}&end_date=${wxYmd(end)}`);
+    let clim=null;
+    if(c){const D=c.daily,N=D.time.length,yrs=N/365.25;
+        const cnt=fn=>{let k=0;for(let i=0;i<N;i++)if(fn(i))k++;return k/yrs;};
+        const g=D.wind_gusts_10m_max,w=D.wind_speed_10m_max;
+        const seasons=[['겨울',[12,1,2]],['봄',[3,4,5]],['여름',[6,7,8]],['가을',[9,10,11]]].map(([nm,ms])=>{
+            const tally={};let tot=0;
+            for(let i=0;i<N;i++){const mo=+D.time[i].slice(5,7);if(!ms.includes(mo)||g[i]==null||g[i]<15||D.wind_direction_10m_dominant[i]==null)continue;const k=wxDir8(D.wind_direction_10m_dominant[i]);tally[k]=(tally[k]||0)+1;tot++;}
+            const top=Object.entries(tally).sort((a,b)=>b[1]-a[1])[0];
+            return {nm,days:tot/yrs,top:top?top[0]:'-',share:top?top[1]/tot*100:0};});
+        const rng=[];for(let i=0;i<N;i++)if(D.temperature_2m_max[i]!=null&&D.temperature_2m_min[i]!=null)rng.push(D.temperature_2m_max[i]-D.temperature_2m_min[i]);
+        const byMo={};for(let i=0;i<N;i++){const mo=+D.time[i].slice(5,7),a=D.temperature_2m_max[i],b=D.temperature_2m_min[i];if(a==null||b==null)continue;(byMo[mo]=byMo[mo]||[]).push(a-b);}
+        const moAvg=Object.entries(byMo).map(([m,a])=>[+m,a.reduce((s,x)=>s+x,0)/a.length]).sort((a,b)=>b[1]-a[1]);
+        let pct=null;if(rec&&rec.dayMaxGust!=null){const v=g.filter(x=>x!=null);pct=v.filter(x=>x>rec.dayMaxGust).length/v.length*100;}
+        clim={from:D.time[0],to:D.time[N-1],yrs,
+            g10:cnt(i=>g[i]!=null&&g[i]>=10),g15:cnt(i=>g[i]!=null&&g[i]>=15),
+            warn:cnt(i=>(g[i]!=null&&g[i]>=20)||(w[i]!=null&&w[i]>=14)),maxGust:Math.max(...g.filter(x=>x!=null)),
+            seasons,swing10:rng.filter(x=>x>=10).length/yrs,swingMonth:moAvg[0],strongerPct:pct};}
+    if(!rec&&!clim){st.textContent='⚠ 기상 자료를 가져오지 못했습니다(네트워크 또는 날짜 문제).';SA_WX=null;box.innerHTML='';return;}
+    SA_WX={place:geo.matched,rec,clim};
+    st.textContent='✔ '+geo.matched+' 기준 · 재분석 격자(약 9~25km) 계산값, 지상 10m 높이 기준 참고값입니다.';
+    box.innerHTML=wxHTML(false);saRender();
+}
+function wxFacing(dir){return dir==null?'':wxDir16(dir)+'쪽에서 불어오는 바람이라, <b>'+wxDir16(dir)+'쪽을 향한 벽면</b>의 창이 바람을 정면으로 받습니다. 창 열기 테스트는 이 벽면의 다른 창으로 하는 것이 좋습니다.';}
+function wxHTML(forReport){
+    const W=SA_WX;if(!W)return '';
+    let h='<div class="sa-panel" style="margin-top:6px">';
+    if(forReport)h+='<div class="sa-note">위치: '+saEsc(W.place)+' · 재분석 격자(약 9~25km) 계산값, 지상 10m 높이 기준 참고값</div>';
+    if(W.rec){const r=W.rec;
+        h+='<div class="sa-h">🌬️ 녹화 시각의 바람 ('+saEsc(r.time)+')</div>';
+        h+='<div>풍속 <b>'+wxF1(r.ws)+' m/s</b> · 순간 최대 <b>'+wxF1(r.gust)+' m/s</b> · 바람 방향 <b>'+wxDir16(r.dir)+'</b> · 기온 '+wxF1(r.temp)+'℃</div>';
+        h+='<div class="sa-note">'+wxFacing(r.dir)+'</div>';
+        if(W.clim&&W.clim.strongerPct!=null)h+='<div class="sa-note">이날 하루 최대 순간풍속('+wxF1(r.dayMaxGust)+' m/s)보다 바람이 셌던 날은 최근 5년 중 <b>'+W.clim.strongerPct.toFixed(0)+'%</b>입니다.</div>';
+    }
+    if(W.clim){const c=W.clim;
+        h+='<div class="sa-h">📅 최근 5년 바람 기록 ('+c.from+' ~ '+c.to+')</div>';
+        h+='<table class="sa-tbl"><tr><th>하루 최대 순간풍속</th><th>1년 평균 일수</th></tr>'+
+           '<tr><td>10 m/s 이상</td><td>'+c.g10.toFixed(0)+'일</td></tr><tr><td>15 m/s 이상</td><td>'+c.g15.toFixed(0)+'일</td></tr>'+
+           '<tr><td>강풍주의보 수준<br><span style="font-size:0.65rem">(순간 20 또는 평균 14 m/s 이상)</span></td><td>'+c.warn.toFixed(0)+'일</td></tr></table>';
+        h+='<div class="sa-note">5년 중 가장 센 순간풍속: '+wxF1(c.maxGust)+' m/s</div>';
+        h+='<div class="sa-h" style="font-size:0.75rem">바람 센 날(순간 15 m/s 이상)의 주된 방향</div><table class="sa-tbl"><tr><th>계절</th><th>1년 평균 일수</th><th>주된 방향</th></tr>'+
+           c.seasons.map(s=>'<tr><td>'+s.nm+'</td><td>'+s.days.toFixed(0)+'일</td><td>'+(s.days>=0.5?s.top+' ('+s.share.toFixed(0)+'%)':'-')+'</td></tr>').join('')+'</table>';
+        const tick=document.getElementById('pt-tick');
+        if(tick&&tick.checked)h+='<div class="sa-h" style="font-size:0.75rem">🌡️ 일교차 (틱틱 소리 참고)</div><div>하루 기온 차이 10℃ 이상인 날: 1년 평균 <b>'+c.swing10.toFixed(0)+'일</b>'+(c.swingMonth?' · 일교차가 가장 큰 달: <b>'+c.swingMonth[0]+'월</b>(평균 '+c.swingMonth[1].toFixed(1)+'℃)':'')+'</div>';
+    }
+    h+='<div class="sa-note" style="margin-top:4px">고층은 지상 10m보다 바람이 더 셉니다(숫자로 환산하지 않음). 섬·바닷가는 격자 자료와 실제 바람의 차이가 클 수 있습니다.</div></div>';
+    return h;
+}
+function wxSummaryText(){
+    const W=SA_WX;if(!W)return '';
+    let s='[기상 자동 조회 — '+W.place+' 기준, 재분석 격자(약 9~25km)·지상 10m 참고값]\n';
+    if(W.rec){const r=W.rec;s+='- 녹화 시각('+r.time+') 바람: 풍속 '+wxF1(r.ws)+'m/s, 순간 최대 '+wxF1(r.gust)+'m/s, 방향 '+wxDir16(r.dir)+'(에서 불어옴), 기온 '+wxF1(r.temp)+'℃';
+        if(W.clim&&W.clim.strongerPct!=null)s+=' / 이날 하루 최대 순간풍속 '+wxF1(r.dayMaxGust)+'m/s보다 센 날은 5년 중 '+W.clim.strongerPct.toFixed(0)+'%';s+='\n';}
+    if(W.clim){const c=W.clim;s+='- 최근 5년('+c.from+'~'+c.to+') 1년 평균: 순간 10m/s↑ '+c.g10.toFixed(0)+'일, 15m/s↑ '+c.g15.toFixed(0)+'일, 강풍주의보 수준 '+c.warn.toFixed(0)+'일, 5년 최대 순간 '+wxF1(c.maxGust)+'m/s\n';
+        s+='- 바람 센 날(순간 15m/s↑) 계절별 주된 방향: '+c.seasons.map(x=>x.nm+' '+(x.days>=0.5?x.top+'('+x.days.toFixed(0)+'일/년)':'거의 없음')).join(', ')+'\n';
+        const tick=document.getElementById('pt-tick');if(tick&&tick.checked)s+='- 일교차 10℃↑ 1년 평균 '+c.swing10.toFixed(0)+'일'+(c.swingMonth?', 가장 큰 달 '+c.swingMonth[0]+'월':'')+'\n';}
+    s+='[기상 자료를 쓰는 규칙] 참고값임을 밝히고, 고층 풍속을 숫자로 환산하지 마십시오. 녹화 시각 바람이 약했으면 그 녹화만으로 "소리 없음"을 단정하지 말고, 1년에 증상이 날 만한 날 수와 주된 바람 방향(바람을 정면으로 받는 벽면)을 설명에 활용하십시오.\n';
+    return s;
 }
 
 // ---- v15.1 주소 이동 (일반 소음 /noise/ ↔ 창호 진단 /noise/window/) ----
@@ -1683,7 +1829,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v15.1-20261118a';
+const BUILD_ID='v15.2-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
