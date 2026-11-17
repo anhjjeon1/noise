@@ -225,36 +225,16 @@
     <div class="content">
         <!-- 기본 정보 -->
         <div class="section">
-            <div class="section-title"><i class="fas fa-info"></i> 기본 정보 (Basic Info)</div>
-            <!-- v15.5 주소를 기본 정보 맨 위로 (창호 진단 주소에서는 기상 자동 조회) -->
-            <div class="wx-row" style="margin-bottom:8px;">
-                <input type="text" id="wx-addr" class="ft-text" style="margin-top:0" placeholder="주소 — 단지 이름이나 동네까지 (예: 안산시 대부도)">
+            <div class="section-title"><i class="fas fa-info"></i> 기본 정보</div>
+            <!-- v15.6 주소 한 칸(동·호수 포함). 동·호·장소 칸 삭제 — 장소는 소음 내용에 -->
+            <div class="wx-row">
+                <div class="mic-input-wrap" style="flex:1;">
+                    <input type="text" id="wx-addr" placeholder="주소 (예: 대부도 ○○리조트 101동 1204호)">
+                    <button type="button" class="mic-btn" id="mic-wx-addr" onclick="voiceInput('wx-addr')" aria-label="주소 음성입력"><i class="fas fa-microphone"></i></button>
+                </div>
                 <button type="button" class="ft-btn win-only" style="margin-left:0" onclick="wxFetch()">기상 조회</button>
             </div>
-            <div class="info-grid-row">
-                <div>
-                    <div class="mic-input-wrap with-suffix">
-                        <input type="text" id="dong" placeholder="101">
-                        <span class="input-suffix">동</span>
-                        <button type="button" class="mic-btn" id="mic-dong" onclick="voiceInput('dong')" aria-label="동 음성입력"><i class="fas fa-microphone"></i></button>
-                    </div>
-                </div>
-                <div>
-                    <div class="mic-input-wrap with-suffix">
-                        <input type="text" id="ho" placeholder="1204">
-                        <span class="input-suffix">호</span>
-                        <button type="button" class="mic-btn" id="mic-ho" onclick="voiceInput('ho')" aria-label="호 음성입력"><i class="fas fa-microphone"></i></button>
-                    </div>
-                </div>
-                <div>
-                    <div class="mic-input-wrap with-suffix">
-                        <input type="text" id="location" placeholder="거실창">
-                        <span class="input-suffix">장소</span>
-                        <button type="button" class="mic-btn" id="mic-location" onclick="voiceInput('location')" aria-label="장소 음성입력"><i class="fas fa-microphone"></i></button>
-                    </div>
-                </div>
-                <input type="hidden" id="date">
-            </div>
+            <input type="hidden" id="date">
             <div class="mic-status" id="mic-status"></div>
             <!-- v15.5 녹화 일시는 소리 파일에서 자동으로 (틀릴 때만 고치기) -->
             <div class="win-only" style="margin-top:6px;">
@@ -264,9 +244,9 @@
                 <div id="wx-box"></div>
             </div>
             <div style="margin-top:8px;">
-                <label class="input-label" style="text-align:left;">소음 내용 <span style="font-size:0.7rem;color:#94a3b8;font-weight:500;">(음성 최대 20초 자동 종료)</span></label>
+                <label class="input-label" style="text-align:left;">소음 내용</label>
                 <div class="mic-input-wrap textarea-wrap">
-                    <textarea id="defect-content" placeholder="소음 발생 상황 및 상세 증상 (예: 바람 불 때 웅웅거림, 밤마다 쿵쿵 소리)"></textarea>
+                    <textarea id="defect-content" placeholder="장소와 증상 (예: 안방, 밤마다 쿵쿵 소리)"></textarea>
                     <button type="button" class="mic-btn" id="mic-defect-content" onclick="voiceInput('defect-content')" aria-label="소음내용 음성입력"><i class="fas fa-microphone"></i></button>
                 </div>
             </div>
@@ -274,8 +254,7 @@
 
         <!-- ★ NEW: 소음 환경 조건 -->
         <div class="section">
-            <div class="section-title"><i class="fas fa-sliders-h"></i> 소음 환경 조건 (Precision)</div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:5px;text-align:center;">* 환경 조건 입력 시 정밀도가 <strong style="color:#dc2626;">30% 이상</strong> 향상됩니다.</div>
+            <div class="section-title"><i class="fas fa-sliders-h"></i> 소음 환경 조건</div>
             <div class="env-grid">
                 <div><label class="input-label">소음 발생 시간대</label>
                     <select class="env-select" id="noise-time"><option value="">선택</option><option value="새벽(00~06시)">새벽 (00~06시)</option><option value="아침(06~09시)">아침 (06~09시)</option><option value="낮(09~18시)">낮 (09~18시)</option><option value="저녁(18~22시)">저녁 (18~22시)</option><option value="야간(22~00시)">야간 (22~00시)</option><option value="24시간 상시">24시간 상시</option></select>
@@ -292,12 +271,12 @@
             </div>
             <div style="margin-top:10px;padding-top:8px;border-top:1px dashed #e2e8f0;">
                 <div style="margin-bottom:10px;">
-                    <label class="input-label" style="text-align:left;font-size:0.8rem;color:var(--primary-dark);"><i class="fas fa-volume-up" style="color:#2563eb;margin-right:4px;"></i>소음측정기 앱 화면 <span style="font-size:0.65rem;color:#2563eb;">- 업로드 시 dB 자동 인식</span></label>
+                    <label class="input-label" style="text-align:left;font-size:0.8rem;color:var(--primary-dark);"><i class="fas fa-volume-up" style="color:#2563eb;margin-right:4px;"></i>소음측정기 앱 화면 </label>
                     <label for="img-thermal" class="upload-box media-box-style" id="box-thermal" style="aspect-ratio:unset!important;height:50px;flex-direction:row!important;gap:8px;padding:4px 10px;"><i class="fas fa-volume-up upload-icon" style="font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="font-size:0.8rem;">소음측정기 스크린샷 업로드</span><img id="view-thermal" class="preview-img"></label>
                     <input type="file" id="img-thermal" class="file-input" accept="image/*" onchange="handleSoundMeterImage(this)">
                     <div id="db-ocr-status" style="display:none;margin-top:6px;padding:8px 10px;border-radius:8px;font-size:0.75rem;font-weight:700;text-align:center;"></div>
                 </div>
-                <div style="font-size:0.75rem;color:#64748b;margin-bottom:5px;text-align:center;"><i class="fas fa-keyboard" style="color:#2563eb;"></i> 소음계 측정값 (자동 입력 또는 직접 입력)</div>
+                <div style="font-size:0.75rem;color:#64748b;margin-bottom:5px;text-align:center;"><i class="fas fa-keyboard" style="color:#2563eb;"></i> 소음계 측정값</div>
                 <div class="db-input-row">
                     <div><label class="input-label">최대값(dB)</label><input type="text" id="db-max" placeholder="예:52"></div>
                     <div><label class="input-label">평균값(dB)</label><input type="text" id="db-avg" placeholder="예:38"></div>
@@ -309,7 +288,6 @@
         <!-- v15.1 창호 진단 전용: 창 종류·의심 부위 -->
         <div class="section win-only">
             <div class="section-title"><i class="fas fa-window-maximize"></i> 의심 부위</div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:2px;">* 여러 개 고를 수 있습니다.</div>
             <div class="win-part-grid">
                 <label><input type="checkbox" class="win-part" value="창짝 둘레(가스켓)"> 창짝 둘레</label>
                 <label><input type="checkbox" class="win-part" value="여밈대(창짝 맞닿는 곳)"> 여밈대</label>
@@ -325,7 +303,6 @@
         <!-- 소음 발생 부위 -->
         <div class="section gen-only">
             <div class="section-title"><i class="fas fa-list-check"></i> 소음 발생 부위 선택 (다중 선택)</div>
-            <div style="font-size:0.75rem;color:#64748b;margin-bottom:5px;text-align:center;">* 의심 부위를 모두 체크하세요.</div>
             <div class="noise-type-grid">
                 <div class="noise-checkbox-wrapper"><input type="checkbox" id="nt-window" class="noise-selector" value="창호(Window)"><label for="nt-window" class="noise-checkbox-label"><div class="check-indicator"><i class="fas fa-check"></i></div><i class="fas fa-window-maximize main-icon"></i><span>창호 소음</span></label></div>
                 <div class="noise-checkbox-wrapper"><input type="checkbox" id="nt-ceiling" class="noise-selector" value="천장(Ceiling)"><label for="nt-ceiling" class="noise-checkbox-label"><div class="check-indicator"><i class="fas fa-check"></i></div><i class="fas fa-cloud main-icon"></i><span>천장 소음</span></label></div>
@@ -338,8 +315,7 @@
 
         <!-- ★ NEW: 소음 특성 패턴 -->
         <div class="section">
-            <div class="section-title"><i class="fas fa-wave-square"></i> 소음 특성 패턴 (Sound Pattern)</div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:5px;text-align:center;">* 소리의 성격을 선택하면 AI가 주파수 대역을 추정하여 정밀 분석합니다.</div>
+            <div class="section-title"><i class="fas fa-wave-square"></i> 소음 특성 패턴</div>
             <div class="pattern-grid">
                 <div class="pattern-checkbox-wrapper gen-only"><input type="checkbox" id="pt-boom" class="pattern-selector" value="쿵쿵/탕탕(충격음,저주파20~100Hz)"><label for="pt-boom" class="pattern-label"><i class="fas fa-drum"></i><span>쿵쿵 / 탕탕</span></label></div>
                 <div class="pattern-checkbox-wrapper"><input type="checkbox" id="pt-hum" class="pattern-selector" value="웅웅/윙윙(공진음,저주파50~200Hz)"><label for="pt-hum" class="pattern-label"><i class="fas fa-compact-disc"></i><span>웅웅 / 윙윙</span></label></div>
@@ -355,7 +331,7 @@
 
         <!-- 현장 채증 -->
         <div class="section">
-            <div class="section-title"><i class="fas fa-camera"></i> 현장 채증 (Evidence)</div>
+            <div class="section-title"><i class="fas fa-camera"></i> 현장 채증</div>
             <div class="photo-stack">
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                     <div class="upload-group">
@@ -370,7 +346,7 @@
                     </div>
                 </div>
                 <div class="upload-group" style="margin-top:5px;">
-                    <label class="input-label" style="color:#2563eb;text-align:left;"><i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성) <span style="font-size:0.65rem;color:#64748b;font-weight:500;">* 소리 날 때 30초~2분 녹화 권장 · 폰 안에서 바로 주파수 분석</span></label>
+                    <label class="input-label" style="color:#2563eb;text-align:left;"><i class="fas fa-volume-up"></i> 2-1. 소음 듣기 (동영상/음성) <span style="font-size:0.65rem;color:#64748b;font-weight:500;">30초~2분</span></label>
                     <label for="file-media" class="upload-box media-box-style" id="box-media" style="aspect-ratio:unset!important;height:50px;flex-direction:row!important;gap:8px;padding:4px 10px;"><i class="fas fa-video upload-icon" style="color:#2563eb;font-size:1rem;margin-bottom:0;"></i><span class="upload-text-main" style="color:#1a233a;font-size:0.8rem;">동영상/음성 파일 선택</span><div id="media-preview-text" style="display:none;font-size:0.8rem;font-weight:bold;color:#1a233a;text-align:center;line-height:1.3;"></div></label>
                     <input type="file" id="file-media" class="file-input" accept="video/*,audio/*" onchange="handleMedia(this)">
                     <div id="sa-panel" class="sa-panel" style="display:none;"></div>
@@ -384,7 +360,6 @@
             <div class="photo-stack">
                 <div class="upload-group">
                     <label class="input-label" style="color:var(--primary-main);">3. FLIR SI1-LD (음향 카메라)</label>
-                    <div style="font-size:0.7rem;color:#64748b;margin-bottom:5px;">* 초음파 누설/소음원 시각화 데이터 (필수)</div>
                     <!-- v15.4 촬영 방식: 초음파 발생기 사용 여부 (점의 뜻이 달라짐) -->
                     <div class="cam-mode-box">
                         <label class="input-label" for="cam-mode" style="text-align:left;">촬영 방식 (초음파 발생기 사용 여부)</label>
@@ -409,7 +384,6 @@
                 <!-- v15.3 감압 연기 시험 사진 (창호 진단 주소만) -->
                 <div class="upload-group win-only" style="margin-top:8px;">
                     <label class="input-label" style="color:var(--primary-main);">4. 감압 연기 시험 (스모킹머신)</label>
-                    <div style="font-size:0.7rem;color:#64748b;margin-bottom:5px;">* 실내 감압 상태에서 연기가 빨려 드는 자리 (= 바람이 새는 길)</div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
                         <div>
                             <label for="img-smoke" class="upload-box" id="box-smoke" style="border-color:#cbd5e1;background-color:#f8fafc;"><i class="fas fa-smog upload-icon" style="color:var(--primary-main);"></i><span class="upload-text-main" style="color:var(--primary-main);">연기 시험 1</span><img id="view-smoke" class="preview-img"></label>
@@ -427,11 +401,10 @@
         <!-- v15.0 현장 확인 테스트 (v15.1: 창호 진단 주소에서만) -->
         <div class="section win-only">
             <div class="section-title"><i class="fas fa-clipboard-check"></i> 현장 확인 테스트</div>
-            <div style="font-size:0.7rem;color:#64748b;margin-bottom:8px;text-align:center;">* 해 본 것만 고르세요. 결과가 주파수 판정에 바로 반영됩니다.</div>
             <div class="ft-row">
                 <label class="input-label" for="ft-open">① 창 조금 열기 (소리 날 때)</label>
                 <select class="env-select" id="ft-open" onchange="saRecAutoSet=false;saRender()"><option value="">안 해 봄</option><option value="사라지거나 바뀜">소리가 사라지거나 바뀜</option><option value="더 커짐">소리가 더 커짐</option><option value="변화 없음">변화 없음</option></select>
-                <div class="sa-note" style="margin-top:6px;line-height:1.5">열 창은 의심 창이 아닌 <b>같은 벽면의 다른 창</b>입니다(틸트 또는 2~5cm). 방문은 닫고 후드·배기팬·전열교환기는 끕니다. 닫음 → 엶 → 다시 닫음을 <b>같은 자리에서 각 1~2분</b> 녹화해 넣으면 자동으로 비교합니다.</div>
+                <div class="sa-note" style="margin-top:6px;line-height:1.5"><b>같은 벽면의 다른 창</b>을 엽니다 · 방문 닫고 배기팬 끔 · 같은 자리에서 1~2분씩</div>
                 <div class="ft-rec">
                     <label for="ft-rec-0" class="ft-rec-btn" id="ft-rec-lbl-0">① 닫음</label><input type="file" id="ft-rec-0" class="file-input" accept="video/*,audio/*" onchange="saRecLoad(0,this)">
                     <label for="ft-rec-1" class="ft-rec-btn" id="ft-rec-lbl-1">② 엶</label><input type="file" id="ft-rec-1" class="file-input" accept="video/*,audio/*" onchange="saRecLoad(1,this)">
@@ -497,7 +470,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v15.5';
+const APP_VERSION = 'v15.6';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -697,7 +670,7 @@ window.addEventListener('DOMContentLoaded',()=>{
     const h1=document.querySelector('.main-header h1');
     if(IS_WIN){
         if(h1) h1.innerHTML='<i class="fas fa-frog frog-icon"></i> 청개구리 창호 소음진단';
-        const loc=document.getElementById('location'); if(loc) loc.placeholder='거실 시스템창';
+        const dc0=document.getElementById('defect-content'); if(dc0) dc0.placeholder='장소·창 종류와 증상 (예: 거실 시스템창, 바람 셀 때 삐~ 소리)';
         document.title='청개구리 창호 소음진단';
         const lt=document.getElementById('loading-text'); if(lt) lt.textContent='창호 소리 분석 중...';
     }
@@ -785,9 +758,9 @@ async function extractDbFromImage(base64Data){
 function handleSubImage(input,type,btnId){if(input.files&&input.files[0]){const r=new FileReader();r.onload=function(e){const b=document.getElementById(btnId);b.innerHTML='<i class="fas fa-check"></i> 추가됨';b.classList.add('filled');images[type]=e.target.result.split(',')[1];imageUrls[type]=e.target.result;};r.readAsDataURL(input.files[0]);}}
 function toggleAnalyzeBtn(){const b=document.getElementById('analyze-btn');if(document.getElementById('legal-agree').checked){b.classList.add('active');b.disabled=false;}else{b.classList.remove('active');b.disabled=true;}}
 function savePdf(){
-    const dong=document.getElementById('dong').value||'000';const ho=document.getElementById('ho').value||'0000';
+    const _ad=(document.getElementById('wx-addr').value||'').trim();const _m=_ad.match(/(\d+)\s*동\s*(\d+)\s*호/);const siteName=_m?`${_m[1]}동${_m[2]}호`:(_ad.replace(/\s+/g,'').slice(0,20)||'현장');
     const d=new Date();const dateStr=`${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
-    document.title=`${dong}동${ho}호${IS_WIN?'창호':''}소음검사_${dateStr}`;
+    document.title=`${siteName}${IS_WIN?'창호':''}소음검사_${dateStr}`;
 
     // 인쇄 전: 입력 폼 숨기고 결과만 표시
     const mc=document.querySelector('.mobile-container');
@@ -871,10 +844,9 @@ async function startAnalysis(){
     const resultArea=document.getElementById('result-area');const loading=document.getElementById('loading-spinner');
     const content=document.getElementById('analysis-content');const chartSection=document.getElementById('chart-section');
     const summaryBox=document.getElementById('report-summary-box');
-    const dong=document.getElementById('dong').value;const ho=document.getElementById('ho').value;
+    const siteAddr=(document.getElementById('wx-addr').value||'').trim();
     const selectedNoiseTypes=IS_WIN?['창호(Window)']:getSelectedNoiseTypes();
     if(selectedNoiseTypes.length===0){alert("소음 발생 부위를 최소 하나 선택해주세요.");return;}
-    const winType=IS_WIN?((document.getElementById('location').value||'').trim()||'미입력'):'';   // v15.5: 창 종류 칸 삭제 → 장소 칸(예: 거실 시스템창)으로
     const winParts=IS_WIN?Array.from(document.querySelectorAll('.win-part:checked')).map(c=>c.value):[];
     const selectedPatterns=getSelectedPatterns();
 
@@ -922,9 +894,9 @@ async function startAnalysis(){
     // 요약 박스
     summaryBox.innerHTML=`
         <div class="report-summary-item"><span class="report-summary-label">진단 일자</span><span class="report-summary-value">${dateInput}</span></div>
-        <div class="report-summary-item"><span class="report-summary-label">현장 위치</span><span class="report-summary-value">${(()=>{const a=(document.getElementById('wx-addr').value||'').trim();return a?saEsc(a)+' ':'';})()}${dong}동 ${ho}호</span></div>
+        <div class="report-summary-item"><span class="report-summary-label">현장 위치</span><span class="report-summary-value">${siteAddr?saEsc(siteAddr):'미입력'}</span></div>
         <div class="report-summary-item"><span class="report-summary-label">중점 분석 대상</span><span class="report-summary-value" style="color:var(--primary-main);">${selectedNoiseTypes.join(', ')}</span></div>
-        ${IS_WIN?`<div class="report-summary-item"><span class="report-summary-label">장소·창 종류</span><span class="report-summary-value">${saEsc(winType)}</span></div><div class="report-summary-item"><span class="report-summary-label">의심 부위</span><span class="report-summary-value">${winParts.length?saEsc(winParts.join(', ')):'미선택'}</span></div>`:''}
+        ${IS_WIN?`<div class="report-summary-item"><span class="report-summary-label">의심 부위</span><span class="report-summary-value">${winParts.length?saEsc(winParts.join(', ')):'미선택'}</span></div>`:''}
         ${selectedPatterns.length>0?`<div class="report-summary-item"><span class="report-summary-label">소음 패턴</span><span class="report-summary-value" style="color:#2563eb;">${selectedPatterns.map(p=>p.split('(')[0]).join(', ')}</span></div>`:''}
         ${noiseTime?`<div class="report-summary-item"><span class="report-summary-label">발생 시간대</span><span class="report-summary-value">${noiseTime}</span></div>`:''}
         ${floorInfo?`<div class="report-summary-item"><span class="report-summary-label">건물 위치</span><span class="report-summary-value">${floorInfo}</span></div>`:''}
@@ -1045,7 +1017,7 @@ CHART_DATA_END
 ${referenceString}
 \`\`\`
 ### 2. 창 정보
-- 장소·창 종류(현장 입력 그대로): ${winType}
+- 장소·창 종류: 아래 '현장 메모'에 적힌 내용을 따릅니다(예: 거실 시스템창).
 - 의심 부위: ${winParts.length?winParts.join(', '):'미선택'}
 ### 3. 환경·측정
 ${envInfo}${dbInfo}${patternInfo}
@@ -1587,7 +1559,7 @@ function saPanelHTML(R,specUrl,forReport){
     const ft=saFieldTests(),v=saVerdict(R,ft),cam=saCamRec(R);
     let h='<div class="sa-verdict" style="border-color:'+v.s[1]+'"><div class="t" style="color:'+v.s[1]+'">'+v.t+'</div><span class="s" style="background:'+v.s[1]+'">'+v.s[0]+'</span><div>'+v.d+'</div></div>';
     h+='<div class="sa-h">소리 높이 지도 (스펙트로그램)</div><img class="sa-spec-img" src="'+specUrl+'" alt="스펙트로그램">';
-    h+='<div class="sa-note">가로=시간, 세로=소리 높이(Hz). 밝을수록 평소보다 크게 솟은 소리입니다. 가는 가로 줄이 휘파람 소리이고, 세로로 번쩍이는 띠는 손잡이 소리·딸깍 같은 순간 잡음입니다.</div>';
+    h+='<div class="sa-note">가로=시간 · 세로=소리 높이 · 가는 가로줄=휘파람</div>';
     if(R.wl.length){
         h+='<div class="sa-h">검출된 휘파람 줄</div><table class="sa-tbl"><tr><th>번호</th><th>높이 범위</th><th>모양</th><th>나온 시간</th></tr>';
         R.wl.forEach((l,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+hzLab(l.fLo)+' ~ '+hzLab(l.fHi)+'</td><td>'+(l.glide>=0.08?'바람 따라 오르내림':'거의 일정')+'</td><td>'+l.dur.toFixed(1)+'초 ('+l.cov.toFixed(0)+'%)</td></tr>';});
@@ -1613,7 +1585,7 @@ function saPanelHTML(R,specUrl,forReport){
     if(ft.smoke)fl.push('감압+연기: <b>'+saEsc(ft.smoke)+'</b>'+(ft.smokePos?' — '+saEsc(ft.smokePos):''));
     if(ft.camLo||ft.camHi||ft.camPos)fl.push('초음파카메라'+(ft.camLo||ft.camHi?' ('+saEsc(ft.camLo)+'~'+saEsc(ft.camHi)+'kHz)':'')+(ft.camPos?': <b>'+saEsc(ft.camPos)+'</b>':''));
     if(fl.length)h+='<div class="sa-h">현장 확인 결과</div><div>'+fl.join('<br>')+'</div>';
-    h+='<div class="sa-note" style="margin-top:6px">※ 폰 마이크는 하나라서 소리가 나는 <b>위치</b>는 이 분석으로 알 수 없습니다. 위치는 초음파카메라와 연기 확인으로 정합니다. 폰 녹음은 자동 음량 조절 때문에 dB 크기는 참고만 하고, 소리 높이(Hz)는 믿을 수 있습니다.</div>';
+    h+='<div class="sa-note" style="margin-top:6px">※ 위치는 이 분석으로 알 수 없습니다(초음파카메라·연기로 확인).</div>';
     if(forReport)h='<div class="section-title" style="margin-top:15px;font-size:0.9rem;"><i class="fas fa-wave-square"></i> 소리 주파수 분석 (앱 직접 계산)</div><div class="sa-panel">'+(SA.fileName?'<div class="sa-note">파일: '+saEsc(SA.fileName)+'</div>':'')+h+'</div>';
     return h;
 }
@@ -1837,9 +1809,9 @@ function camModeChanged(){
     const c=camMode();
     document.getElementById('cam-gen-wrap').style.display=(c.mode==='gen'||c.mode==='both')?'block':'none';
     const note=document.getElementById('cam-mode-note');
-    note.innerHTML=c.mode==='direct'?'점 = <b>실제로 소리가 나는 자리</b>입니다. 카메라 범위는 아래 주파수 분석의 추천값(휘파람 대역)에 맞추십시오. 점이 없어도 바람이 약했을 수 있어 <b>틈이 없다는 뜻은 아닙니다</b>.'
-        :c.mode==='gen'?'점 = <b>발생기 소리가 새어 나온 틈</b>(바람길 후보)입니다. 휘파람이 나는 자리와는 다를 수 있습니다. 카메라 범위는 <b>발생기 주파수</b>에 맞추고, 카메라는 발생기 반대쪽에서 찍습니다.'
-        :c.mode==='both'?'사진 1(직접) = 소리 나는 자리, 사진 2(발생기) = 새는 틈입니다. 두 점이 같은 자리면 원인이 거의 확정됩니다.':'';
+    note.innerHTML=c.mode==='direct'?'점 = <b>소리 나는 자리</b> · 점이 없어도 틈이 없다는 뜻은 아님'
+        :c.mode==='gen'?'점 = <b>발생기 소리가 새는 틈</b> · 카메라는 발생기 주파수에 맞춤'
+        :c.mode==='both'?'사진 1 = 소리 나는 자리 · 사진 2 = 새는 틈':'';
     const set=(id,t)=>{const b=document.getElementById(id);const sp=b&&b.querySelector('.upload-text-main');if(sp)sp.textContent=t;};
     const k1=camKindOf(1),k2=camKindOf(2),nm=k=>k==='direct'?' (직접)':k==='gen'?' (발생기)':'';
     set('box-acoustic','음향 진단 1'+nm(k1));set('box-acoustic-2','음향 진단 2'+nm(k2));
@@ -1911,7 +1883,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v15.5-20261118a';
+const BUILD_ID='v15.6-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
