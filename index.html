@@ -573,7 +573,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v16.1';
+const APP_VERSION = 'v16.2';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -1661,6 +1661,38 @@ function saVerdict(R,ft){
     return {t,s,d};
 }
 
+// ★ v16.2 '정수배 사다리' 그림 — 휘파람 줄(막대, 길이=난 시간)을 가장 낮은 줄의 ×1·×2·×3… 점선 위에 올려
+//   사다리에 맞으면(4% 이내) 같은 자리의 배음일 수 있음(파랑), 벗어나면 다른 자리(빨강 점선) — R.harm 판정과 같은 규칙
+function saLadderHTML(R){
+    const wl=R.wl;if(!wl||wl.length<2)return '';
+    const f0=wl[0].fMed;
+    const onL=(l,i)=>{if(i===0)return true;const r=l.fMed/f0,n=Math.round(r);return n>=2&&Math.abs(r-n)/r<=0.04;};
+    const fLo=Math.floor(Math.min(...wl.map(l=>l.fLo))/1000)*1000, fHi=Math.ceil(Math.max(...wl.map(l=>l.fHi))/1000)*1000;
+    const W=360,x0=44,x1=238,y0=14,y1=214,H=246;
+    const y=f=>y1-(f-fLo)/(fHi-fLo)*(y1-y0);
+    const dMax=Math.max(...wl.map(l=>l.dur));
+    let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="휘파람 줄과 정수배 사다리" style="display:block;margin:6px 0;background:#fff;border-radius:12px;font-family:inherit">';
+    s+='<line x1="'+x0+'" y1="'+y0+'" x2="'+x0+'" y2="'+y1+'" stroke="#cbd5e1" stroke-width="1"/><line x1="'+x0+'" y1="'+y1+'" x2="'+x1+'" y2="'+y1+'" stroke="#cbd5e1" stroke-width="1"/>';
+    for(let f=fLo;f<=fHi;f+=1000){const yy=y(f);s+='<text x="'+(x0-5)+'" y="'+(yy+3.5)+'" font-size="10" fill="#64748b" text-anchor="end">'+(f/1000)+'k</text>';}
+    for(let n=1;f0*n<=fHi+1;n++){const f=f0*n,yy=y(f);if(f<fLo)continue;
+        s+='<line x1="'+x0+'" y1="'+yy.toFixed(1)+'" x2="'+x1+'" y2="'+yy.toFixed(1)+'" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4 3"/>';
+        s+='<text x="'+(x1+5)+'" y="'+(yy+3.5).toFixed(1)+'" font-size="10" fill="#64748b">'+(n===1?hzLab(f)+' 기준':'×'+n+' = '+hzLab(f))+'</text>';}
+    wl.forEach((l,i)=>{const on=onL(l,i);let top=y(l.fHi),bot=y(l.fLo);if(bot-top<6){const c=(top+bot)/2;top=c-3;bot=c+3;}
+        const w=Math.max(6,(l.dur/dMax)*(x1-x0-8));
+        s+='<rect x="'+(x0+1)+'" y="'+top.toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+(bot-top).toFixed(1)+'" rx="3" fill="'+(on?'#dbeafe':'#fee2e2')+'" stroke="'+(on?'#2563eb':'#dc2626')+'" stroke-width="1"'+(on?'':' stroke-dasharray="3 2"')+'/>';});
+    s+='<text x="'+((x0+x1)/2)+'" y="'+(y1+16)+'" font-size="10" fill="#64748b" text-anchor="middle">막대 길이 = 그 줄이 난 시간</text></svg>';
+    const nOff=wl.filter((l,i)=>!onL(l,i)).length;
+    const top2=wl.map((l,i)=>({l,i})).sort((a,b)=>b.l.dur-a.l.dur).slice(0,2);
+    const topOff=top2.filter(o=>!onL(o.l,o.i));
+    let h='<div class="sa-h">정수배 사다리 (소리 나는 자리가 몇 곳인지)</div>'+s;
+    h+='<div class="sa-note" style="line-height:1.6"><span style="display:inline-block;width:10px;height:10px;border:1px solid #2563eb;background:#dbeafe;border-radius:2px;vertical-align:-1px"></span> 사다리에 맞음 = 한 자리의 배음일 수 있음 &nbsp; <span style="display:inline-block;width:10px;height:10px;border:1px dashed #dc2626;background:#fee2e2;border-radius:2px;vertical-align:-1px"></span> 벗어남 = 다른 자리</div>';
+    h+='<div class="sa-note" style="line-height:1.6">점선은 가장 낮은 줄('+hzLab(f0)+')의 2배·3배… 높이입니다. 한 틈에서 나는 휘파람은 이 칸에 맞춰 함께 울립니다. '+
+        (nOff?'칸에서 벗어난 줄이 <b>'+nOff+'개</b> 있어 다른 자리에서도 소리가 날 가능성이 있습니다.':'모든 줄이 칸에 맞아 한 자리에서 나는 소리일 가능성이 있습니다.')+
+        (topOff.length===2?' 가장 오래 난 두 줄('+topOff.map(o=>hzLab(o.l.fMed)).join(', ')+')이 모두 칸을 벗어나, 주된 소리는 '+hzLab(f0)+' 줄과 다른 자리일 가능성이 큽니다.':'')+
+        ' 확정은 초음파카메라로 합니다.</div>';
+    return h;
+}
+
 function saPanelHTML(R,specUrl,forReport){
     const ft=saFieldTests(),v=saVerdict(R,ft),cam=saCamRec(R);
     let h='<div class="sa-verdict" style="border-color:'+v.s[1]+'"><div class="t" style="color:'+v.s[1]+'">'+v.t+'</div><span class="s" style="background:'+v.s[1]+'">'+v.s[0]+'</span><div>'+v.d+'</div></div>';
@@ -1671,6 +1703,7 @@ function saPanelHTML(R,specUrl,forReport){
         R.wl.forEach((l,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+hzLab(l.fLo)+' ~ '+hzLab(l.fHi)+'</td><td>'+(l.glide>=0.08?'바람 따라 오르내림':'거의 일정')+'</td><td>'+l.dur.toFixed(1)+'초 ('+l.cov.toFixed(0)+'%)</td></tr>';});
         h+='</table>';
         if(R.harm)h+='<div class="sa-note">'+(R.harm.non>0?'서로 정수배가 아닌 줄이 '+R.harm.non+'개 있어 소리 나는 자리가 여러 곳일 가능성이 있습니다.':'모든 줄이 가장 낮은 줄의 정수배여서 한 자리의 배음일 가능성이 있습니다.')+'</div>';
+        h+=saLadderHTML(R);
     }
     h+='<div class="sa-h">귀에 들리는 소리 비중 (A가중)</div>';
     CAUSE_GROUPS.forEach((g,i)=>{const p=R.shares[i];h+='<div class="sa-bar"><span class="n">'+g.nm+'</span><span class="b"><i style="width:'+Math.max(2,p).toFixed(0)+'%"></i></span><span class="p">'+p.toFixed(0)+'%</span></div>';});
@@ -1988,7 +2021,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v16.1-20261118a';
+const BUILD_ID='v16.2-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
