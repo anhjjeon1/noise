@@ -432,6 +432,7 @@
                     <option class="win-opt" value="쉬이/쏴(틈 바람소리,고주파1~4kHz)">쉬이 / 쏴</option>
                     <option value="틱틱/딱딱(열팽창Stick-slip)">틱틱 / 딱딱</option>
                     <option value="덜컹/파닥(기밀불량,역풍)">덜컹 / 파닥</option>
+                    <option value="챙/딸깍(금속 부딪힘·울림)">챙 / 딸깍 (금속)</option>
                     <option class="gen-opt" value="졸졸/쏴아(유체이동음)">졸졸 / 쏴아</option>
                     <option class="gen-opt" value="지잉/찌잉(전기노이즈)">지잉 / 찌잉</option>
                     <option class="gen-opt" value="진동/떨림(고체전달음,구조체공진)">진동 / 떨림</option>
@@ -573,7 +574,7 @@ google.charts.load("current",{packages:["corechart"]});
 
 // ★ v14.0: GAS 프록시 전환 — Gemini 키는 서버에만 보관 (클라이언트 노출 0)
 // GAS 프로젝트 "청개구리-소음진단-Backend" v1.0
-const APP_VERSION = 'v16.3';
+const APP_VERSION = 'v16.4';
 const IS_WIN = new URLSearchParams(location.search).get('mode') === 'window';   // v15.1: 창호 진단 주소
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyOuFwkvWnQw8I5Pi4NbgPibm_n57LukQZKfkGZKm7MWS6JQZGd_UGenaeEJGQgktX7/exec";
 let ADMIN_TOKEN = localStorage.getItem('noise_admin_token') || '';
@@ -1150,6 +1151,7 @@ ${envInfo}${dbInfo}${patternInfo}
 7. 배수 챔버(②)는 창 열기 결과가 "변화 없음"이고 감압 연기에서 빨려 드는 자리가 없을 때만 "의심"으로 씁니다. 휘파람 줄의 높이가 일정하다는 것만으로 배수 챔버·공명 구조와 연결하지 않습니다(높이가 일정한 줄은 틈 소리·기기 소리·구조물 소리 모두에서 나올 수 있습니다).
 8. 바람 따라 높이가 오르내린다는 것은 "바람이 만드는 소리"라는 뜻일 뿐, 실내 틈과 창 밖 구조물을 가르는 근거가 아닙니다.
 9. 앱이 준 "정수배 사다리" 결론(사다리를 벗어난 줄 개수, 가장 오래 난 줄들이 기준 줄과 다른 자리일 가능성)이 있으면 2번과 4번 섹션에 그대로 인용합니다.
+10. 앱이 "금속 부딪힘·울림 가능성 큼"을 주면, 주된 소리를 휘파람이 아니라 **바람에 들썩이는 금속 부재의 부딪힘·울림**으로 다룹니다. 금속 울림과 같은 높이의 휘파람 줄은 울림으로 봅니다. 후보 부재(창 밖 금속 마감판·캐노피 금속·창호 바깥 덮개·캡)를 들되 위치는 단정하지 않고, 확인 방법으로 "소리 날 때 눌러 보기·테이프 임시 고정", "두드려 녹음해 울림 높이 비교"를 6번 섹션 맨 앞에 넣습니다. 금속 충격음은 창을 열어도 계속 날 수 있다고 적습니다. 유리·가스켓 기밀 문제를 주된 원인으로 쓰지 않습니다.
 
 ##[보고서 출력 형식]
 ### 1. 📋 진단 개요
@@ -1593,7 +1595,8 @@ async function saAnalyze(x,sr){
     const lsd=Math.sqrt(lowGood.reduce((a,b)=>a+(b-lm)*(b-lm),0)/Math.max(1,lowGood.length));
     const windMic=(eLow/Math.max(1e-15,eAll))>0.6&&lsd>3;
     const wf=new Set();wl.forEach(l=>l.pts.forEach(p=>wf.add(p.t)));const whistleFrac=wf.size/Math.max(1,nGood);
-    return {whistleFrac,sr,N,df,dt,T,K,D,med,bad,nBad:T-nGood,wl,harm,bands,shares,tonal,windMic,lowShare:eLow/Math.max(1e-15,eAll)*100,lowSd:lsd};
+    let imp=null;try{imp=saImpacts(x,sr);}catch(e){console.warn('[금속 검출]',e);}
+    return {imp,whistleFrac,sr,N,df,dt,T,K,D,med,bad,nBad:T-nGood,wl,harm,bands,shares,tonal,windMic,lowShare:eLow/Math.max(1e-15,eAll)*100,lowSd:lsd};
 }
 
 // ---- 스펙트로그램 그림 (평소 크기 대비 솟은 정도, 0.5~8kHz) ----
@@ -1635,8 +1638,106 @@ function saCamRec(R){
     const hi=Math.ceil(Math.max(...inR.map(l=>l.fHi))*1.25/500)*0.5;
     return {lo,hi,below};
 }
+// ================================================================
+// ★ v16.4 금속 부딪힘·울림 검출 (대부도 사례: 돌풍 때 묶음 충격 + 매번 같은 높이 7.7·6.0·9.0kHz 울림)
+//   ① 2~10kHz 대역 5ms 크기에서 평소보다 12dB 이상 솟는 순간 = 충격음
+//   ② 모든 충격의 직후 15~70ms 평균 스펙트럼에서 평소보다 10dB·이웃보다 6dB 이상 솟은 높이 = 울림 높이
+//   ③ 충격마다 가장 강한 울림 높이(좁은 대역)가 평소보다 6dB 넘게 40ms 이상 이어지면 = 울림이 남는 충격(금속),
+//      아니면 짧은 딸깍(휴대폰 잡는 소리 등) — 넓은 대역 크기로 재면 바람 휘파람에 묻혀 울림을 놓침(대부도 시험에서 확인)
+//   ④ 울림 충격 3회 이상 + 울림 높이 있음 = 금속 부딪힘·울림 의심
+// ================================================================
+function saBiquad(y,type,f0,Q,sr){
+    const w0=2*Math.PI*f0/sr,al=Math.sin(w0)/(2*Q),c=Math.cos(w0),a0=1+al;
+    const b=type==='hp'?[(1+c)/2,-(1+c),(1+c)/2]:type==='bp'?[al,0,-al]:[(1-c)/2,1-c,(1-c)/2];
+    const B0=b[0]/a0,B1=b[1]/a0,B2=b[2]/a0,A1=-2*c/a0,A2=(1-al)/a0;
+    const o=new Float32Array(y.length);let x1=0,x2=0,y1=0,y2=0;
+    for(let i=0;i<y.length;i++){const v=B0*y[i]+B1*x1+B2*x2-A1*y1-A2*y2;x2=x1;x1=y[i];y2=y1;y1=v;o[i]=v;}
+    return o;
+}
+function saSpecDb(x,i0,n,NF,sr){
+    const re=new Float32Array(NF),im=new Float32Array(NF);
+    for(let k=0;k<n&&i0+k<x.length;k++)re[k]=x[i0+k]*(0.5-0.5*Math.cos(2*Math.PI*k/(n-1)));
+    saFFT(re,im);const P=new Float64Array(NF/2);for(let k=0;k<NF/2;k++)P[k]=re[k]*re[k]+im[k]*im[k];return P;
+}
+function saImpacts(x,sr){
+    let y=saBiquad(x,'hp',2000,0.707,sr);y=saBiquad(y,'hp',2000,0.707,sr);y=saBiquad(y,'lp',10000,0.707,sr);y=saBiquad(y,'lp',10000,0.707,sr);
+    const blk=Math.round(0.005*sr),nb=Math.floor(y.length/blk);if(nb<200)return null;
+    const e=new Float32Array(nb);for(let b=0;b<nb;b++){let s=0;for(let i=b*blk;i<(b+1)*blk;i++)s+=y[i]*y[i];e[b]=10*Math.log10(s/blk+1e-18);}
+    // 평소 크기 = 앞뒤 0.5초 중앙값 (10블록마다 계산)
+    const base=new Float32Array(nb);const W=100;
+    for(let b=0;b<nb;b+=10){const lo=Math.max(0,b-W),hi=Math.min(nb,b+W+1);const arr=Array.from(e.subarray(lo,hi)).sort((p,q)=>p-q);const m=arr[arr.length>>1];for(let k=b;k<Math.min(nb,b+10);k++)base[k]=m;}
+    const start=Math.ceil(0.1/0.005),hits=[];let last=-1e9;
+    for(let b=start;b<nb-1;b++){const r=e[b]-base[b];if(r<12)continue;let isMax=true;for(let k=Math.max(0,b-4);k<=Math.min(nb-1,b+4);k++)if(e[k]>e[b]){isMax=false;break;}
+        if(isMax&&b-last>=8){hits.push({b,t:b*0.005,rise:r});last=b;}}
+    if(!hits.length)return {hits:[],ring:[],dry:[],bursts:[],ringFreqs:[],consistency:0,metal:false};
+    const bursts=[];hits.forEach(h=>{const g=bursts[bursts.length-1];if(g&&h.t-g[g.length-1].t<0.6)g.push(h);else bursts.push([h]);});
+    hits.forEach(h=>{h.i=h.b*blk;h.ringMs=0;});
+    // 울림 높이: 모든 충격의 직후 15~70ms(충격 자체는 건너뜀) 평균 스펙트럼에서 평소보다 10dB·이웃보다 6dB 이상 솟은 높이
+    const NF=4096,n=Math.round(0.055*sr),off=Math.round(0.008*sr),fdf=sr/NF,kLo=Math.round(1000/fdf),kHi=Math.min(NF/2-30,Math.round(11000/fdf));
+    let ringFreqs=[],consistency=0;
+    if(hits.length>=2){
+        // 큰 딸깍 몇 개가 평균을 덮지 않도록 dB로 평균, 다음 충격과 겹치는 창은 뺌 (acc는 '거듭제곱 값'으로 되돌려 아래 코드와 맞춤)
+        const accDb=new Float64Array(NF/2),per=[];let nu=0;
+        hits.forEach((h,ix)=>{const nx=hits[ix+1];if(nx&&nx.t-h.t<0.08)return;const P=saSpecDb(x,h.i+off,n,NF,sr);per.push(P);nu++;for(let k=0;k<NF/2;k++)accDb[k]+=10*Math.log10(P[k]+1e-20);});
+        const acc=new Float64Array(NF/2);for(let k=0;k<NF/2;k++)acc[k]=Math.pow(10,accDb[k]/Math.max(1,nu)/10);
+        // 평소: 충격에서 0.3초 이상 떨어진 고른 30곳
+        const calm=new Float64Array(NF/2);let nc=0;const far=t=>hits.every(h=>Math.abs(h.t-t)>0.3);
+        for(let q=0;q<60&&nc<30;q++){const t=0.2+q*(x.length/sr-0.4)/60;if(!far(t))continue;const P=saSpecDb(x,Math.round(t*sr),n,NF,sr);for(let k=0;k<NF/2;k++)calm[k]+=10*Math.log10(P[k]+1e-20);nc++;}
+        if(nc){for(let k=0;k<NF/2;k++)calm[k]=Math.pow(10,calm[k]/nc/10);}
+        const dB=a=>10*Math.log10(a+1e-20);const cand=[];
+        for(let k=kLo;k<=kHi;k++){const v=dB(acc[k]);if(v<dB(acc[k-1])||v<dB(acc[k+1])||v<dB(acc[k-2])||v<dB(acc[k+2]))continue;
+            let s=0,c=0;for(let j=k-25;j<=k+25;j++){if(Math.abs(j-k)<5)continue;s+=dB(acc[j]);c++;}const prom=v-s/c,over=nc?v-dB(calm[k]):99;
+            if(prom>=4&&over>=8)cand.push({f:k*fdf,prom,over});}
+        cand.sort((p,q)=>q.over-p.over);   // 평소보다 가장 많이 솟은 높이부터 (대부도: 7.8k·5.8k가 20dB 이상)
+        for(const c of cand){if(ringFreqs.every(f=>Math.abs(f-c.f)>500))ringFreqs.push(c.f);if(ringFreqs.length>=3)break;}
+        // 충격마다 울림 길이: 가장 강한 울림 높이(좁은 대역) 크기가 평소(전체 중앙값)보다 6dB 넘게 이어지는 시간
+        if(ringFreqs.length){const f1=ringFreqs[0];let z=saBiquad(x,'bp',f1,12,sr);z=saBiquad(z,'bp',f1,12,sr);
+            const ez=new Float32Array(nb);for(let b=0;b<nb;b++){let s=0;for(let i=b*blk;i<(b+1)*blk;i++)s+=z[i]*z[i];ez[b]=10*Math.log10(s/blk+1e-18);}
+            // 기준 = 그 충격 앞 0.6~0.1초 사이 같은 높이의 평소 크기(중앙값) — 같은 높이의 바람 휘파람이 이어질 때 헛 울림 방지
+            hits.forEach(h=>{const a0=Math.max(0,h.b-120),a1=Math.max(a0+1,h.b-20);const arr=Array.from(ez.subarray(a0,a1)).sort((p,q)=>p-q);const zloc=arr[arr.length>>1];
+                let k=h.b+2,gap=0,cnt=0;while(k<nb&&cnt<60){if(ez[k]-zloc>=6){cnt++;gap=0;}else{gap++;if(gap>1)break;cnt++;}k++;}h.ringMs=Math.max(0,cnt-gap)*5;});}
+    }
+    const ring=hits.filter(h=>h.ringMs>=40),dry=hits.filter(h=>h.ringMs<40);
+    consistency=hits.length?ring.length/hits.length:0;
+    const metal=ring.length>=3&&ringFreqs.length>=1;
+    const rm=ring.map(h=>h.ringMs).sort((p,q)=>p-q);
+    return {hits:hits.map(h=>({t:h.t,ringMs:h.ringMs})),ring:ring.map(h=>({t:h.t,ringMs:h.ringMs})),dry:dry.map(h=>({t:h.t,ringMs:h.ringMs})),
+        bursts:bursts.map(g=>({t0:g[0].t,t1:g[g.length-1].t,n:g.length,nRing:g.filter(h=>h.ringMs>=40).length})),
+        ringFreqs,consistency,medRingMs:rm.length?rm[rm.length>>1]:0,metal};
+}
+function saImpactHTML(R){
+    const I=R.imp;if(!I||!I.hits.length)return '';
+    const dur=R.dur||((R.T||0)*(R.dt||0))||Math.max(...I.hits.map(h=>h.t))+1;
+    const W=360,H=70,x0=8,x1=352;const X=t=>x0+(t/dur)*(x1-x0);
+    let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%" role="img" aria-label="충격음 시간표" style="display:block;margin:6px 0;background:#fff;border-radius:12px">';
+    s+='<line x1="'+x0+'" y1="44" x2="'+x1+'" y2="44" stroke="#cbd5e1" stroke-width="1"/>';
+    for(let t=0;t<=dur;t+=dur>90?20:10){s+='<text x="'+X(t).toFixed(1)+'" y="60" font-size="9" fill="#64748b" text-anchor="middle">'+t+'초</text>';}
+    I.dry.forEach(h=>{s+='<rect x="'+(X(h.t)-1.5).toFixed(1)+'" y="30" width="3" height="14" fill="#94a3b8"/>';});
+    I.ring.forEach(h=>{const hh=Math.min(36,8+h.ringMs/10);s+='<rect x="'+(X(h.t)-2).toFixed(1)+'" y="'+(44-hh).toFixed(1)+'" width="4" height="'+hh.toFixed(1)+'" rx="1" fill="#dc2626"/>';});
+    s+='</svg>';
+    let h='<div class="sa-h">금속 부딪힘·울림 (순간 충격음)</div>'+s;
+    h+='<div class="sa-note"><span style="color:#dc2626;font-weight:800">■</span> 울림이 남는 충격음(막대 높이=울림 길이) &nbsp; <span style="color:#94a3b8;font-weight:800">■</span> 울림 없는 짧은 딸깍(휴대폰 잡는 소리일 수 있어 판단에서 뺌)</div>';
+    h+='<table class="sa-tbl"><tr><th>항목</th><th>값</th></tr>'+
+       '<tr><td>순간 충격음</td><td>'+I.hits.length+'회 (울림 남음 '+I.ring.length+'회 · 짧은 딸깍 '+I.dry.length+'회)</td></tr>'+
+       '<tr><td>묶음(0.6초 안에 이어짐)</td><td>'+I.bursts.filter(b=>b.nRing).map(b=>b.t0.toFixed(1)+'초 '+b.nRing+'회').join(', ')+'</td></tr>'+
+       (I.ring.length?'<tr><td>울림 길이 (중앙값)</td><td>'+(I.medRingMs/1000).toFixed(2)+'초</td></tr>':'')+
+       (I.ringFreqs.length?'<tr><td>매번 울리는 높이</td><td>'+I.ringFreqs.map(hzLab).join(' · ')+' (전체 충격의 '+Math.round(I.consistency*100)+'%가 이 높이로 울림)</td></tr>':'')+'</table>';
+    h+='<div class="sa-note" style="line-height:1.6">'+(I.metal?'충격 뒤에 울림이 남고 매번 같은 높이로 울려, <b>같은 금속 부재가 바람에 들썩이며 반복해서 부딪히고 울리는 소리</b>일 가능성이 큽니다. 확인: 소리 날 때 후보 금속 부재(창 밖 마감판·캐노피 금속·창호 바깥 덮개·캡)를 손으로 누르거나 테이프로 임시 고정해 멈추는지 보고, 두드려 녹음해 울림 높이('+I.ringFreqs.map(hzLab).join('·')+')가 같은지 비교합니다.':'울림이 남는 충격이 적거나 울림 높이가 일정하지 않아 금속 부딪힘으로 판단하지 않았습니다.')+'</div>';
+    return h;
+}
+
 function saVerdict(R,ft){
     const BLUE='#2563eb',RED='#dc2626',NAVY='#1a233a';
+    if(R.imp&&R.imp.metal){
+        const I=R.imp,t='금속 부딪힘·울림 소리 검출 (울림 충격 '+I.ring.length+'회)';
+        let d='돌풍 때 순간 충격음이 묶음으로 나고, 충격 뒤 울림이 남으며 매번 같은 높이('+I.ringFreqs.map(hzLab).join('·')+')로 웁니다. <b>바람에 들썩이는 금속 부재가 반복해서 부딪히고 울리는 소리</b>일 가능성이 큽니다. ';
+        if(R.wl.length)d+='바람 소리 성분(가는 줄 '+R.wl.length+'개)도 함께 있습니다. ';
+        let s=['⚠️ 금속 부재 확인 필요',NAVY];
+        if(ft.open==='변화 없음'||ft.open==='더 커짐')d+='창을 열어도 소리가 이어져 창 틈보다 금속 부재 쪽을 우선 의심합니다. ';
+        else if(ft.open==='사라지거나 바뀜')d+='창을 열었을 때 소리가 바뀌었으므로 바람 소리 성분은 창 틈과 관련이 있을 수 있습니다. ';
+        d+='후보 금속 부재를 눌러 보거나 테이프로 임시 고정해 소리가 멈추는지 확인하십시오.';
+        return {t,s,d};
+    }
     const glide=R.wl.filter(l=>l.glide>=0.08), steady=R.wl.filter(l=>l.glide<0.08);
     const lowPk=R.windMic?[]:R.tonal.filter(p=>p.fc<=250), midPk=R.tonal.filter(p=>p.fc>=315&&p.fc<=4000);
     const hi=R.shares[2]+R.shares[3], lowmid=R.shares[0]+R.shares[1];
@@ -1714,11 +1815,13 @@ function saPanelHTML(R,specUrl,forReport){
     h+='<div class="sa-note">가로=시간 · 세로=소리 높이 · 가는 가로줄=휘파람</div>';
     if(R.wl.length){
         h+='<div class="sa-h">검출된 휘파람 줄</div><table class="sa-tbl"><tr><th>번호</th><th>높이 범위</th><th>모양</th><th>나온 시간</th></tr>';
-        R.wl.forEach((l,i)=>{h+='<tr><td>'+(i+1)+'</td><td>'+hzLab(l.fLo)+' ~ '+hzLab(l.fHi)+'</td><td>'+(l.glide>=0.08?'바람 따라 오르내림':'거의 일정')+'</td><td>'+l.dur.toFixed(1)+'초 ('+l.cov.toFixed(0)+'%)</td></tr>';});
+        const mf=(R.imp&&R.imp.metal)?R.imp.ringFreqs:[];
+        R.wl.forEach((l,i)=>{const isRing=mf.some(f=>Math.abs(l.fMed-f)/f<0.04);h+='<tr><td>'+(i+1)+'</td><td>'+hzLab(l.fLo)+' ~ '+hzLab(l.fHi)+'</td><td>'+(isRing?'<b style="color:#dc2626">금속 울림과 같은 높이</b>':(l.glide>=0.08?'바람 따라 오르내림':'거의 일정'))+'</td><td>'+l.dur.toFixed(1)+'초 ('+l.cov.toFixed(0)+'%)</td></tr>';});
         h+='</table>';
         if(R.harm)h+='<div class="sa-note">'+(R.harm.non>0?'서로 정수배가 아닌 줄이 '+R.harm.non+'개 있어 소리 나는 자리가 여러 곳일 가능성이 있습니다.':'모든 줄이 가장 낮은 줄의 정수배여서 한 자리의 배음일 가능성이 있습니다.')+'</div>';
         h+=saLadderHTML(R);
     }
+    h+=saImpactHTML(R);
     h+='<div class="sa-h">귀에 들리는 소리 비중 (A가중)</div>';
     CAUSE_GROUPS.forEach((g,i)=>{const p=R.shares[i];h+='<div class="sa-bar"><span class="n">'+g.nm+'</span><span class="b"><i style="width:'+Math.max(2,p).toFixed(0)+'%"></i></span><span class="p">'+p.toFixed(0)+'%</span></div>';});
     if(R.tonal.length)h+='<div class="sa-note">1/3옥타브에서 뾰족하게 솟은 대역: '+R.tonal.map(p=>hzLab(p.fc)+'(+'+p.prom+'dB)').join(', ')+'</div>';
@@ -1763,6 +1866,12 @@ function saSummaryText(){
         if(R.harm)s+='- 배음 관계: '+(R.harm.non>0?'정수배 아닌 줄 '+R.harm.non+'개 → 여러 자리 가능성':'모두 정수배 → 한 자리 배음 가능성')+'\n';
         const L=saLadderInfo(R);if(L)s+='- 정수배 사다리 결론(앱 계산): 기준 줄 '+Math.round(L.f0)+'Hz의 ×2·×3… 칸에서 벗어난 줄 '+L.offs.length+'개('+L.offs.map(f=>Math.round(f)+'Hz').join(', ')+')'+(L.topBothOff?'. 가장 오래 난 두 줄('+L.top.map(f=>Math.round(f)+'Hz').join(', ')+')이 모두 칸을 벗어나 주된 소리는 기준 줄과 다른 자리일 가능성이 큽니다':'')+'. 확정은 초음파카메라로 합니다.\n';}
     else s+='- 휘파람 줄: 검출 안 됨\n';
+    if(R.imp&&R.imp.hits.length){const I=R.imp;
+        s+='- 금속 부딪힘·울림 검출(앱 계산): 순간 충격음 '+I.hits.length+'회(울림 남음 '+I.ring.length+'회, 울림 없는 짧은 딸깍 '+I.dry.length+'회는 휴대폰 잡는 소리일 수 있어 제외)';
+        if(I.ring.length)s+=', 울림 길이 중앙값 '+(I.medRingMs/1000).toFixed(2)+'초';
+        if(I.ringFreqs.length)s+=', 매번 울리는 높이 '+I.ringFreqs.map(f=>Math.round(f)+'Hz').join('·')+'(전체 충격의 '+Math.round(I.consistency*100)+'%가 이 높이로 울림)';
+        s+=', 묶음 '+I.bursts.filter(b=>b.nRing).map(b=>b.t0.toFixed(1)+'초 '+b.nRing+'회').join(', ')+' → '+(I.metal?'금속 부재 부딪힘·울림 가능성 큼':'금속 부딪힘으로 판단하지 않음')+'\n';
+        if(I.metal&&R.wl.length){const m=R.wl.filter(l=>I.ringFreqs.some(f=>Math.abs(l.fMed-f)/f<0.04));if(m.length)s+='- 휘파람 줄 중 금속 울림과 같은 높이: '+m.map(l=>Math.round(l.fMed)+'Hz').join(', ')+' (휘파람이 아니라 금속 울림으로 봄)\n';}}
     s+='- 귀에 들리는 소리 비중(A가중): '+CAUSE_GROUPS.map((g,i)=>g.nm+' '+R.shares[i].toFixed(0)+'%').join(', ')+'\n';
     if(R.tonal.length)s+='- 1/3옥타브 뾰족한 대역: '+R.tonal.map(p=>p.fc+'Hz(+'+p.prom+'dB)').join(', ')+'\n';
     if(R.windMic)s+='- 폰 마이크 바람 잡음 많음 → 낮은 음(250Hz 이하) 판정 제외\n';
@@ -2036,7 +2145,7 @@ function saRecCompare(){
 }
 
 // ---- 새 버전 자동 확인 (화면으로 돌아올 때) ----
-const BUILD_ID='v16.3-20261118a';
+const BUILD_ID='v16.4-20261118a';
 document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState!=='visible')return;
     try{const r=await fetch(location.pathname+'?_='+Date.now(),{cache:'no-store'});const t=await r.text();
